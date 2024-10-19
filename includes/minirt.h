@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2024/10/18 16:53:27 by aghergho         ###   ########.fr       */
+/*   Updated: 2024/10/19 15:34:39 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,38 +34,61 @@ typedef struct map
     int scen_elements[6];
 } t_map;
 
-typedef struct g_scene
+typedef struct sphere
 {
-    /*======= ambime properities =========*/
-    double     *ambient_ration;
-    double     ambient_color[3];
+    double          sphere_cordinates[3];
+    double          sphere_diameter;
+    double          sphere_color[3];
+    struct sphere   *next;
+}   t_sphere;
 
-    /*======= light properities =========*/
-    double     light_coordinate[3];
-    double     light_ration;
-    double     light_color[3];    
 
-    /*======= camera properities =========*/
-    double     camera_position[3];
-    double     camera_cordinates[3];
-    int        camera_fow;
-    
-    /*======= sphere properities =========*/
-    double     sphere_cordinates[3];
-    double     sphere_diameter;
-    double     sphere_color[3];
-
-    /*======= plan properities =========*/
+typedef struct plane
+{
     double     plane_cordinates[3];
     double     plane_normal[3];
     double     plane_color[3];
+    struct plane   *next;
+} t_plane;
 
-    /*======= cylinder properities =========*/
+typedef struct cylinder
+{
     double     cylinder_cordinates[3];
     double     cylinder_normal[3];
     double     cylinder_color[3];
     double     cylinder_diameter;
     double     cylinder_height;
+    struct cylinder   *next;
+} t_cylinder;
+
+typedef struct camera
+{
+    double     camera_position[3];
+    double     camera_cordinates[3];
+    int        camera_fow;
+} t_camera;
+
+typedef struct ambient
+{
+    double     *ambient_ration;
+    double     ambient_color[3];
+} t_ambient;
+
+typedef struct light
+{
+    double     light_coordinate[3];
+    double     light_ration;
+    double     light_color[3];
+} t_light;
+
+typedef struct g_scene
+{
+    t_camera    *camera;
+    t_ambient   *ambient;
+    t_light     *light;
+    t_sphere    *sphere;
+    t_plane     *plane;
+    t_cylinder  *cylinder;
 }   scene;
 
 map_line    *ft_gen_sen_map(char *file_name);
