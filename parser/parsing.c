@@ -6,12 +6,41 @@
 /*   By: aghergho <aghergho@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 20:24:10 by aghergho          #+#    #+#             */
-/*   Updated: 2024/10/18 16:55:52 by aghergho         ###   ########.fr       */
+/*   Updated: 2024/10/19 22:53:43 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 # include "../includes/minirt.h"
 #include   <string.h>
+
+int ft_is_whitespace(char c)
+{
+    return (c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\v');
+}
+
+double ft_atod(char *str)
+{
+    int result;
+    int i;
+
+    result = 0;
+    i = 0;
+    while (ft_is_whitespace(str[i]))
+    {
+        i++;
+    }
+    if (str[i] == '-')
+    {
+        i++;
+        result *= (-1);
+    }
+    while (str[i] && str[i] >= '0' && str[i] <= '9')
+    {
+        result = result * 10 + str[i];
+        i++;
+    }
+    return result;
+}
 
 void ft_free_line_components(char **components)
 {
@@ -39,11 +68,6 @@ void    ft_free_map(map_line **map_lines)
     }
     free(map_lines);
     map_lines = NULL;
-}
-
-int ft_is_whitespace(const char c)
-{
-    return (c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\v');
 }
 
 int ft_check_file_name(char *filename)
@@ -171,27 +195,232 @@ int	main(void)
 ===================================================================*/
 
 
-                                                                              {
-    
+int ft_count_components(char **components)
+{
+    int i;
+
+    i = 0;
+    while (components[i])
+        i++;
+    return i;
 }
 
-int ft_check_map_contents(t_map **map)
+int ft_check_range(char *component)
+{
+    int range;
+
+    range = ft_atod(component);
+    if (range < 0 || range > 1)
+        return 0;
+    return 1;
+}
+
+int ft_check_colors(char *component)
+{
+    char **colors;
+    int i;
+    int color;
+    
+    colors = split(component,",");
+    if (ft_count_components(colors) != 3)
+        return (ft_free_line_components(colors), 0);
+    if (!colors)
+        return 0;
+    i = -1;
+    while (colors[++i])
+    {
+        color = ft_atod(colors[i]);
+        if (color < 0 || color > 255)
+            return (ft_free_line_components(colors), 0);         
+    }
+    return (1);
+}
+
+int ft_check_coordinates(char *component)
+{
+    char **coordinates;
+    int i;
+    
+    coordinates = split(component,",");
+    if (ft_count_components(coordinates) != 3)
+        return ( ft_free_line_components(coordinates),0);
+    return ( ft_free_line_components(coordinates),1);
+}
+
+int ft_check_orientation(char *compoenent)
+{
+    char **oriontations;
+    int i;
+    int axes;
+    
+    i = -1;
+    oriontations = split(compoenent, ",");
+    if (ft_count_components(oriontations) != 3)
+            return (ft_free_line_components(oriontations), 0);
+    while (oriontations[++i])
+    {
+        axes = ft_atod(oriontations[i]);
+        if (axes < -1 || axes > 1)
+            return (ft_free_line_components(oriontations), 0);
+    }
+    return (1);
+}
+
+int ft_check_non_negative(char *component)
+{
+    int value;
+
+    value = ft_atod(component);
+    if (value < 0)
+        return 0;
+    return 1;
+}
+
+int ft_check_fov(char *component)
+{
+    int fov;
+
+    fov = ft_atod(component);
+    if (fov < 0 || fov > 180)
+        return 0;
+    return 1;
+}
+
+int ft_check_ambient_component(char **components, int **counter)
+{
+    if (ft_count_components(components) != 3)
+        return 0;
+    if (!ft_check_range(components[1]))
+        return (0);
+    if (!ft_check_colors(components[2]))
+        return (0);
+    (*counter)[0]++;
+    return (1);
+}
+
+int ft_check_camera_component(char **components, int **counter)
+{
+    if (ft_count_components(components) != 4)
+        return (0);
+    if (ft_check_coordinates(components[1]))
+        return (0);
+    if (!ft_check_orientation(components[2]))
+        return (0);
+    if (!ft_check_fov(components[3]))
+        return (0);
+    (*counter)[1]++;
+    return (1);
+}
+
+int ft_check_light_component(char **components, int **counter)
+{
+    if (ft_count_components(components) != 4)
+        return (0);
+    if (!ft_check_coordinates(components[1]))
+        return (0);
+    if (!ft_check_range(components[2]))
+        return (0);
+    if (!ft_check_colors(components[3]))
+        return (0);
+    (*counter)[2]++;
+    return (1);
+}
+
+int ft_check_sphere_component(char **components, int **counter)
+{
+    if (!ft_count_components(components) != 4)
+        return 0;
+    if (!ft_check_coordinates(components[1]))
+        return 0;
+    if (!ft_check_non_negative(components[2])) 
+        return 0;
+    if (!ft_check_colors(components[3]))
+        return 0;
+    return 1;
+}
+
+int ft_check_plane_component(char **components, int **counter)
+{
+    if (ft_count_components(components) != 4)
+        return 0;
+    if (!ft_check_coordinates(components[1]))
+        return 0;
+    if (!ft_check_orientation(components[2]))
+        return 0;
+    if (!ft_check_colors(components[3]))
+        return 0;
+    return 1;
+}
+
+int ft_check_cylinder_component(char **components, int **counter)
+{
+    if (ft_count_components(components) != 5)
+        return 0;
+    if (!ft_check_coordinates(components[1]))
+        return 0;
+    if (!ft_check_orientation(components[2]))
+        return 0;
+    if (ft_check_non_negative(components[3]) || ft_check_non_negative(components[4]))
+        return 0;
+    if (!ft_check_colors(components[4]))
+    return 0;
+
+}
+
+int ft_check_components(int identifier_id, char **components, int **counter)
+{
+    if (identifier_id == 1)
+        return (ft_check_ambient_component(components, counter));
+    if (identifier_id == 2)
+        return (ft_check_camera_component(components , counter));
+    if (identifier_id == 3)
+        return (ft_check_light_component(components , counter));
+    if (identifier_id == 4)
+        return (ft_check_sphere_component(components , counter));
+    if (identifier_id == 5)
+        return (ft_check_plane_component(components , counter));
+    if (identifier_id == 6)
+        return (ft_check_cylinder_component(components , counter));
+    return 1;
+}
+                                                                              
+int is_identifier(char *identifier)
+{
+    if (!ft_strcmp(identifier, "A"))
+        return 1;
+    if (!ft_strcmp(identifier, "C"))
+       return 2;
+    if (!ft_strcmp(identifier, "L"))
+        return 3;
+    if (!ft_strcmp(identifier, "pl"))
+        return 4;
+    if (!ft_strcmp(identifier, "sp"))
+        return 5;
+    if (!ft_strcmp(identifier, "cy"))
+        return 6;
+    return 0;
+}
+
+int ft_check_map_components(t_map **map)
 {
     map_line    *tmp;
     int         identifier_id;
 
     
-    tmp = *map;
+    tmp = (*map)->lines;
     while (tmp)
     {
         identifier_id = is_identifier(tmp->line_component[0]);
-        if (identifier_id == -1)
+        if (!identifier_id)
+        {
+            printf("identifier is not a valid identifier (%s)\n", tmp->line_component[0]);
             return (0);
-        if (!ft_check_components(identifier_id))
+        }
+        if (!ft_check_components(identifier_id, tmp->line_component, (*map)->scen_elements))
             return (0);
         tmp = tmp->next;
     }
-    
+    return (1);
 }
 
 

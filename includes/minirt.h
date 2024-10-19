@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2024/10/19 15:34:39 by aghergho         ###   ########.fr       */
+/*   Updated: 2024/10/19 17:24:29 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ typedef struct lines
 typedef struct map
 {
     map_line  *lines;
-    int scen_elements[6];
+    int scen_elements[3];
 } t_map;
 
 typedef struct sphere
@@ -93,5 +93,6 @@ typedef struct g_scene
 
 map_line    *ft_gen_sen_map(char *file_name);
 void        var_dump_lines(map_line *map);
+int ft_check_map_components(t_map **map);
 // int         ft_strlen(char *str);
 #endif
