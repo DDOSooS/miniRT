@@ -6,11 +6,12 @@
 /*   By: aghergho <aghergho@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 20:24:10 by aghergho          #+#    #+#             */
-/*   Updated: 2024/10/20 12:36:31 by aghergho         ###   ########.fr       */
+/*   Updated: 2024/10/20 16:18:07 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 # include "../includes/minirt.h"
+#include <string.h>
 
 int ft_is_whitespace(char c)
 {
@@ -23,7 +24,6 @@ double ft_atod(char *str)
     double fractional_part = 0.0;
     int i = 0;
     int sign = 1;
-    double decimal_divisor = 1.0;
     double divisor ;
 
     while (ft_is_whitespace(str[i]))
@@ -255,7 +255,6 @@ int ft_check_coordinates(char *component)
     char **coordinates;
     
     coordinates = split(component,",");
-    printf("--->coordinates %d\n",ft_count_components(coordinates));
     if (ft_count_components(coordinates) != 3)
         return ( ft_free_line_components(coordinates),0);
     return ( ft_free_line_components(coordinates),1);
@@ -300,54 +299,34 @@ int ft_check_fov(char *component)
     return 1;
 }
 
-int ft_check_ambient_component(char **components, int **counter)
+int ft_check_ambient_component(char **components, int *counter)
 {
     if (ft_count_components(components) != 3)
         return 0;
     if (!ft_check_range(components[1]))
-    {
-        printf("ft_check_range error: invalid\n");
         return (0);
-    }
     if (!ft_check_colors(components[2]))
-    {
-        printf("ft_check_colors error: invalid\n");
         return (0);
-    }
-    // (*counter)[0]++;
-    printf("ambient components are valid\n");
+    (counter)[0] += 1;
     return (1);
 }
 
-int ft_check_camera_component(char **components, int **counter)
+int ft_check_camera_component(char **components, int *counter)
 {
     if (ft_count_components(components) != 4)
-    {
-        printf("ft_check_camera_component error: invalid\n");
         return (0);
-    }
       
     if (!ft_check_coordinates(components[1]))
-    {
-        printf("ft_check_coordinates error: invalid\n");
         return (0);
-    }
     if (!ft_check_orientation(components[2]))
-    {
-        printf("ft_check_orientation error: invalid\n");   
         return (0);
-    }
     if (!ft_check_fov(components[3]))
-    {
-        printf("ft_check_fov error: invalid\n");
         return (0);
-    }
-    // (*counter)[1]++;
-    printf("camera components are valid\n");
+    (counter)[1]++;
     return (1);
 }
 
-int ft_check_light_component(char **components, int **counter)
+int ft_check_light_component(char **components, int *counter)
 {
     if (ft_count_components(components) != 4)
         return (0);
@@ -357,40 +336,26 @@ int ft_check_light_component(char **components, int **counter)
         return (0);
     if (!ft_check_colors(components[3]))
         return (0);
-    // (*counter)[2]++;
-    printf("light components are valid\n");
-
+    (counter)[2]++;
+    // printf("light components are valid\n");
     return (1);
 }
 
-int ft_check_sphere_component(char **components, int **counter)
+int ft_check_sphere_component(char **components, int *counter)
 {
     if (ft_count_components(components) != 4)
-    {
-        printf("ft_check_sphere_component error: invalid\n");
         return 0;
-    }
     if (!ft_check_coordinates(components[1]))
-    {
-        printf("Error in coordinates  \n");
         return 0;
-    }
     if (!ft_check_non_negative(components[2])) 
-    {
-        printf("Error in diametere  \n");
         return 0;
-    }
     if (!ft_check_colors(components[3]))
-    {
-        printf("Error in colors \n");
         return 0;
-    }
-    printf("sphere components are valid\n");
-
+    // printf("sphere components are valid\n");
     return 1;
 }
 
-int ft_check_plane_component(char **components, int **counter)
+int ft_check_plane_component(char **components, int *counter)
 {
     if (ft_count_components(components) != 4)
         return 0;
@@ -400,47 +365,28 @@ int ft_check_plane_component(char **components, int **counter)
         return 0;
     if (!ft_check_colors(components[3]))
         return 0;
-    printf("plane components are valid\n");
-
+    // printf("plane components are valid\n");
     return 1;
 }
 
-int ft_check_cylinder_component(char **components, int **counter)
+int ft_check_cylinder_component(char **components, int *counter)
 {
     if (ft_count_components(components) != 5)
-    {
-        printf("ft_check_cylinder_component error: invalid\n");
         return 0;
-    }
     if (!ft_check_coordinates(components[1]))
-    {
-        printf("Error in coordinates  \n");
         return 0;
-    }
     if (!ft_check_orientation(components[2]))
-    {
-        printf("Error in orientaions  \n");
         return 0;
-    }
     if (!ft_check_non_negative(components[3]) || !ft_check_non_negative(components[4]))
-    {
-        printf("Error in non negative  \n");
-
-    return 0;
-    }
-    if (!ft_check_colors(components[4]))
-    {
-        printf("Error in colors  \n");
         return 0;
-    }
-    printf("cylinder components are valid\n");
-        
+    if (!ft_check_colors(components[4]))
+        return 0;
+    // printf("cylinder components are valid\n");        
     return 1;
 }
 
-int ft_check_components(int identifier_id, char **components, int **counter)
+int ft_check_components(int identifier_id, char **components, int *counter)
 {
-    printf(">>>>>>>>>>>>>>>>>>>>>>>checking identifier %d\n", identifier_id);
     if (identifier_id == 1)
         return (ft_check_ambient_component(components, counter));
     if (identifier_id == 2)
@@ -495,12 +441,19 @@ int ft_check_map_components(t_map **map)
         }
         tmp = tmp->next;
     }
+
+
+    if ((*map)->scen_elements[0] > 1 || (*map)->scen_elements[1] > 1
+        || (*map)->scen_elements[2] > 1)
+    {
+        printf("duplicated of elements that must be declared just Once\n");
+        return 0;
+    }
     return (1);
 }
 
-
-
 //================================================================
+
 void    var_dump_lines(map_line *map)
 {
     if (!map)
@@ -553,15 +506,7 @@ int    ft_add_line(map_line **map, char *line)
     else
         *map = new;
     return (1);
-    // new->l
-    // printf(">> line : %s<<\n", line);
-    // for (size_t i = 0; new->line_component[i] ; i++)
-    // {
-    //     printf(" -> (%s) <-", new->line_component[i]);
-    // }
-    // printf("\n");
 }
-
 
 map_line *ft_gen_scen_map(char *file_name)
 {

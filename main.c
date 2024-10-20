@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:05 by aghergho          #+#    #+#             */
-/*   Updated: 2024/10/20 10:12:34 by aghergho         ###   ########.fr       */
+/*   Updated: 2024/10/20 16:12:36 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ t_map *ft_init_map()
         return NULL;
     new->lines = NULL;
     while (++i < 3)
-        new->scen_elements[i] = 0;
+        new->scen_elements[i] = 0;    
     return new;
 }
 
@@ -33,17 +33,13 @@ int main(int argc, char **argv)
 
     if (argc != 2)
         return (printf("error: try with : ./minirt scene.rt\n"), 1);
-    // printf
     map = ft_init_map();
     if (!map)
         return (printf("error : memory allocation failed\n"), 1);
     
     map->lines = ft_gen_scen_map(argv[1]);
     if (!map->lines || !ft_check_map_components(&map))
-    {
-        printf("error at map components: \n");
         return (free(map),1);
-    }
     var_dump_lines(map->lines);
     printf("donee");
     return (0);
