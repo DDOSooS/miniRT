@@ -1,5 +1,5 @@
 CC = cc
-CFLAGS = -Wall  # Uncommenting options if needed
+CFLAGS = -Wall # -fsanitize=address # Uncommenting options if needed 
 RM = rm -rf
 LIBFT = ./includes/libft/libft.a
 

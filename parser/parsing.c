@@ -6,12 +6,11 @@
 /*   By: aghergho <aghergho@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 20:24:10 by aghergho          #+#    #+#             */
-/*   Updated: 2024/10/19 22:53:43 by aghergho         ###   ########.fr       */
+/*   Updated: 2024/10/20 12:36:31 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 # include "../includes/minirt.h"
-#include   <string.h>
 
 int ft_is_whitespace(char c)
 {
@@ -20,26 +19,39 @@ int ft_is_whitespace(char c)
 
 double ft_atod(char *str)
 {
-    int result;
-    int i;
+    double result = 0.0;
+    double fractional_part = 0.0;
+    int i = 0;
+    int sign = 1;
+    double decimal_divisor = 1.0;
+    double divisor ;
 
-    result = 0;
-    i = 0;
     while (ft_is_whitespace(str[i]))
-    {
         i++;
-    }
     if (str[i] == '-')
     {
+        sign = -1;
         i++;
-        result *= (-1);
-    }
-    while (str[i] && str[i] >= '0' && str[i] <= '9')
+    } else if (str[i] == '+') 
+        i++;
+    while (str[i] && (str[i] >= '0' && str[i] <= '9'))
     {
-        result = result * 10 + str[i];
+        result = result * 10 + (str[i] - '0');
         i++;
     }
-    return result;
+    if (str[i] == '.')
+    {
+        i++; 
+        divisor = 10.0;
+        while (str[i] && (str[i] >= '0' && str[i] <= '9'))
+        {
+            fractional_part += (str[i] - '0') / divisor;
+            divisor *= 10.0;
+            i++;
+        }
+    }
+    result += fractional_part;
+    return result * sign;
 }
 
 void ft_free_line_components(char **components)
@@ -177,23 +189,24 @@ char	**split(char const *s, char *delimiter)
 	ft_gen_words(words, s, delimiter);
 	return (words);
 }
-/*=======================Testing part==================
-int	main(void)
+
+int ft_is_degit(char *str)
 {
-	char	*s;
-	char	**words;
+    int i;
 
-	s = "hello worldsgfdsgdsffffg|||||||||";
-	words = ft_split("nonempty", 0);
-	for (int i = 0; words[i]; i++)
-	{
-			printf("%s\n", words[i]);
-	        printf("Length: %zu\n", strlen(words[i]));
-	}
-	return (0);
+    i = 0;
+    while (str[i] && (str[i] >= '0' && str[i] <= '9'))
+         i++;
+    if (str[i] == '.')
+    {
+        i++;
+        while (str[i] && (str[i] >= '0' && str[i] <= '9'))
+            i++;
+        if (str[i])
+            return 0;
+    }
+    return 1;
 }
-===================================================================*/
-
 
 int ft_count_components(char **components)
 {
@@ -207,9 +220,10 @@ int ft_count_components(char **components)
 
 int ft_check_range(char *component)
 {
-    int range;
+    double range;
 
     range = ft_atod(component);
+    // printf("range = %f", range);
     if (range < 0 || range > 1)
         return 0;
     return 1;
@@ -219,7 +233,7 @@ int ft_check_colors(char *component)
 {
     char **colors;
     int i;
-    int color;
+    double color;
     
     colors = split(component,",");
     if (ft_count_components(colors) != 3)
@@ -239,9 +253,9 @@ int ft_check_colors(char *component)
 int ft_check_coordinates(char *component)
 {
     char **coordinates;
-    int i;
     
     coordinates = split(component,",");
+    printf("--->coordinates %d\n",ft_count_components(coordinates));
     if (ft_count_components(coordinates) != 3)
         return ( ft_free_line_components(coordinates),0);
     return ( ft_free_line_components(coordinates),1);
@@ -251,7 +265,7 @@ int ft_check_orientation(char *compoenent)
 {
     char **oriontations;
     int i;
-    int axes;
+    double axes;
     
     i = -1;
     oriontations = split(compoenent, ",");
@@ -268,7 +282,7 @@ int ft_check_orientation(char *compoenent)
 
 int ft_check_non_negative(char *component)
 {
-    int value;
+    double value;
 
     value = ft_atod(component);
     if (value < 0)
@@ -278,7 +292,7 @@ int ft_check_non_negative(char *component)
 
 int ft_check_fov(char *component)
 {
-    int fov;
+    double fov;
 
     fov = ft_atod(component);
     if (fov < 0 || fov > 180)
@@ -291,24 +305,45 @@ int ft_check_ambient_component(char **components, int **counter)
     if (ft_count_components(components) != 3)
         return 0;
     if (!ft_check_range(components[1]))
+    {
+        printf("ft_check_range error: invalid\n");
         return (0);
+    }
     if (!ft_check_colors(components[2]))
+    {
+        printf("ft_check_colors error: invalid\n");
         return (0);
-    (*counter)[0]++;
+    }
+    // (*counter)[0]++;
+    printf("ambient components are valid\n");
     return (1);
 }
 
 int ft_check_camera_component(char **components, int **counter)
 {
     if (ft_count_components(components) != 4)
+    {
+        printf("ft_check_camera_component error: invalid\n");
         return (0);
-    if (ft_check_coordinates(components[1]))
+    }
+      
+    if (!ft_check_coordinates(components[1]))
+    {
+        printf("ft_check_coordinates error: invalid\n");
         return (0);
+    }
     if (!ft_check_orientation(components[2]))
+    {
+        printf("ft_check_orientation error: invalid\n");   
         return (0);
+    }
     if (!ft_check_fov(components[3]))
+    {
+        printf("ft_check_fov error: invalid\n");
         return (0);
-    (*counter)[1]++;
+    }
+    // (*counter)[1]++;
+    printf("camera components are valid\n");
     return (1);
 }
 
@@ -322,20 +357,36 @@ int ft_check_light_component(char **components, int **counter)
         return (0);
     if (!ft_check_colors(components[3]))
         return (0);
-    (*counter)[2]++;
+    // (*counter)[2]++;
+    printf("light components are valid\n");
+
     return (1);
 }
 
 int ft_check_sphere_component(char **components, int **counter)
 {
-    if (!ft_count_components(components) != 4)
+    if (ft_count_components(components) != 4)
+    {
+        printf("ft_check_sphere_component error: invalid\n");
         return 0;
+    }
     if (!ft_check_coordinates(components[1]))
+    {
+        printf("Error in coordinates  \n");
         return 0;
+    }
     if (!ft_check_non_negative(components[2])) 
+    {
+        printf("Error in diametere  \n");
         return 0;
+    }
     if (!ft_check_colors(components[3]))
+    {
+        printf("Error in colors \n");
         return 0;
+    }
+    printf("sphere components are valid\n");
+
     return 1;
 }
 
@@ -349,26 +400,47 @@ int ft_check_plane_component(char **components, int **counter)
         return 0;
     if (!ft_check_colors(components[3]))
         return 0;
+    printf("plane components are valid\n");
+
     return 1;
 }
 
 int ft_check_cylinder_component(char **components, int **counter)
 {
     if (ft_count_components(components) != 5)
+    {
+        printf("ft_check_cylinder_component error: invalid\n");
         return 0;
+    }
     if (!ft_check_coordinates(components[1]))
+    {
+        printf("Error in coordinates  \n");
         return 0;
+    }
     if (!ft_check_orientation(components[2]))
+    {
+        printf("Error in orientaions  \n");
         return 0;
-    if (ft_check_non_negative(components[3]) || ft_check_non_negative(components[4]))
-        return 0;
-    if (!ft_check_colors(components[4]))
-    return 0;
+    }
+    if (!ft_check_non_negative(components[3]) || !ft_check_non_negative(components[4]))
+    {
+        printf("Error in non negative  \n");
 
+    return 0;
+    }
+    if (!ft_check_colors(components[4]))
+    {
+        printf("Error in colors  \n");
+        return 0;
+    }
+    printf("cylinder components are valid\n");
+        
+    return 1;
 }
 
 int ft_check_components(int identifier_id, char **components, int **counter)
 {
+    printf(">>>>>>>>>>>>>>>>>>>>>>>checking identifier %d\n", identifier_id);
     if (identifier_id == 1)
         return (ft_check_ambient_component(components, counter));
     if (identifier_id == 2)
@@ -392,9 +464,9 @@ int is_identifier(char *identifier)
        return 2;
     if (!ft_strcmp(identifier, "L"))
         return 3;
-    if (!ft_strcmp(identifier, "pl"))
-        return 4;
     if (!ft_strcmp(identifier, "sp"))
+        return 4;
+    if (!ft_strcmp(identifier, "pl"))
         return 5;
     if (!ft_strcmp(identifier, "cy"))
         return 6;
@@ -416,8 +488,11 @@ int ft_check_map_components(t_map **map)
             printf("identifier is not a valid identifier (%s)\n", tmp->line_component[0]);
             return (0);
         }
-        if (!ft_check_components(identifier_id, tmp->line_component, (*map)->scen_elements))
+        if (!ft_check_components(identifier_id, tmp->line_component, ((*map)->scen_elements)))
+        {
+            printf("Error at map checking line component \n");
             return (0);
+        }
         tmp = tmp->next;
     }
     return (1);
@@ -488,7 +563,7 @@ int    ft_add_line(map_line **map, char *line)
 }
 
 
-map_line *ft_gen_sen_map(char *file_name)
+map_line *ft_gen_scen_map(char *file_name)
 {
     map_line *map;
     char *line;
