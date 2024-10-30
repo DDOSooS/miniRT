@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2024/10/21 10:33:16 by aghergho         ###   ########.fr       */
+/*   Updated: 2024/10/30 10:22:28 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <mlx.h>
 #include "./get_next_line/get_next_line.h"
 #include "./libft/libft.h"
 
+
+typedef struct	s_data {
+	void	*img;
+	char	*addr;
+	int		bits_per_pixel;
+	int		line_length;
+	int		endian;
+}				t_data;
 
 typedef struct lines
 {

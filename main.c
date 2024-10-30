@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:05 by aghergho          #+#    #+#             */
-/*   Updated: 2024/10/21 11:00:03 by aghergho         ###   ########.fr       */
+/*   Updated: 2024/10/29 18:02:43 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,6 @@ void var_dump_all(t_map *map, t_scene *scene)
     }
 }
 
-
 t_map *ft_init_map()
 {
     t_map *new;
@@ -129,7 +128,9 @@ int main(int argc, char **argv)
 {
     t_map   *map;
     t_scene *scene;
-    
+    void *mlx;
+    void *mlx_window;
+
     if (argc != 2)
         return (printf("error: try with : ./minirt scene.rt\n"), 1);
     map = ft_init_map();
@@ -137,10 +138,13 @@ int main(int argc, char **argv)
         return (printf("error : memory allocation failed\n"), 1);
     map->lines = ft_gen_scen_map(argv[1]);
     if (!map->lines || !ft_check_map_components(&map))
-        return (free(map),1);
+        return (free(map),ft_putstr_fd("map is empty\n",2),1);
     scene = ft_generate_scene(map->lines);
-    // var_dump_lines(map->lines);
-    // var_dump_all(map , scene);
+    var_dump_lines(map->lines);
+    mlx = mlx_init();
+    mlx_window = mlx_new_window(mlx, 500, 500, "MiniRT");
     
+	mlx_loop(mlx);
     return (0);
+    // var_dump_all(map , scene);
 }

@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 20:24:10 by aghergho          #+#    #+#             */
-/*   Updated: 2024/10/21 10:58:18 by aghergho         ###   ########.fr       */
+/*   Updated: 2024/10/30 10:49:11 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,24 @@ double ft_atod(char *str)
     result += fractional_part;
     return result * sign;
 }
+
+int is_empty_line(char *line)
+{   
+    int i = 0;
+    
+    if (!line || line[0] == '\n')
+        return 1;
+
+    while (line[i])
+    {
+        if (!ft_is_whitespace(line[i]))
+            return 0;
+        i++;
+    }
+    printf("end of line check\n");
+    return 1;
+}
+
 
 void ft_free_line_components(char **components)
 {
@@ -397,18 +415,20 @@ int ft_check_components(int identifier_id, char **components, int *counter)
 }
                                                                               
 int is_identifier(char *identifier)
-{
-    if (!ft_strcmp(identifier, "A"))
+{   
+    printf("identifier %s\n", identifier);
+    
+    if (identifier && !ft_strcmp(identifier, "A"))
         return 1;
-    if (!ft_strcmp(identifier, "C"))
+    if (identifier && !ft_strcmp(identifier, "C"))
        return 2;
-    if (!ft_strcmp(identifier, "L"))
+    if (identifier && !ft_strcmp(identifier, "L"))
         return 3;
-    if (!ft_strcmp(identifier, "sp"))
+    if (identifier && !ft_strcmp(identifier, "sp"))
         return 4;
-    if (!ft_strcmp(identifier, "pl"))
+    if (identifier && !ft_strcmp(identifier, "pl"))
         return 5;
-    if (!ft_strcmp(identifier, "cy"))
+    if (identifier && !ft_strcmp(identifier, "cy"))
         return 6;
     return 0;
 }
@@ -418,13 +438,26 @@ int ft_check_map_components(t_map **map)
     map_line    *tmp;
     int         identifier_id;
 
-    
+    int i;
+    i = 0;
     tmp = (*map)->lines;
+    int count = 0;
+    map_line *line =(*map)->lines;
+    while (line)
+    {
+        count++;
+        line = line->next;
+    }
+    printf("map counter is %d<<<<<<<<\n", count);
+    var_dump_lines(tmp);
     while (tmp)
     {
+        printf("identifier %s====<\n", tmp->line_component[0]);
+        
         identifier_id = is_identifier(tmp->line_component[0]);
         if (!identifier_id)
         {
+            printf("line %d: \n", i);
             printf("identifier is not a valid identifier (%s)\n", tmp->line_component[0]);
             return (0);
         }
@@ -434,6 +467,7 @@ int ft_check_map_components(t_map **map)
             return (0);
         }
         tmp = tmp->next;
+        i++;
     }
     if ((*map)->scen_elements[0] > 1 || (*map)->scen_elements[1] > 1
         || (*map)->scen_elements[2] > 1)
@@ -457,8 +491,10 @@ void    var_dump_lines(map_line *map)
     printf("============== map  =================\n");
     while (map)
     {
+        printf("======================================\n");
         for (int i = 0; map->line_component[i]; i++)
             printf("component %d : %s\n", i, map->line_component[i]);
+        // printf("sdfs\n");
         printf("======================================\n");
         printf("\n");
         map = map->next;
@@ -511,15 +547,20 @@ map_line *ft_gen_scen_map(char *file_name)
         return (printf("error : failed to open file\n"),NULL);
     map = NULL;
     line = get_next_line(fd);
+
     while (line)
     {
-        if (line && strncmp(line, "\n", 1))
+        if (line && !is_empty_line(line))
+        {
+            printf("==+++%s======\n",line);   
             if (!ft_add_line(&map, line))
                 return (free(line), close(fd),NULL);
+        }
         free(line);
         line = get_next_line(fd);
     }
     close(fd);
+    
     return (map);
 }
 
@@ -727,6 +768,7 @@ t_scene *ft_generate_scene(map_line *compoenent)
     while (compoenent)
     {
         identifier_id = is_identifier(compoenent->line_component[0]);
+        // printf("%d: --- %s ", identifier_id, compoenent->line_component[1]);
         if (identifier_id)
             ft_add_component(&new, identifier_id, compoenent->line_component);
         compoenent = compoenent->next;

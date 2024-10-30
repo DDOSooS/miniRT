@@ -1,7 +1,9 @@
 CC = cc
-CFLAGS = -Wall # -fsanitize=address # Uncommenting options if needed 
+CFLAGS = -Wall -I/home/ddos/Desktop/dev/42/miniRT/minilibx-linux  # Additional flags can be added here
 RM = rm -rf
+LIBMLX = -L/home/ddos/Desktop/dev/42/miniRT/minilibx-linux -lmlx -lX11 -lXext -lm  # Link MiniLibX with necessary libraries
 LIBFT = ./includes/libft/libft.a
+MLX = ./minilibx-linux/libmlx.a
 
 name = miniRT
 src = main.c ./parser/parsing.c \
@@ -11,8 +13,8 @@ obj = $(src:.c=.o)
 
 all: $(name)
 
-$(name): $(obj) $(LIBFT)
-	$(CC) $(CFLAGS) $^ -o $@  # Linking with $(LIBFT) automatically since it's in $^
+$(name): $(obj) $(LIBFT) $(MLX)
+	$(CC) $(CFLAGS) $^ $(LIBMLX) -o $@  
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -20,13 +22,18 @@ $(name): $(obj) $(LIBFT)
 $(LIBFT):
 	make -C ./includes/libft  # Proper rule to build libft.a
 
+$(MLX):
+	make -C ./minilibx-linux
+
 clean:
 	$(RM) $(obj)
 	make -C ./includes/libft clean
+	# make -C ./minilibx-linux clean
 
 fclean: clean
 	$(RM) $(name)
 	make -C ./includes/libft fclean
+	# make -C ./minilibx-linux fclean
 
 re: fclean all
 
