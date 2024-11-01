@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 20:24:10 by aghergho          #+#    #+#             */
-/*   Updated: 2024/10/30 10:49:11 by aghergho         ###   ########.fr       */
+/*   Updated: 2024/11/01 10:08:06 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ int is_empty_line(char *line)
             return 0;
         i++;
     }
-    printf("end of line check\n");
+    // printf("end of line check\n");
     return 1;
 }
 
@@ -416,7 +416,7 @@ int ft_check_components(int identifier_id, char **components, int *counter)
                                                                               
 int is_identifier(char *identifier)
 {   
-    printf("identifier %s\n", identifier);
+    // printf("identifier %s\n", identifier);
     
     if (identifier && !ft_strcmp(identifier, "A"))
         return 1;
@@ -448,11 +448,11 @@ int ft_check_map_components(t_map **map)
         count++;
         line = line->next;
     }
-    printf("map counter is %d<<<<<<<<\n", count);
-    var_dump_lines(tmp);
+    // printf("map counter is %d<<<<<<<<\n", count);
+    // var_dump_lines(tmp);
     while (tmp)
     {
-        printf("identifier %s====<\n", tmp->line_component[0]);
+        // printf("identifier %s====<\n", tmp->line_component[0]);
         
         identifier_id = is_identifier(tmp->line_component[0]);
         if (!identifier_id)
@@ -551,11 +551,8 @@ map_line *ft_gen_scen_map(char *file_name)
     while (line)
     {
         if (line && !is_empty_line(line))
-        {
-            printf("==+++%s======\n",line);   
             if (!ft_add_line(&map, line))
                 return (free(line), close(fd),NULL);
-        }
         free(line);
         line = get_next_line(fd);
     }
@@ -768,7 +765,6 @@ t_scene *ft_generate_scene(map_line *compoenent)
     while (compoenent)
     {
         identifier_id = is_identifier(compoenent->line_component[0]);
-        // printf("%d: --- %s ", identifier_id, compoenent->line_component[1]);
         if (identifier_id)
             ft_add_component(&new, identifier_id, compoenent->line_component);
         compoenent = compoenent->next;

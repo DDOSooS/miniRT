@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2024/10/30 10:22:28 by aghergho         ###   ########.fr       */
+/*   Updated: 2024/10/30 16:27:22 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,13 +23,32 @@
 #include "./libft/libft.h"
 
 
-typedef struct	s_data {
-	void	*img;
-	char	*addr;
+#define WINDOW_WIDTH 900
+#define WINDOW_HEIGHT 900
+
+typedef struct    s_vector
+{
+    double    x;
+    double    y;
+    double    z;
+}                t_vector;
+
+typedef struct s_img
+{
+	void	*img_ptr;
+	char	*img_pixels_ptr;
 	int		bits_per_pixel;
-	int		line_length;
 	int		endian;
-}				t_data;
+	int		line_len;
+}				t_img;
+
+typedef struct var
+{
+    void    *mlx;
+    void    *win;
+    t_img  img;
+    int     color;
+}   t_var;
 
 typedef struct lines
 {

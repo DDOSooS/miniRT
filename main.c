@@ -6,11 +6,16 @@
 /*   By: aghergho <aghergho@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:05 by aghergho          #+#    #+#             */
-/*   Updated: 2024/10/29 18:02:43 by aghergho         ###   ########.fr       */
+/*   Updated: 2024/11/01 10:20:23 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include  "./includes/minirt.h"
+#define XK_escape 65307
+#define L_key 65361
+#define U_key 65362
+#define R_key 65363
+#define D_key 65364
 
 void var_dump_all(t_map *map, t_scene *scene)
 {
@@ -124,12 +129,132 @@ t_map *ft_init_map()
     return new;
 }
 
+
+
+// void	color_screen(t_var *data, int color)
+// {
+// 			my_pixel_put(&data->img,
+// 						X,
+// 						Y,
+// 						color);
+// }
+// int	handle_input(int keysym, t_var *data)
+// {
+//     //Check the #defines
+//     //find / -name keysym.h 2>/dev/null
+//     //find / -name keysymdef.h 2>/dev/null
+//     if (keysym == XK_escape)
+//     {
+//         printf("The %d key (ESC) has been pressed\n\n", keysym);
+//         mlx_destroy_window(data->mlx_ptr, data->win_ptr);
+//         mlx_destroy_display(data->mlx_ptr);
+//         free(data->mlx_ptr);
+//         exit(1);
+//     }
+//     printf("The %d key has been pressed\n\n", keysym);
+//     return (0);
+// }
+
+
+// int f(int keysym, t_var *data)
+// {
+//     printf("Pressed %d\n", keysym);
+//     //sleep to appreciate loop_hook stopping
+//     sleep(1);
+//     return 1;
+// }
+
+
+
+// int     change_color(t_var *data)
+// {
+//     // Fill the window with the current color
+// //  mlx_clear_window(data->mlx, data->win);
+//     mlx_string_put(data->mlx_ptr, data->win_ptr, 150, 150, data->color, "Color Changing Window!");
+
+//     // Cycle through some basic colors: RED, GREEN, BLUE
+//     if (data->color == 0xFF0000)        // If it's red
+//         data->color = 0x00FF00;        // Change to green
+//     else if (data->color == 0x00FF00)   // If it's green
+//         data->color = 0x0000FF;        // Change to blue
+//     else
+//         data->color = 0xFF0000;        // Otherwise, go back to red
+
+//     return (0);
+// }
+
+
+void	my_pixel_put(t_img *img, int x, int y, int color)
+{
+	int	offset;
+
+	//🚨 Line len is in bytes. WIDTH 800 len_line ~3200 (can differ for alignment)
+	offset = (img->line_len * y) + (x * (img->bits_per_pixel / 8)) ;	
+
+	*((unsigned int *)(offset + img->img_pixels_ptr)) = color;
+}
+
+int	f(int keysym, t_var *data)
+{
+
+	if (keysym == L_key)
+	{
+		color_screen(data, 0xff0000);
+	}
+	else if (keysym == R_key)
+	{
+		color_screen(data, 0xff00);
+	}
+	else if (keysym == D_key)
+	{
+		color_screen(data, 0xff);
+	}	
+    else if (keysym == 2)
+        color_screen(data, 0xf6f5ee);
+	else if (keysym == XK_escape)
+		exit(1);
+
+	// push the READY image to window
+	// the last parameters are the offset image-window
+	mlx_put_image_to_window(data->mlx,
+							data->win, 
+							data->img.img_ptr, 
+							0, 0);
+
+	return 0;
+}
+
+void	color_screen(t_var *data, int color)
+{
+	for (int y = 0; y < WINDOW_HEIGHT ; ++y)	
+	{
+		for (int x = 0; x < WINDOW_WIDTH; ++x)
+		{
+			/*
+			 * This function is much faster than the library one🏻
+			 * 	~Buffer in the image and push only when ready-> No flickering effect
+			*/
+            if (y == WINDOW_HEIGHT / 2 || x == WINDOW_WIDTH / 2)
+			    my_pixel_put(&data->img,
+				    		x, 
+				    		y, 
+						    color);
+            if ( y * y + x*x == 2 * 2)
+                my_pixel_put(&data->img,
+				    		x, 
+				    		y, 
+						    color);
+            
+		}
+	}
+}
+
 int main(int argc, char **argv)
 {
     t_map   *map;
     t_scene *scene;
-    void *mlx;
-    void *mlx_window;
+    // void *mlx;
+    // void *mlx_window;
 
     if (argc != 2)
         return (printf("error: try with : ./minirt scene.rt\n"), 1);
@@ -141,10 +266,28 @@ int main(int argc, char **argv)
         return (free(map),ft_putstr_fd("map is empty\n",2),1);
     scene = ft_generate_scene(map->lines);
     var_dump_lines(map->lines);
-    mlx = mlx_init();
-    mlx_window = mlx_new_window(mlx, 500, 500, "MiniRT");
-    
-	mlx_loop(mlx);
+    t_var	vars;
+
+	vars.mlx = mlx_init();
+	vars.win = mlx_new_window(vars.mlx,
+								WINDOW_WIDTH, 
+								WINDOW_HEIGHT, 
+								"My window");
+	
+
+	// Code to create an image and get the related DATA
+	vars.img.img_ptr = mlx_new_image(vars.mlx,
+									WINDOW_WIDTH, 
+									WINDOW_HEIGHT);
+	vars.img.img_pixels_ptr = mlx_get_data_addr(vars.img.img_ptr, 
+												&vars.img.bits_per_pixel, 
+												&vars.img.line_len, 
+												&vars.img.endian);
+	mlx_key_hook(vars.win, 
+				f,
+				&vars);
+	mlx_loop(vars.mlx);
+
     return (0);
     // var_dump_all(map , scene);
-}
+} 
