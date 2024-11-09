@@ -18,7 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <mlx.h>
+#include "../minilibx-linux/mlx.h"
 #include "./get_next_line/get_next_line.h"
 #include "./libft/libft.h"
 
@@ -26,11 +26,12 @@
 #define WINDOW_WIDTH 900
 #define WINDOW_HEIGHT 900
 
+
 typedef struct    s_vector
 {
-    double    x;
-    double    y;
-    double    z;
+    float    x;
+    float    y;
+    float    z;
 }                t_vector;
 
 typedef struct s_img
@@ -41,14 +42,6 @@ typedef struct s_img
 	int		endian;
 	int		line_len;
 }				t_img;
-
-typedef struct var
-{
-    void    *mlx;
-    void    *win;
-    t_img  img;
-    int     color;
-}   t_var;
 
 typedef struct lines
 {
@@ -64,52 +57,52 @@ typedef struct map
 
 typedef struct sphere
 {
-    double          sphere_coordinates[3];
+    t_vector        *sphere_coordinates;
     double          sphere_diameter;
-    int          sphere_color[3];
+    int             sphere_color[3];
     struct sphere   *next;
 }   t_sphere;
 
 
 typedef struct plane
 {
-    double     plane_cordinates[3];
-    double     plane_normal[3];
-    int     plane_color[3];
-    struct plane   *next;
+    t_vector        *plane_cordinates;
+    t_vector        *plane_normal;
+    int             plane_color[3];
+    struct plane    *next;
 } t_plane;
 
 typedef struct cylinder
 {
-    double     coordinates[3];
-    double     orientation[3];
-    int     colors[3];
-    double     diameter;
-    double     height;
-    struct cylinder   *next;
+    t_vector        *coordinates;
+    t_vector        *orientation;
+    int             colors[3];
+    double          diameter;
+    double          height;
+    struct cylinder *next;
 } t_cylinder;
 
 typedef struct camera
 {
-    double     camera_position[3];
-    double     camera_cordinates[3];
-    int        camera_fow;
+    t_vector        *camera_position;
+    t_vector        *camera_cordinates;
+    int             camera_fow;
 } t_camera;
 
 typedef struct ambient
 {
-    double     ambient_ration;
-    int     ambient_color[3];
+    double      ambient_ration;
+    int         ambient_color[3];
 } t_ambient;
 
 typedef struct light
 {
-    double     light_coordinate[3];
-    double     light_ration;
-    int         light_color[3];
+    t_vector        *light_coordinate;
+    double          light_ration;
+    int             light_color[3];
 } t_light;
 
-typedef struct g_scene
+typedef struct s_scene
 {
     t_camera    *camera;
     t_ambient   *ambient;
@@ -119,9 +112,20 @@ typedef struct g_scene
     t_cylinder  *cylinder;
 }   t_scene;
 
+typedef struct var
+{
+    void    *mlx;
+    void    *win;
+    t_img  img;
+    int     color;
+    t_scene *scene;
+}   t_var;
+
+
 map_line    *ft_gen_scen_map(char *file_name);
 void        var_dump_lines(map_line *map);
-t_scene *ft_generate_scene(map_line *compoenent);
-int ft_check_map_components(t_map **map);
+t_scene     *ft_generate_scene(map_line *compoenent);
+int         ft_check_map_components(t_map **map);
+t_vector    *ft_new_vector(float x, float y, float z);
 // int         ft_strlen(char *str);
 #endif

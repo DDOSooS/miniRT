@@ -448,12 +448,8 @@ int ft_check_map_components(t_map **map)
         count++;
         line = line->next;
     }
-    // printf("map counter is %d<<<<<<<<\n", count);
-    // var_dump_lines(tmp);
     while (tmp)
-    {
-        // printf("identifier %s====<\n", tmp->line_component[0]);
-        
+    {        
         identifier_id = is_identifier(tmp->line_component[0]);
         if (!identifier_id)
         {
@@ -578,17 +574,14 @@ int ft_gen_colors(int *colors,char *components)
     return (1); 
 }
 
-int ft_gen_elements(double *coordinates, char *components)
+int ft_gen_elements(t_vector **coordinates, char *components)
 {
-    int i;
     char **tmp_cord;
 
-    i = -1;
     tmp_cord = split(components, ",");
     if (!tmp_cord)
         return (0);
-    while (++i < 3)
-        coordinates[i] = ft_atod(tmp_cord[i]);
+    *coordinates = ft_new_vector(ft_atod(tmp_cord[0]),ft_atod(tmp_cord[1]), ft_atod(tmp_cord[2]));
     ft_free_line_components(tmp_cord);
     return (1);
 }
@@ -609,12 +602,13 @@ int ft_add_camera(t_scene **scene, char **components)
 {
     t_camera *camera;
 
-    // camera = (*scene)->camera;
     camera = malloc(sizeof(t_camera));
-    ft_gen_elements(camera->camera_cordinates, components[1]);
-    ft_gen_elements(camera->camera_cordinates, components[2]);
+    ft_gen_elements(&camera->camera_cordinates, components[1]);
+    ft_gen_elements(&camera->camera_position, components[2]);
     camera->camera_fow = ft_atod(components[3]);
     (*scene)->camera = camera;
+    // printf("=== x: %f, y: %f, z: %f  ==\n", (*scene)->camera->camera_cordinates->x, (*scene)->camera->camera_cordinates->y, (*scene)->camera->camera_cordinates->z);
+    // printf("=== x: %f, y: %f, z: %f  ==\n", (*scene)->camera->camera_position->x, (*scene)->camera->camera_position->y, (*scene)->camera->camera_position->z);
     return 1;
 }
 
@@ -624,7 +618,7 @@ int ft_add_light(t_scene **scene, char **components)
 
     // light = (*scene)->light;
     light = malloc(sizeof(t_light));
-    ft_gen_elements(light->light_coordinate, components[1]);
+    ft_gen_elements(&light->light_coordinate, components[1]);
     light->light_ration = ft_atod(components[2]);
     ft_gen_colors(light->light_color, components[3]);
     (*scene)->light = light;
@@ -638,7 +632,7 @@ t_sphere *ft_new_sphere(char **components)
     sphere = malloc(sizeof(t_sphere));
     if (!sphere)
         return NULL;
-    ft_gen_elements(sphere->sphere_coordinates, components[1]);
+    ft_gen_elements(&sphere->sphere_coordinates, components[1]);
     sphere->sphere_diameter = ft_atod(components[2]);
     ft_gen_colors(sphere->sphere_color, components[3]);
     sphere->next = NULL;
@@ -672,8 +666,8 @@ t_plane *ft_new_plane(char **components)
     plane = malloc(sizeof(t_plane));
     if (!plane)
         return NULL;
-    ft_gen_elements(plane->plane_cordinates, components[1]);
-    ft_gen_elements(plane->plane_normal, components[2]);
+    ft_gen_elements(&plane->plane_cordinates, components[1]);
+    ft_gen_elements(&plane->plane_normal, components[2]);
     ft_gen_colors(plane->plane_color, components[3]);
     plane->next = NULL;
     return plane;
@@ -704,8 +698,8 @@ t_cylinder *ft_new_cylinder(char **components)
     new = malloc(sizeof(t_cylinder));
     if (!new)
         return (NULL);
-    ft_gen_elements(new->coordinates, components[1]);
-    ft_gen_elements(new->orientation, components[2]);
+    ft_gen_elements(&new->coordinates, components[1]);
+    ft_gen_elements(&new->orientation, components[2]);
     new->diameter = ft_atod(components[3]);
     new->height = ft_atod(components[4]);
     ft_gen_colors(new->colors, components[5]);

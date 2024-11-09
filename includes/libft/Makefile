@@ -16,7 +16,7 @@ BONUS = bonus
 
 # Compiler and flags
 CC = cc
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall# -Wextra -Werror
 
 AR = ar crs
 

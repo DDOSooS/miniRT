@@ -1,7 +1,8 @@
-CC = cc
-CFLAGS = -Wall -I/home/ddos/Desktop/dev/42/miniRT/minilibx-linux  # Additional flags can be added here
+CC = cc -g3
+CFLAGS = -Wall # Additional flags can be added here
 RM = rm -rf
-LIBMLX = -L/home/ddos/Desktop/dev/42/miniRT/minilibx-linux -lmlx -lX11 -lXext -lm  # Link MiniLibX with necessary libraries
+LIBX = minilibx-linux/libmlx_Linux.a
+
 LIBFT = ./includes/libft/libft.a
 MLX = ./minilibx-linux/libmlx.a
 
@@ -14,7 +15,7 @@ obj = $(src:.c=.o)
 all: $(name)
 
 $(name): $(obj) $(LIBFT) $(MLX)
-	$(CC) $(CFLAGS) $^ $(LIBMLX) -o $@  
+	$(CC) $(CFLAGS) -o $@ $^ -Lminilibx-linux -lmlx_Linux -lX11 -lXext -lm
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -28,7 +29,7 @@ $(MLX):
 clean:
 	$(RM) $(obj)
 	make -C ./includes/libft clean
-	# make -C ./minilibx-linux clean
+	make -C ./minilibx-linux clean
 
 fclean: clean
 	$(RM) $(name)
