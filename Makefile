@@ -6,10 +6,12 @@ LIBX = minilibx-linux/libmlx_Linux.a
 LIBFT = ./includes/libft/libft.a
 MLX = ./minilibx-linux/libmlx.a
 
-name = miniRT
-src = main.c ./parser/parsing.c \
+name = scen	
+src = sd_main.c ./src/parser/parsing.c \
 	./includes/get_next_line/get_next_line.c \
-	./includes/get_next_line/get_next_line_utils.c
+	./includes/get_next_line/get_next_line_utils.c \
+	./src/operations/vec_utils.c ./src/raytracing/ray_utils.c
+
 obj = $(src:.c=.o)
 
 all: $(name)

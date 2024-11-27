@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "../includes/minirt.h"
+# include "../../includes/minirt.h"
 #include <string.h>
 
 int ft_is_whitespace(char c)
@@ -97,8 +97,35 @@ void    ft_free_map(map_line **map_lines)
         (*map_lines) = tmp;
     }
     free(map_lines);
-    map_lines = NULL;
+    map_lines = NULL;    
 }
+
+t_vector *ft_new_vector(float x, float y, float z)
+{
+    t_vector *new;
+
+    new = malloc(sizeof(t_vector));
+    if (!new)
+        return (NULL);
+    new->x = x;
+    new->y = y;
+    new->z = z;
+    return (new);
+}
+
+// t_vector *vector_add(t_vector *v1, t_vector *v2)
+// {
+//     t_vector *vec_add;
+
+//     vec_add = ft_new_vector(0,0,0);
+//     if (!vec_add)
+//         return (NULL);
+//     vec_add->x = v1->x + v2->x;
+//     vec_add->y = v1->y + v2->y;
+//     vec_add->z = v1->z + v2->z;
+
+//    return (vec_add);
+// }
 
 int ft_check_file_name(char *filename)
 {
@@ -109,6 +136,7 @@ int ft_check_file_name(char *filename)
         return 1;
     return 0;
 }
+
 
 int check_delimiter(char c, char *delimiter)
 {
@@ -383,7 +411,7 @@ int ft_check_plane_component(char **components)
 
 int ft_check_cylinder_component(char **components)
 {
-    if (ft_count_components(components) != 5)
+    if (ft_count_components(components) != 6)
         return 0;
     if (!ft_check_elements(components[1]))
         return 0;
@@ -391,7 +419,7 @@ int ft_check_cylinder_component(char **components)
         return 0;
     if (!ft_check_non_negative(components[3]) || !ft_check_non_negative(components[4]))
         return 0;
-    if (!ft_check_colors(components[4]))
+    if (!ft_check_colors(components[5]))
         return 0;
     // printf("cylinder components are valid\n");        
     return 1;
@@ -559,17 +587,16 @@ map_line *ft_gen_scen_map(char *file_name)
 
 /* =====================   map Components generation   ==========================  */
 
-int ft_gen_colors(int *colors,char *components)
+int ft_gen_colors(t_color **color,char *components)
 {
     char    **tmp_colors;
-    int     i;
-
-    i = -1;
+ 
     tmp_colors = split(components, ",");
     if (!tmp_colors) 
         return 0;
-    while (++i < 3)
-        colors[i] = ft_atoi(tmp_colors[i]);
+    (*color)->r= ft_atoi(tmp_colors[0]);
+    (*color)->g= ft_atoi(tmp_colors[1]);
+    (*color)->b= ft_atoi(tmp_colors[2]);
     ft_free_line_components(tmp_colors);
     return (1); 
 }
@@ -592,8 +619,9 @@ int ft_add_ambient(t_scene **scene, char **components)
 
     // tmp = (*scene)->ambient;
     tmp = malloc(sizeof(t_ambient));
+    tmp->ambient_color = malloc(sizeof(t_color));
     tmp->ambient_ration = ft_atod(components[1]);
-    ft_gen_colors(tmp->ambient_color, components[2]);
+    ft_gen_colors(&tmp->ambient_color, components[2]);
     (*scene)->ambient = tmp;
     return (1);
 }
@@ -603,12 +631,17 @@ int ft_add_camera(t_scene **scene, char **components)
     t_camera *camera;
 
     camera = malloc(sizeof(t_camera));
-    ft_gen_elements(&camera->camera_cordinates, components[1]);
-    ft_gen_elements(&camera->camera_position, components[2]);
-    camera->camera_fow = ft_atod(components[3]);
+    ft_gen_elements(&camera->camera_position, components[1]);
+    ft_gen_elements(&camera->camera_dir, components[2]);
+    camera->camera_fov = ft_atod(components[3]);
+    camera->cam_u = NULL;
+    camera->cam_v = NULL;
+    camera->projection_center = NULL;
+    camera->focal_lenght = 0;
+    camera->hor_size = 0;
+    camera->alignement_vector = NULL;
+    // printf("==> x %f <== y %f==> z %f <==\n", camera->camera_dir->x, camera->camera_dir->y, camera->camera_dir->z);
     (*scene)->camera = camera;
-    // printf("=== x: %f, y: %f, z: %f  ==\n", (*scene)->camera->camera_cordinates->x, (*scene)->camera->camera_cordinates->y, (*scene)->camera->camera_cordinates->z);
-    // printf("=== x: %f, y: %f, z: %f  ==\n", (*scene)->camera->camera_position->x, (*scene)->camera->camera_position->y, (*scene)->camera->camera_position->z);
     return 1;
 }
 
@@ -618,9 +651,10 @@ int ft_add_light(t_scene **scene, char **components)
 
     // light = (*scene)->light;
     light = malloc(sizeof(t_light));
+    light->light_color = malloc(sizeof(t_color));
     ft_gen_elements(&light->light_coordinate, components[1]);
     light->light_ration = ft_atod(components[2]);
-    ft_gen_colors(light->light_color, components[3]);
+    ft_gen_colors(&light->light_color, components[3]);
     (*scene)->light = light;
     return 1;
 }
@@ -632,9 +666,10 @@ t_sphere *ft_new_sphere(char **components)
     sphere = malloc(sizeof(t_sphere));
     if (!sphere)
         return NULL;
+    sphere->sphere_color = malloc(sizeof(t_color));
     ft_gen_elements(&sphere->sphere_coordinates, components[1]);
     sphere->sphere_diameter = ft_atod(components[2]);
-    ft_gen_colors(sphere->sphere_color, components[3]);
+    ft_gen_colors(&sphere->sphere_color, components[3]);
     sphere->next = NULL;
     return sphere;
 }
@@ -666,9 +701,10 @@ t_plane *ft_new_plane(char **components)
     plane = malloc(sizeof(t_plane));
     if (!plane)
         return NULL;
+    plane->plane_color = malloc(sizeof(t_color));
     ft_gen_elements(&plane->plane_cordinates, components[1]);
     ft_gen_elements(&plane->plane_normal, components[2]);
-    ft_gen_colors(plane->plane_color, components[3]);
+    ft_gen_colors(&plane->plane_color, components[3]);
     plane->next = NULL;
     return plane;
 }
@@ -698,11 +734,12 @@ t_cylinder *ft_new_cylinder(char **components)
     new = malloc(sizeof(t_cylinder));
     if (!new)
         return (NULL);
+    new->cylinder_color = malloc(sizeof(t_color));
     ft_gen_elements(&new->coordinates, components[1]);
     ft_gen_elements(&new->orientation, components[2]);
-    new->diameter = ft_atod(components[3]);
+    new->raduis = ft_atod(components[3]);
     new->height = ft_atod(components[4]);
-    ft_gen_colors(new->colors, components[5]);
+    ft_gen_colors(&new->cylinder_color, components[5]);
     new->next = NULL;
     return new;
 }
@@ -756,6 +793,7 @@ t_scene *ft_generate_scene(map_line *compoenent)
     new->sphere = NULL;
     new->plane = NULL;
     new->cylinder = NULL;
+    new->data = NULL;
     while (compoenent)
     {
         identifier_id = is_identifier(compoenent->line_component[0]);
