@@ -1,5 +1,5 @@
 CC = cc -g3
-CFLAGS = -Wall # Additional flags can be added here
+CFLAGS = #-Wall # Additional flags can be added here
 RM = rm -rf
 LIBX = minilibx-linux/libmlx_Linux.a
 

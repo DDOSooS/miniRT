@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aghergho <aghergho@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 20:24:10 by aghergho          #+#    #+#             */
-/*   Updated: 2024/11/01 10:08:06 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/01/01 14:12:06 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,33 +99,6 @@ void    ft_free_map(map_line **map_lines)
     free(map_lines);
     map_lines = NULL;    
 }
-
-t_vector *ft_new_vector(float x, float y, float z)
-{
-    t_vector *new;
-
-    new = malloc(sizeof(t_vector));
-    if (!new)
-        return (NULL);
-    new->x = x;
-    new->y = y;
-    new->z = z;
-    return (new);
-}
-
-// t_vector *vector_add(t_vector *v1, t_vector *v2)
-// {
-//     t_vector *vec_add;
-
-//     vec_add = ft_new_vector(0,0,0);
-//     if (!vec_add)
-//         return (NULL);
-//     vec_add->x = v1->x + v2->x;
-//     vec_add->y = v1->y + v2->y;
-//     vec_add->z = v1->z + v2->z;
-
-//    return (vec_add);
-// }
 
 int ft_check_file_name(char *filename)
 {

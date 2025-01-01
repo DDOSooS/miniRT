@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minirt.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aghergho <aghergho@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2024/10/30 16:27:22 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/01/01 17:31:46 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 
 // # define    WIN_WIDTH   1280
 // # define    WIN_HEIGHT  720
-# define    EPSILON     1e-21f
+# define    EPSILON     1e-6f
 # define    PI          3.14159265359
 
 typedef struct    s_vector
@@ -32,6 +32,7 @@ typedef struct    s_vector
     float    x;
     float    y;
     float    z;
+    float    w;
 }                t_vector;
 
 typedef struct s_color
@@ -183,4 +184,24 @@ int         gen_ray(t_scene *scene,float x, float y, t_ray **cam_ray);
 // int check_intersection(t_ray *ray, t_vector *sphere_center, float radius) ;
 // int check_intersection(t_ray *cast_ray,t_vector *inter_point ,t_vector *local_normal,t_vector *locol_color);
 t_vector    *vector_copy(t_vector *src);
+
+/* colors operations*/
+t_color *ft_new_color(float r, float g, float b);
+t_color *ft_add_color(t_color *c1, t_color *c2);
+t_color *ft_sub_color(t_color *c1, t_color *c2);
+t_color *ft_scale_color(t_color *c, float scalar);
+t_color *ft_multiply_color(t_color *c1, t_color *c2);
+void    negate_vector(t_vector *vector);
+int compare_vector(float a, float b);
+/* end of color manipulation*/
+
+/* matrix operations*/
+float **ft_create_matrix(int n_rows, int n_cols);
+int ft_compare_matrix(float **m1, float **m2, int n_col, int n_row);
+void ft_transpose_matrix(float ***m, int n_rows, int n_col);
+float **get_minor(float **m, int row, int col, int n);
+float determinant(float **m, int n);
+/* end of  matrix operation*/
+
+
 #endif

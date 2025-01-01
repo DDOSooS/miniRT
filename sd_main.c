@@ -9,10 +9,10 @@
 
 void var_dump_all(t_map *map, t_scene *scene)
 {
-    // --- Dump t_scene ---
+    // ---  t_scene ---
     if (scene)
     {
-        // Dump camera
+        //  camera
         printf("\n--- Camera  %p---\n" , scene->camera);
         if (scene->camera)
         {
@@ -23,7 +23,7 @@ void var_dump_all(t_map *map, t_scene *scene)
             printf("Camera is NULL\n");
         }
 
-        // Dump ambient
+        //  ambient
         printf("\n--- Ambient ---\n");
         if (scene->ambient)
         {
@@ -33,7 +33,7 @@ void var_dump_all(t_map *map, t_scene *scene)
             printf("Ambient is NULL\n");
         }
 
-        // Dump light
+        //  light
         printf("\n--- Light ---\n");
         if (scene->light) {
             printf("Light Coordinates: [%f, %f, %f]\n", scene->light->light_coordinate->x, scene->light->light_coordinate->y, scene->light->light_coordinate->z);
@@ -43,7 +43,7 @@ void var_dump_all(t_map *map, t_scene *scene)
             printf("Light is NULL\n");
         }
 
-        // Dump spheres
+        //  spheres
         printf("\n--- Spheres ---\n");
         t_sphere *sphere = scene->sphere;
         if (sphere) {
@@ -57,7 +57,7 @@ void var_dump_all(t_map *map, t_scene *scene)
             printf("No Spheres in Scene\n");
         }
 
-        // Dump planes
+        //  planes
         printf("\n--- Planes ---\n");
         t_plane *plane = scene->plane;
         if (plane) {
@@ -71,7 +71,7 @@ void var_dump_all(t_map *map, t_scene *scene)
             printf("No Planes in Scene\n");
         }
 
-        // Dump cylinders
+        //  cylinders
         printf("\n--- Cylinders ---\n");
         t_cylinder *cylinder = scene->cylinder;
         if (cylinder) {
@@ -123,170 +123,106 @@ void var_dump_vector(t_vector *vec)
     printf("x-> (%f) y-> (%f) z-> (%f) ===\n",vec->x, vec->y, vec->z);
 }
 
+/*
+int check_sphere_intersection(t_ray *ray, t_sphere *sphere)
+{
+    t_vector    *oc;
+    double      a, b, c, delta;
 
-// int check_sphere_intersection(t_ray *ray, t_sphere *sphere)
-// {
-//     t_vector    *oc;
-//     double      a, b, c, delta;
+    oc = vector_sub(sphere->sphere_coordinates, ray->origin);
+    // Debug print
+    printf("Ray direction: x=%f, y=%f, z=%f\n", ray->direction->x, ray->direction->y, ray->direction->z);
+    printf("Sphere pos: x=%f, y=%f, z=%f\n", sphere->sphere_coordinates->x, 
+           sphere->sphere_coordinates->y, sphere->sphere_coordinates->z);
+    
+    a = 1;
+    b = -2.0 * vector_dot(ray->direction, oc);
+    c = vector_dot(oc, oc) - sphere->sphere_diameter * sphere->sphere_diameter;
+    delta = b * b - 4 * a * c;
+    printf("=== delta>> a=%f b=%f c=%f  delta::%f<<====\n", a,b,c,delta);
+    return (delta >= 0);  
+}
+Add this helper function
+double get_sphere_intersection_t(t_ray *ray, t_sphere *sphere)
+{
+    t_vector *oc = vector_sub(ray->origin, sphere->sphere_coordinates);
+    double a = vector_dot(ray->direction, ray->direction);
+    double b = 2.0 * vector_dot(ray->direction, oc);
+    double c = vector_dot(oc, oc) - (sphere->sphere_diameter * sphere->sphere_diameter / 4.0);
+    double delta = b * b - 4 * a * c;
+    
+    if (delta < 0) return -1;
+    
+    double t1 = (-b - sqrt(delta)) / (2.0 * a);
+    double t2 = (-b + sqrt(delta)) / (2.0 * a);
+    
+    return (t1 < t2 && t1 > 0) ? t1 : t2;
+}
 
-//     oc = vector_sub(sphere->sphere_coordinates, ray->origin);
-//     // Debug print
-//     printf("Ray direction: x=%f, y=%f, z=%f\n", ray->direction->x, ray->direction->y, ray->direction->z);
-//     printf("Sphere pos: x=%f, y=%f, z=%f\n", sphere->sphere_coordinates->x, 
-//            sphere->sphere_coordinates->y, sphere->sphere_coordinates->z);
+int check_intersection(t_ray *ray, t_scene *scene)
+{
+    t_vector *unit_dir = vector_normilze(ray->direction);
+    double a = 0.5 * (unit_dir->y + 1.0);
     
-//     a = 1;
-//     b = -2.0 * vector_dot(ray->direction, oc);
-//     c = vector_dot(oc, oc) - sphere->sphere_diameter * sphere->sphere_diameter;
-//     delta = b * b - 4 * a * c;
-//     printf("=== delta>> a=%f b=%f c=%f  delta::%f<<====\n", a,b,c,delta);
-//     return (delta >= 0);  
-// }
-// Add this helper function
-// double get_sphere_intersection_t(t_ray *ray, t_sphere *sphere)
-// {
-//     t_vector *oc = vector_sub(ray->origin, sphere->sphere_coordinates);
-//     double a = vector_dot(ray->direction, ray->direction);
-//     double b = 2.0 * vector_dot(ray->direction, oc);
-//     double c = vector_dot(oc, oc) - (sphere->sphere_diameter * sphere->sphere_diameter / 4.0);
-//     double delta = b * b - 4 * a * c;
-    
-//     if (delta < 0) return -1;
-    
-//     double t1 = (-b - sqrt(delta)) / (2.0 * a);
-//     double t2 = (-b + sqrt(delta)) / (2.0 * a);
-    
-//     return (t1 < t2 && t1 > 0) ? t1 : t2;
-// }
-
-// int check_intersection(t_ray *ray, t_scene *scene)
-// {
-//     t_vector *unit_dir = vector_normilze(ray->direction);
-//     double a = 0.5 * (unit_dir->y + 1.0);
-    
-//     // Get the actual intersection distance
-//     double t = get_sphere_intersection_t(ray, scene->sphere);
-//     printf("intersection === %f====\n", t);
-//     if (t >= 0)  // If we hit the sphere
-//     {
-//         // Calculate intersection point and normal for proper shading
-//         t_vector *hit_point = vector_add(ray->origin, vector_multiply_scalar(ray->direction, t));
-//         t_vector *normal = vector_normilze(vector_sub(hit_point, scene->sphere->sphere_coordinates));
+    // Get the actual intersection distance
+    double t = get_sphere_intersection_t(ray, scene->sphere);
+    printf("intersection === %f====\n", t);
+    if (t >= 0)  // If we hit the sphere
+    {
+        // Calculate intersection point and normal for proper shading
+        t_vector *hit_point = vector_add(ray->origin, vector_multiply_scalar(ray->direction, t));
+        t_vector *normal = vector_normilze(vector_sub(hit_point, scene->sphere->sphere_coordinates));
         
-//         // Simple diffuse shading
-//         // double light_intensity = fmax(0.2, vector_dot(normal, scene->light->light_coordinate));
+        // Simple diffuse shading
+        // double light_intensity = fmax(0.2, vector_dot(normal, scene->light->light_coordinate));
         
-//         return (255 << 24 | 
-//                 (int)(scene->sphere->sphere_color->r) << 16 | 
-//                 (int)(scene->sphere->sphere_color->b) << 8 | 
-//                 (int)(scene->sphere->sphere_color->b));
-//     }
+        return (255 << 24 | 
+                (int)(scene->sphere->sphere_color->r) << 16 | 
+                (int)(scene->sphere->sphere_color->b) << 8 | 
+                (int)(scene->sphere->sphere_color->b));
+    }
 
-//     // Background color if no hit
-//     int red   = (int)(255.0 * ((1.0 - a) * 1.0 + a * 0.5));
-//     int green = (int)(255.0 * ((1.0 - a) * 1.0 + a * 0.7));
-//     int blue  = (int)(255.0 * ((1.0 - a) * 1.0 + a * 1.0));
+    // Background color if no hit
+    int red   = (int)(255.0 * ((1.0 - a) * 1.0 + a * 0.5));
+    int green = (int)(255.0 * ((1.0 - a) * 1.0 + a * 0.7));
+    int blue  = (int)(255.0 * ((1.0 - a) * 1.0 + a * 1.0));
     
-//     return (255 << 24 | red << 16 | green << 8 | blue);
-// }
+    return (255 << 24 | red << 16 | green << 8 | blue);
+}
 
-// void update_camera_settings(t_scene *scene)
-// {
-//     scene->camera->focal_lenght = 1.0;
-//     t_vector *vec_up = ft_new_vector(0,1,0);
-//     // Calculate viewport vectors
-//     double viewport_height = 2.0 * tan(scene->camera->camera_fov * PI / 360.0);
-//     double viewport_width = viewport_height * scene->aspect_ratio;
+void update_camera_settings(t_scene *scene)
+{
+    scene->camera->focal_lenght = 1.0;
+    t_vector *vec_up = ft_new_vector(0,1,0);
+    // Calculate viewport vectors
+    double viewport_height = 2.0 * tan(scene->camera->camera_fov * PI / 360.0);
+    double viewport_width = viewport_height * scene->aspect_ratio;
     
-//     // Get camera orientation vectors
-//     t_vector *w = vector_normilze(vector_multiply_scalar(scene->camera->camera_dir, -1));
-//     t_vector *u = vector_normilze(vector_cross(vec_up, w));
-//     t_vector *v = vector_cross(w, u);
+    // Get camera orientation vectors
+    t_vector *w = vector_normilze(vector_multiply_scalar(scene->camera->camera_dir, -1));
+    t_vector *u = vector_normilze(vector_cross(vec_up, w));
+    t_vector *v = vector_cross(w, u);
     
-//     // Calculate viewport vectors
-//     scene->vp_u = vector_multiply_scalar(u, viewport_width);
-//     scene->vp_v = vector_multiply_scalar(v, -viewport_height);
+    // Calculate viewport vectors
+    scene->vp_u = vector_multiply_scalar(u, viewport_width);
+    scene->vp_v = vector_multiply_scalar(v, -viewport_height);
     
-//     // Calculate pixel delta vectors
-//     scene->camera->cam_u = vector_multiply_scalar(scene->vp_u, 1.0 / scene->image_width);
-//     scene->camera->cam_v = vector_multiply_scalar(scene->vp_v, 1.0 / scene->image_height);
+    // Calculate pixel delta vectors
+    scene->camera->cam_u = vector_multiply_scalar(scene->vp_u, 1.0 / scene->image_width);
+    scene->camera->cam_v = vector_multiply_scalar(scene->vp_v, 1.0 / scene->image_height);
     
-//     // Calculate upper left corner
-//     t_vector *viewport_center = vector_sub(scene->camera->camera_position, w);
-//     t_vector *viewport_upper_left = vector_sub(viewport_center, 
-//                                              vector_add(vector_multiply_scalar(scene->vp_u, 0.5),
-//                                                       vector_multiply_scalar(scene->vp_v, 0.5)));
+    // Calculate upper left corner
+    t_vector *viewport_center = vector_sub(scene->camera->camera_position, w);
+    t_vector *viewport_upper_left = vector_sub(viewport_center, 
+                                             vector_add(vector_multiply_scalar(scene->vp_u, 0.5),
+                                                      vector_multiply_scalar(scene->vp_v, 0.5)));
     
-//     scene->l_corner = vector_add(viewport_upper_left,
-//                                 vector_multiply_scalar(vector_add(scene->camera->cam_u,
-//                                                                scene->camera->cam_v),
-//                                                     0.5));
-// }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    scene->l_corner = vector_add(viewport_upper_left,
+                                vector_multiply_scalar(vector_add(scene->camera->cam_u,
+                                                               scene->camera->cam_v),
+                                                    0.5));
+}
+*/
 
 
 t_vector *pixel_dir(int x, int y, t_scene *scene)
@@ -301,26 +237,21 @@ t_vector *pixel_dir(int x, int y, t_scene *scene)
 
 double intersection(t_vector *u, t_vector *sphere_center, t_scene *scene)
 {
-  
-    t_vector *camera_to_center = vector_sub(sphere_center, scene->camera->camera_position);
-    
- 
-    double a = 1.0;  
-    double b = -2.0 * vector_dot(u, camera_to_center);
-    double c = vector_dot(camera_to_center, camera_to_center) - 
-               (scene->sphere->sphere_diameter * scene->sphere->sphere_diameter / 4.0);  // Use radius squared
-    
-    free(camera_to_center);  
-    
+    double  t1;
+    double  t2;
+    double  delta, a, b, c;
 
-    double delta = b * b - 4.0 * a * c;
-    
+    t_vector *camera_to_center = vector_sub(sphere_center, scene->camera->camera_position);
+    a = 1.0;  
+    b = -2.0 * vector_dot(u, camera_to_center);
+    c = vector_dot(camera_to_center, camera_to_center) - 
+               (scene->sphere->sphere_diameter * scene->sphere->sphere_diameter);
+    free(camera_to_center);  
+    delta = b * b - 4.0 * a * c;
     if (delta < 0)
-        return 0; 
-        
-    double t1 = (-b - sqrt(delta)) / (2.0 * a);
-    double t2 = (-b + sqrt(delta)) / (2.0 * a);
-    
+        return 0;     
+    t1 = (-b - sqrt(delta)) / (2.0 * a);
+    t2 = (-b + sqrt(delta)) / (2.0 * a);
     if (t1 > 0 && t2 > 0)
         return fmin(t1, t2);
     if (t1 > 0)
@@ -342,7 +273,6 @@ int get_pixel_color(t_vector *dir, t_scene *scene)
     
     if (t > 0)
     {
-
         t_vector *intersection_point = vector_multiply_scalar(dir, t);
         
         t_vector *normal = calculate_surface_normal(intersection_point, 
@@ -361,16 +291,13 @@ int get_pixel_color(t_vector *dir, t_scene *scene)
         int b = (int)fmin(scene->sphere->sphere_color->b * light_intensity * scene->light->light_ration, 255);
         
         // Blend with light color
-
         r = (r * scene->light->light_color->r) / 255;
         g = (g * scene->light->light_color->g) / 255;
         b = (b * scene->light->light_color->b) / 255;
-        
         free(intersection_point);
         free(normal);
         free(light_dir);
         free(light_dir_normalized);
-        
         return (255 << 24) | (r << 16) | (g << 8) | b;
     }
     
@@ -380,7 +307,7 @@ int get_pixel_color(t_vector *dir, t_scene *scene)
 
 void init_scene(t_scene *scene)
 {
-    scene->image_width = 1880;
+    scene->image_width = 700;
     scene->aspect_ratio = 16.0f / 9.0f;
     scene->image_height = scene->image_width / scene->aspect_ratio;
     scene->vp_hight = 2.0;
@@ -400,6 +327,22 @@ void init_scene(t_scene *scene)
                                              &scene->data->img.bits_per_pixel,
                                              &scene->data->img.line_length,
                                              &scene->data->img.endian);
+}
+
+int	ft_close(t_var *vars)
+{
+    printf("============> (hehooooooooooo) <============\n");
+	mlx_destroy_window(vars->mlx, vars->win);
+	exit(0); // Exit the program
+	return (0);
+}
+
+int	ft_close_window(t_var *data)
+{
+    mlx_destroy_window(data->mlx, data->win);
+
+	exit(EXIT_SUCCESS);
+	return (1);
 }
 
 int render_sphere(t_scene *scene)
@@ -422,6 +365,7 @@ int render_sphere(t_scene *scene)
                            scene->data->win, 
                            scene->data->img.img_ptr, 
                            0, 0);
+    mlx_hook(scene->data->win, 17, 32, &ft_close_window, scene->data);
     mlx_loop(scene->data->mlx);
     return 1;
 }
@@ -439,10 +383,60 @@ int main(int argc, char **argv)
     map->lines = ft_gen_scen_map(argv[1]);
     if (!map->lines || !ft_check_map_components(&map))
         return (free(map), ft_putstr_fd("map is empty\n", 2), 1);
-    scene = ft_generate_scene(map->lines);
-    var_dump_all(map, scene);
-    init_scene(scene);
-    render_sphere(scene);
+    // scene = ft_generate_scene(map->lines);
+    
+    // var_dump_all(map, scene);
+    // init_scene(scene);
+    // render_sphere(scene);
+    float **matrix = ft_create_matrix(2,2);
+    matrix[0][0]=0;
+    matrix[0][1]=1;
+    matrix[1][0]=2;
+    matrix[1][1]=3;
+    // for(int i= 0; i <2; i++)
+    //     for (int j= 0; j< 2; j++)
+    //         printf("matrix[%d][%d]==[%f]\n", i, j, matrix[i][j]);
+    float **matrix1 = ft_create_matrix(3,3);
+    matrix1[0][0]=1;
+    matrix1[0][1]=2;
+    matrix1[0][2]=6;
+    matrix1[1][0]=-5;
+    matrix1[1][1]=8;
+    matrix1[1][2]=-4;
+    matrix1[2][0]=2;
+    matrix1[2][1]=6;
+    matrix1[2][2]= 4;
+
+    // if (ft_compare_matrix(matrix, matrix1,2,2))
+    //     printf("matrix and matrix1 are equal!!\n");
+    // else
+    //     printf("matrix and matrix1 are !!! equal!!\n");
+    printf("===========================\n");
+    ft_transpose_matrix(&matrix1, 3, 3);
+    printf("===========================\n");
+    for (int i=0; i<3; i++)
+    {
+        for (int j=0; j<3; j++)
+            printf("matrix[%d][%d]==[%f] || ", i, j, matrix1[i][j]);
+        printf("\n");
+    }
+    float **m =get_minor(matrix1, 0,0,3);
+    printf("================MINOR===========\n");
+    for (int i=0; i<2; i++)
+    {
+        for (int j=0; j<2; j++)
+            printf("matrix[%d][%d]==[%f] || ", i, j, m[i][j]);
+        printf("\n");
+    }
+    printf ("determinant %f=======", determinant(matrix1, 3));
     return 0;
 }
+// 00
+// 0 \1 2 
+// 3 \4 5
+// 6 \7 8
 
+
+// 0 3 6
+// 1 4 7
+// 2 5 8
