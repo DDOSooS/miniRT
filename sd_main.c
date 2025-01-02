@@ -370,6 +370,15 @@ int render_sphere(t_scene *scene)
     return 1;
 }
 
+void print_matrix(float **matrix, int rows, int cols) {
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            printf("%8.6f ", matrix[i][j]);
+        }
+        printf("\n");
+    }
+}
+
 int main(int argc, char **argv)
 {
     t_map *map;
@@ -383,34 +392,74 @@ int main(int argc, char **argv)
     map->lines = ft_gen_scen_map(argv[1]);
     if (!map->lines || !ft_check_map_components(&map))
         return (free(map), ft_putstr_fd("map is empty\n", 2), 1);
-    // scene = ft_generate_scene(map->lines);
+/*
+    scene = ft_generate_scene(map->lines);
     
-    // var_dump_all(map, scene);
-    // init_scene(scene);
-    // render_sphere(scene);
-    float **matrix = ft_create_matrix(2,2);
-    matrix[0][0]=0;
-    matrix[0][1]=1;
-    matrix[1][0]=2;
-    matrix[1][1]=3;
-    // for(int i= 0; i <2; i++)
-    //     for (int j= 0; j< 2; j++)
-    //         printf("matrix[%d][%d]==[%f]\n", i, j, matrix[i][j]);
-    float **matrix1 = ft_create_matrix(3,3);
-    matrix1[0][0]=1;
-    matrix1[0][1]=2;
-    matrix1[0][2]=6;
-    matrix1[1][0]=-5;
-    matrix1[1][1]=8;
-    matrix1[1][2]=-4;
-    matrix1[2][0]=2;
-    matrix1[2][1]=6;
-    matrix1[2][2]= 4;
+    var_dump_all(map, scene);
+    init_scene(scene);
+    render_sphere(scene);
+    float **matrix = ft_create_matrix(4,4);
+    matrix[0][0]=3.0f;
+    matrix[0][1]=-9.0f;
+    matrix[0][2]=7.0f;
+    matrix[0][3]=3.0f;
+    matrix[1][0]=3.0f;
+    matrix[1][1]=-8.0f;
+    matrix[1][2]=2.0f;
+    matrix[1][3]=-9.0f;
+    matrix[2][0]=-4.0f;
+    matrix[2][1]=4.0f;
+    matrix[2][2]=4.0f;
+    matrix[2][3]=1.0f;
+    matrix[3][0]=-6.0f;
+    matrix[3][1]=5.0f;
+    matrix[3][2]=-1.0f;
+    matrix[3][3]=1.0f;
+    for(int i= 0; i <2; i++)
+        for (int j= 0; j< 2; j++)
+            printf("matrix[%d][%d]==[%f]\n", i, j, matrix[i][j]);
+    float **matrix1 = ft_create_matrix(4,4);
+    matrix1[0][0]=8.0f;
+    matrix1[0][1]=2.0f;
+    matrix1[0][2]=2.0f;
+    matrix1[0][3]=2.0f;
+    matrix1[1][0]=3.0f;
+    matrix1[1][1]=-1.0f;
+    matrix1[1][2]=7.0f;
+    matrix1[1][3]=-0.0f;
+    matrix1[2][0]=7.0f;
+    matrix1[2][1]=0.0f;
+    matrix1[2][2]=5.0f;
+    matrix1[2][3]=4.0f;
+    matrix1[3][0]=6.0f;
+    matrix1[3][1]=-2.0f;
+    matrix1[3][2]=0.0f;
+    matrix1[3][3]=5.0f;
 
-    // if (ft_compare_matrix(matrix, matrix1,2,2))
-    //     printf("matrix and matrix1 are equal!!\n");
-    // else
-    //     printf("matrix and matrix1 are !!! equal!!\n");
+    float **res = ft_multiply_matrix(matrix, matrix1, 4,4);
+     printf("===========================\n");
+    float **inv = inverse_matrix(matrix1, 4);
+    printf("===========================\n");
+    float **a = ft_multiply_matrix(matrix1 , inv, 4,4);
+
+    printf("===========================\n");
+    for (int i=0; i<4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+            printf("matrix[%d][%d]==[%f] || ", i, j, (a[i][j]));
+        printf("\n");            
+    }
+
+    if (ft_compare_matrix(a, matrix, 4,4))
+        printf("the are equal\n");
+    else
+        printf("the are not equal\n");
+
+
+    if (ft_compare_matrix(matrix, matrix1,2,2))
+        printf("matrix and matrix1 are equal!!\n");
+    else
+        printf("matrix and matrix1 are !!! equal!!\n");
     printf("===========================\n");
     ft_transpose_matrix(&matrix1, 3, 3);
     printf("===========================\n");
@@ -429,6 +478,36 @@ int main(int argc, char **argv)
         printf("\n");
     }
     printf ("determinant %f=======", determinant(matrix1, 3));
+    float **inv = inverse_matrix(matrix1, 3);
+    printf("===========================\n");
+    for (int i=0; i<3; i++)
+    {
+        for (int j=0; j<3; j++)
+            printf("matrix[%d][%d]==[%f] || ", i, j, inv[i][j]);
+        printf("\n");
+    }
+    t_point *p = ft_new_point(2,3,4);
+    t_point *p2 = ft_new_point(-3,4,5);
+    t_vector *v = ft_new_vector(-4, 6,8);
+    // t_point *res = ft_transform(p, p2, -1);
+    t_point *res = ft_scale(p, v, -1);
+
+    // rotaion 
+    float **m = rotate_x(PI / 4);
+    float **m1 = rotate_x(PI / 2);
+    t_point *p = ft_new_point(0,1,0);
+    t_point *res = ft_multiply_matrix_vec(m, p);
+    t_point *res1 = ft_multiply_matrix_vec(m1, p);
+    // printf("Translation %f %f %f\n", res->x, res->y, res->z);
+    printf("Translation %f %f %f\n", res->x, res->y, res->z);
+    printf("Translation %f %f %f\n", res1->x, res1->y, res1->z);
+*/
+
+    int cor[6] = {0,0,0,0,0,1};
+    t_point *p = ft_new_point(2,3,4);
+    float **m = shearing_matrix(cor);
+    t_point *res = ft_multiply_matrix_vec(m, p);
+    printf("Translation %f %f %f\n", res->x, res->y, res->z);
     return 0;
 }
 // 00

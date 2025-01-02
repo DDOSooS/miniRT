@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2025/01/01 17:31:46 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/01/02 16:19:07 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 
 // # define    WIN_WIDTH   1280
 // # define    WIN_HEIGHT  720
-# define    EPSILON     1e-6f
+# define    EPSILON     1e-5f
 # define    PI          3.14159265359
 
 typedef struct    s_vector
@@ -51,7 +51,7 @@ typedef struct s_ray
     t_vector    *r_lab;    
 } t_ray;
 
-typedef t_vector Point3;
+typedef t_vector t_point;
 
 typedef struct	s_img
 {
@@ -179,7 +179,7 @@ t_vector    *vector_add(t_vector *v1, t_vector *v2);
 t_vector    *ft_new_vector(float x, float y, float z);
 void        var_dump_vector(t_vector *vec);
 t_ray       *create_ray(t_vector *origin, t_vector *direction);
-int         gen_ray(t_scene *scene,float x, float y, t_ray **cam_ray);
+int         gen_ray(t_scene *scene,float x, float y, t_ray **cam_r);
 
 // int check_intersection(t_ray *ray, t_vector *sphere_center, float radius) ;
 // int check_intersection(t_ray *cast_ray,t_vector *inter_point ,t_vector *local_normal,t_vector *locol_color);
@@ -197,11 +197,25 @@ int compare_vector(float a, float b);
 
 /* matrix operations*/
 float **ft_create_matrix(int n_rows, int n_cols);
+float ** ft_multiply_matrix(float **m1, float **m2, int n_cols, int n_row);
 int ft_compare_matrix(float **m1, float **m2, int n_col, int n_row);
+t_vector *ft_multiply_matrix_vec(float **m, t_vector *v);
 void ft_transpose_matrix(float ***m, int n_rows, int n_col);
 float **get_minor(float **m, int row, int col, int n);
 float determinant(float **m, int n);
-/* end of  matrix operation*/
+float **inverse_matrix(float **m, int n);
+void ft_scale_matrix(float ***m, float scale,int n);
+float **ft_translate_matrix(t_point *point, int inverse);
+t_point *ft_transform(t_point *p1 , t_point *p2, int inverse);
 
+t_point *ft_new_point(float x, float y, float z);
+void print_matrix(float **matrix, int rows, int cols) ;
+t_point *ft_scale(t_point *scale, t_point *point, int inverse);
+
+float **rotate_x(float degere);
+
+float **shearing_matrix(int *coord);
+
+/* end of  matrix operation*/
 
 #endif
