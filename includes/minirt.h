@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2025/01/02 16:19:07 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/01/03 17:32:59 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ typedef struct s_ray
     t_color     *color;
     t_vector    *origin;
     t_vector    *direction;
-    t_vector    *r_lab;    
+    // t_vector    *r_lab;    
 } t_ray;
 
 typedef t_vector t_point;
@@ -205,6 +205,7 @@ float **get_minor(float **m, int row, int col, int n);
 float determinant(float **m, int n);
 float **inverse_matrix(float **m, int n);
 void ft_scale_matrix(float ***m, float scale,int n);
+float **ft_scaling_matrix(int x, int y, int z, int inverse);
 float **ft_translate_matrix(t_point *point, int inverse);
 t_point *ft_transform(t_point *p1 , t_point *p2, int inverse);
 
@@ -212,10 +213,19 @@ t_point *ft_new_point(float x, float y, float z);
 void print_matrix(float **matrix, int rows, int cols) ;
 t_point *ft_scale(t_point *scale, t_point *point, int inverse);
 
-float **rotate_x(float degere);
-
+float **rotate_x(float rad);
+float **rotate_y(float rad);
+float **rotate_z(float rad);
+void print_matrix(float **matrix, int rows, int cols);
 float **shearing_matrix(int *coord);
 
+void ft_free_matrix(float **m, int n);
+
 /* end of  matrix operation*/
+
+
+/* ray manipulation*/
+t_point *position(t_ray *ray, float distance);
+t_ray *create_ray(t_point *origin, t_vector *dir);
 
 #endif

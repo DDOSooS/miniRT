@@ -260,7 +260,7 @@ t_point *ft_transform(t_point *p1 , t_point *p2, int inverse)
 }
 
 
-float **ft_scaling_matrix(t_point *scale, int inverse)
+float **ft_scaling_matrix(int x, int y, int z, int inverse)
 {
     float **scale_matrix;
 
@@ -268,35 +268,35 @@ float **ft_scaling_matrix(t_point *scale, int inverse)
     if (!scale_matrix)
         return (NULL);
     for (int i = 0; i < 4; i++)
-        for (int j; j < 4; i++)
+        for (int j = 0; j < 4; j++)
             scale_matrix[i][j] = 0;
     scale_matrix[3][3] = 1;
     if (inverse == -1)
     {
-        scale_matrix[0][0] = 1 / scale->x;
-        scale_matrix[1][1] = 1 / scale->y;
-        scale_matrix[2][2] = 1 / scale->z;
+        scale_matrix[0][0] = 1 / x;
+        scale_matrix[1][1] = 1 / y;
+        scale_matrix[2][2] = 1 / z;
     }
     else
     {
-        scale_matrix[1][1] = scale->y;
-        scale_matrix[2][2] = scale->z;
-        scale_matrix[0][0] = scale->x;
+        scale_matrix[1][1] = y;
+        scale_matrix[2][2] = z;
+        scale_matrix[0][0] = x;
     }
     return (scale_matrix);
 }
 
-t_point *ft_scale(t_point *scale, t_point *point, int inverse)
-{
-    t_point *scaled_point;
-    float **scale_matrix;
+// t_point *ft_scale(t_point *scale, t_point *point, int inverse)
+// {
+//     t_point *scaled_point;
+//     float **scale_matrix;
 
-    scale_matrix = ft_scaling_matrix(scale, inverse);
-    scaled_point = ft_multiply_matrix_vec(scale_matrix, point);
-    // print_matrix(scale_matrix, 4, 4);
-    ft_free_matrix(scale_matrix, 4);
-    return (scaled_point);
-}
+//     scale_matrix = ft_scaling_matrix(scale, inverse);
+//     scaled_point = ft_multiply_matrix_vec(scale_matrix, point);
+//     // print_matrix(scale_matrix, 4, 4);
+//     ft_free_matrix(scale_matrix, 4);
+//     return (scaled_point);
+// }
 
 t_vector *vector_add(t_vector *v1, t_vector *v2)
 {

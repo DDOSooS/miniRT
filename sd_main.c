@@ -307,9 +307,9 @@ int get_pixel_color(t_vector *dir, t_scene *scene)
 
 void init_scene(t_scene *scene)
 {
-    scene->image_width = 700;
+    scene->image_width = 200;
     scene->aspect_ratio = 16.0f / 9.0f;
-    scene->image_height = scene->image_width / scene->aspect_ratio;
+    scene->image_height = 200;
     scene->vp_hight = 2.0;
     scene->vp_width = scene->vp_hight * scene->aspect_ratio;
     scene->camera->focal_lenght = 500; 
@@ -370,6 +370,32 @@ int render_sphere(t_scene *scene)
     return 1;
 }
 
+int render_clock(t_scene *scene) 
+{
+    int color = ((255 << 24) | (255 << 16) | (0 << 8) | 0);
+    float radius = scene->image_width * 3 / 8 - 10;
+    t_point *origin = ft_new_point(1, 1, 0);
+
+    for (int i = 0; i < 12; i++)
+    {
+        float theta = ((float)i * 30.0f * PI) / 180.0f;
+        float **m = rotate_y(theta);
+        t_point *p = ft_multiply_matrix_vec(m, ft_new_point(origin->x, origin->y, origin->y));
+        int x = (int)(p->x * radius + scene->image_width / 2);
+        int y = (int)(p->z * radius + scene->image_height / 2); 
+        my_pixel_put(&scene->data->img, x, y, color);
+        free(p);
+        ft_free_matrix(m, 4);
+    }
+    free(origin);
+    mlx_put_image_to_window(scene->data->mlx, scene->data->win, 
+                            scene->data->img.img_ptr, 0, 0);
+    mlx_hook(scene->data->win, 17, 32, &ft_close_window, scene->data);
+    mlx_loop(scene->data->mlx);
+
+    return 1;
+}
+
 void print_matrix(float **matrix, int rows, int cols) {
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
@@ -392,12 +418,13 @@ int main(int argc, char **argv)
     map->lines = ft_gen_scen_map(argv[1]);
     if (!map->lines || !ft_check_map_components(&map))
         return (free(map), ft_putstr_fd("map is empty\n", 2), 1);
-/*
     scene = ft_generate_scene(map->lines);
     
     var_dump_all(map, scene);
     init_scene(scene);
-    render_sphere(scene);
+    // render_clock(scene);
+    // render_sphere(scene);
+/*
     float **matrix = ft_create_matrix(4,4);
     matrix[0][0]=3.0f;
     matrix[0][1]=-9.0f;
@@ -501,13 +528,31 @@ int main(int argc, char **argv)
     // printf("Translation %f %f %f\n", res->x, res->y, res->z);
     printf("Translation %f %f %f\n", res->x, res->y, res->z);
     printf("Translation %f %f %f\n", res1->x, res1->y, res1->z);
-*/
-
     int cor[6] = {0,0,0,0,0,1};
     t_point *p = ft_new_point(2,3,4);
     float **m = shearing_matrix(cor);
     t_point *res = ft_multiply_matrix_vec(m, p);
     printf("Translation %f %f %f\n", res->x, res->y, res->z);
+    t_point *p= ft_new_point(1,0,1);
+    float **rotatiom_m = rotate_x(PI / 2);
+    float **scale_m = ft_scaling_matrix(5,5,5,1);
+    t_point *pp1 = ft_new_point(10,5,7);
+    float **translation  = ft_translate_matrix(pp1, 1);
+    t_point *p2 =ft_multiply_matrix_vec(rotatiom_m , p);
+    printf("Translation %f %f %f\n", p2->x, p2->y, p2->z);
+    t_point *p3 =ft_multiply_matrix_vec(scale_m , p2);
+    printf("Translation %f %f %f\n", p3->x, p3->y, p3->z);
+    t_point *p4 =ft_multiply_matrix_vec(translation , p3);
+    printf("Translation %f %f %f\n", p4->x, p4->y, p4->z);
+    float **m = ft_multiply_matrix(translation, ft_multiply_matrix(scale_m, rotatiom_m, 4,4 ), 4,4);
+    t_point *p5 = ft_multiply_matrix_vec(m, p);
+    printf("Translation %f %f %f\n", p5->x, p5->y, p5->z);
+*/
+    t_point *p = ft_new_point(2,3,4);
+    t_vector *v = ft_new_vector(1,0,0);
+    t_ray *new = create_ray(p,v);
+    t_point *tmp = position(new, 2.5);
+    printf("Position %f %f %f\n", tmp->x, tmp->y, tmp->z);
     return 0;
 }
 // 00
