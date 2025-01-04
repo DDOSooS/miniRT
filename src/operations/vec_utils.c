@@ -491,6 +491,23 @@ float **inverse_matrix(float **m, int n)
     return (inverse);
 }
 
+float **identity_matrix(int n)
+{
+    float **identity;
+
+    identity = ft_create_matrix(n, n);
+    if (!identity)
+        return (NULL);
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+        {
+            if (i == j)
+                identity[i][j] = 1;
+            else 
+                identity[i][j] = 0;    
+        }
+    return (identity);
+}
 
 
 t_vector *vector_sub(t_vector *v1, t_vector *v2)

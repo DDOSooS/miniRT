@@ -307,9 +307,9 @@ int get_pixel_color(t_vector *dir, t_scene *scene)
 
 void init_scene(t_scene *scene)
 {
-    scene->image_width = 200;
+    scene->image_width = 100;
     scene->aspect_ratio = 16.0f / 9.0f;
-    scene->image_height = 200;
+    scene->image_height = 100;
     scene->vp_hight = 2.0;
     scene->vp_width = scene->vp_hight * scene->aspect_ratio;
     scene->camera->focal_lenght = 500; 
@@ -405,6 +405,47 @@ void print_matrix(float **matrix, int rows, int cols) {
     }
 }
 
+int render_spher(t_scene *scene)
+{
+    float wall_size = 6;
+    float pixel_size = wall_size / scene->image_width;
+    float half_size = wall_size / 2;
+    t_sphere *spher = malloc(sizeof(t_sphere));
+    spher->sphere_coordinates = ft_new_point(0,0,0);
+    spher->sphere_diameter = 1;
+    spher->transform = identity_matrix(4);
+    float world_x,world_y, wall_z;
+    t_point *r_origin = ft_new_point(0,0,-5);
+    t_ray *o_ray ;
+    t_point *position;
+    t_intersection inter;
+    int color;
+    wall_z = 10;
+
+    for (int y = 0; y < scene->image_height; y++)
+    {
+        world_y = half_size - pixel_size * y;
+        for (int x = 0; x < scene->image_width; x++)
+        {
+            world_x = half_size - pixel_size * x;
+            position = ft_new_point(world_x,world_y,wall_z);
+            o_ray = create_ray(r_origin, vector_normilze(vector_sub(position,r_origin)));
+            inter = ft_intersect_sphere(o_ray,spher);
+            if (inter.t1)
+            {
+                color = (255 << 24 | 255 << 16 | 0 << 8 << 0); 
+                my_pixel_put(&scene->data->img, x, y, color);
+            }
+        }
+    }
+    mlx_put_image_to_window(scene->data->mlx, 
+                        scene->data->win, 
+                        scene->data->img.img_ptr, 
+                        0, 0);
+    mlx_hook(scene->data->win, 17, 32, &ft_close_window, scene->data);
+    mlx_loop(scene->data->mlx);
+}
+
 int main(int argc, char **argv)
 {
     t_map *map;
@@ -422,6 +463,8 @@ int main(int argc, char **argv)
     
     var_dump_all(map, scene);
     init_scene(scene);
+
+    render_spher(scene);
     // render_clock(scene);
     // render_sphere(scene);
 /*
@@ -547,12 +590,55 @@ int main(int argc, char **argv)
     float **m = ft_multiply_matrix(translation, ft_multiply_matrix(scale_m, rotatiom_m, 4,4 ), 4,4);
     t_point *p5 = ft_multiply_matrix_vec(m, p);
     printf("Translation %f %f %f\n", p5->x, p5->y, p5->z);
-*/
+    //position function
     t_point *p = ft_new_point(2,3,4);
     t_vector *v = ft_new_vector(1,0,0);
     t_ray *new = create_ray(p,v);
     t_point *tmp = position(new, 2.5);
     printf("Position %f %f %f\n", tmp->x, tmp->y, tmp->z);
+
+
+    t_sphere *sphere = malloc(sizeof(t_sphere));
+    sphere->sphere_coordinates = ft_new_point(0, 0, 0);
+    sphere->sphere_diameter = 1;
+    sphere->sphere_color = ft_new_color(255, 0, 0);
+
+    t_ray *ray = create_ray(ft_new_point(0,0,5), ft_new_vector(0,0,1));
+    t_intersection intersection = ft_intersect_sphere(ray, sphere);
+    printf("N~ Intersection == %d\n", intersection.n_sol);
+    printf("sol1: %f\n", intersection.t1);
+    printf("sol2: %f\n", intersection.t2);
+    printf("sphere1: %f\n", ((t_sphere *)intersection.object)->sphere_diameter);
+
+    t_intersection intersection[4];
+    intersection[0] = ft_new_intersection(5, (void *)sphere, 1);
+    intersection[1] = ft_new_intersection(7, (void *)sphere, 1);
+    intersection[2] = ft_new_intersection(-3, (void *)sphere, 1);
+    intersection[3] = ft_new_intersection(2, (void *)sphere, 1);
+    t_intersection *hit = ray_hit(intersection, 4);
+    printf("solution || %f \n", hit->t1);
+   
+    t_ray *tmp =create_ray(ft_new_point(1,2,3), ft_new_vector(0,1,0));
+    float **m = ft_translate_matrix(ft_new_point(3,4,5),1);
+    float **n = ft_scaling_matrix(2,3,4,1);
+    t_ray *res = transform(tmp,m);
+    t_ray *res1 = transform(tmp,n);
+    printf("Translation %f %f %f\n", res->origin->x, res->origin->y, res->origin->z);
+    printf("Translation %f %f %f\n", res->direction->x, res->direction->y, res->direction->z);
+    printf("Translation1 %f %f %f\n", res1->origin->x, res1->origin->y, res1->origin->z);
+    printf("Translation1 %f %f %f\n", res1->direction->x, res1->direction->y, res1->direction->z);
+
+    t_ray * ray = create_ray(ft_new_point(0,0,-5), ft_new_vector(0,0,1));
+    t_sphere *s = malloc(sizeof(t_sphere));
+    s->sphere_coordinates = ft_new_point(0, 0, 0);
+    s->sphere_diameter = 1;
+    s->transform = ft_scaling_matrix(2,2,2,1);
+    // s->transform = ft_scaling_matrix(ft_new_point(2,2,2),1);
+    t_intersection t = ft_intersect_sphere(ray,s);
+    printf("Intersect solid %d\n", t.n_sol);
+    printf("Intersect solid 1 %f\n", t.t1);
+    printf("Intersect solid 2 %f\n", t.t2);
+*/
     return 0;
 }
 // 00

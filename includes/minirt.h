@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2025/01/03 17:32:59 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/01/04 16:17:11 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,15 @@ typedef struct s_ray
     // t_vector    *r_lab;    
 } t_ray;
 
+typedef struct s_intersection
+{
+    int     n_sol;
+    float   t1;
+    float   t2;
+    void    *object;
+    int     type;
+} t_intersection;
+
 typedef t_vector t_point;
 
 typedef struct	s_img
@@ -87,6 +96,7 @@ typedef struct sphere
     double          sphere_diameter;
     t_vector        *sphere_coordinates;
     t_color         *sphere_color;
+    float           **transform;
     struct sphere   *next;
 }   t_sphere;
 
@@ -184,7 +194,7 @@ int         gen_ray(t_scene *scene,float x, float y, t_ray **cam_r);
 // int check_intersection(t_ray *ray, t_vector *sphere_center, float radius) ;
 // int check_intersection(t_ray *cast_ray,t_vector *inter_point ,t_vector *local_normal,t_vector *locol_color);
 t_vector    *vector_copy(t_vector *src);
-
+t_sphere *ft_new_sphere(char **components);
 /* colors operations*/
 t_color *ft_new_color(float r, float g, float b);
 t_color *ft_add_color(t_color *c1, t_color *c2);
@@ -200,6 +210,7 @@ float **ft_create_matrix(int n_rows, int n_cols);
 float ** ft_multiply_matrix(float **m1, float **m2, int n_cols, int n_row);
 int ft_compare_matrix(float **m1, float **m2, int n_col, int n_row);
 t_vector *ft_multiply_matrix_vec(float **m, t_vector *v);
+float **identity_matrix(int n);
 void ft_transpose_matrix(float ***m, int n_rows, int n_col);
 float **get_minor(float **m, int row, int col, int n);
 float determinant(float **m, int n);
@@ -227,5 +238,10 @@ void ft_free_matrix(float **m, int n);
 /* ray manipulation*/
 t_point *position(t_ray *ray, float distance);
 t_ray *create_ray(t_point *origin, t_vector *dir);
+t_intersection ft_intersect_sphere(t_ray *ray, t_sphere *sphere);
+t_intersection  ft_new_intersection(float t, void *object, int type);
+t_intersection *ray_hit(t_intersection *inters, int count);
+t_ray *transform(t_ray *ray, float **m);
+/* end of ray manipulation functions*/
 
 #endif
