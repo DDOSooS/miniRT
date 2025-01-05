@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2025/01/04 16:17:11 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/01/05 10:19:22 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -216,10 +216,10 @@ float **get_minor(float **m, int row, int col, int n);
 float determinant(float **m, int n);
 float **inverse_matrix(float **m, int n);
 void ft_scale_matrix(float ***m, float scale,int n);
-float **ft_scaling_matrix(int x, int y, int z, int inverse);
+float **ft_scaling_matrix(float x, float y, float z, int inverse);
 float **ft_translate_matrix(t_point *point, int inverse);
 t_point *ft_transform(t_point *p1 , t_point *p2, int inverse);
-
+float **shearing_matrix(int *coord);
 t_point *ft_new_point(float x, float y, float z);
 void print_matrix(float **matrix, int rows, int cols) ;
 t_point *ft_scale(t_point *scale, t_point *point, int inverse);

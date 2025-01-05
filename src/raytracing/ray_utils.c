@@ -32,8 +32,13 @@ t_intersection ft_intersect_sphere(t_ray *ray, t_sphere *sphere)
     t_vector *oc;
     t_ray *tmp;
     float a,b,c, discriminant;
+    float **t;
 
-    tmp = transform(ray, inverse_matrix(sphere->transform, 4));
+    t = inverse_matrix(sphere->transform, 4);
+    if (!t)
+      t = sphere->transform;
+
+    tmp = transform(ray, t);
     oc = vector_sub(tmp->origin, sphere->sphere_coordinates);
     a = vector_dot(tmp->direction, tmp->direction);
     b = 2 * vector_dot(tmp->direction, oc);
@@ -103,7 +108,8 @@ t_ray *transform(t_ray *ray, float **m)
 {
     t_vector *dir;
     t_point *origin;
-
+    if (!m)
+        printf("===> NULLLLLLLLLLLL  <===\n");
     dir = ft_multiply_matrix_vec(m, ray->direction);
     origin = ft_multiply_matrix_vec(m, ray->origin);
     return create_ray(origin, dir);

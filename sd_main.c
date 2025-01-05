@@ -407,7 +407,13 @@ void print_matrix(float **matrix, int rows, int cols) {
 
 int render_spher(t_scene *scene)
 {
-    float wall_size = 6;
+    // spher->transform = ft_scaling_matrix(1,0.5,1,1);
+    // spher->transform = ft_scaling_matrix(0.5,1,1,1);
+    // spher->transform = ft_multiply_matrix(rotate_z(PI / 4), ft_scaling_matrix(0.5,1,1,1),4,4);
+    // int arr[6] = {1,0,0,0,0,0};
+    // spher->transform = ft_multiply_matrix(shearing_matrix(arr), ft_scaling_matrix(0.5,1,1,1),4,4);
+    // print_matrix(spher->transform,4,4);
+    float wall_size = 6; //100 
     float pixel_size = wall_size / scene->image_width;
     float half_size = wall_size / 2;
     t_sphere *spher = malloc(sizeof(t_sphere));
@@ -424,9 +430,11 @@ int render_spher(t_scene *scene)
 
     for (int y = 0; y < scene->image_height; y++)
     {
+        //  NDC - Normalized Device Coordinates **************(RULE)*************
         world_y = half_size - pixel_size * y;
         for (int x = 0; x < scene->image_width; x++)
         {
+            //  NDC - Normalized Device Coordinates **************(RULE)*************
             world_x = half_size - pixel_size * x;
             position = ft_new_point(world_x,world_y,wall_z);
             o_ray = create_ray(r_origin, vector_normilze(vector_sub(position,r_origin)));
@@ -641,12 +649,5 @@ int main(int argc, char **argv)
 */
     return 0;
 }
-// 00
-// 0 \1 2 
-// 3 \4 5
-// 6 \7 8
 
 
-// 0 3 6
-// 1 4 7
-// 2 5 8

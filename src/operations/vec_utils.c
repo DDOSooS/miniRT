@@ -260,7 +260,7 @@ t_point *ft_transform(t_point *p1 , t_point *p2, int inverse)
 }
 
 
-float **ft_scaling_matrix(int x, int y, int z, int inverse)
+float **ft_scaling_matrix(float x, float y, float z, int inverse)
 {
     float **scale_matrix;
 
@@ -273,9 +273,9 @@ float **ft_scaling_matrix(int x, int y, int z, int inverse)
     scale_matrix[3][3] = 1;
     if (inverse == -1)
     {
-        scale_matrix[0][0] = 1 / x;
-        scale_matrix[1][1] = 1 / y;
-        scale_matrix[2][2] = 1 / z;
+        scale_matrix[0][0] = 1.0f / x;
+        scale_matrix[1][1] = 1.0f / y;
+        scale_matrix[2][2] = 1.0f / z;
     }
     else
     {
