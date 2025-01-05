@@ -573,6 +573,119 @@ t_vector *vector_multiply_scalar(t_vector *v, float scalar)
 //     return (new);
 // }
 
+t_vector *normilize_at_sphere_pos(t_sphere *sphere, t_point *w_p)
+{
+    t_vector *vec;
+    t_vector *diff;
+    t_point *tmp;
+    float **tmp_m;
+
+    tmp_m = inverse_matrix(sphere->transform,4);
+    tmp = ft_multiply_matrix_vec(tmp_m, w_p);
+    diff = vector_sub(tmp, sphere->sphere_coordinates);
+    ft_transpose_matrix(&tmp_m,4,4);
+    vec = ft_multiply_matrix_vec(tmp_m, diff);
+    vec = vector_normilze(diff);
+    free(diff);
+    ft_free_matrix(tmp_m,4);
+    vec->w = 0;
+    return vec;
+}
+
+//Phong reflection model
+t_vector *reflect_vector(t_vector *in_vec, t_vector *norm_vec)
+{
+    t_vector *reflect_vec;
+    t_vector *tmp;
+    
+    tmp = vector_multiply_scalar(norm_vec, 2.0f * vector_dot(in_vec, norm_vec));
+    reflect_vec = vector_sub(in_vec, tmp);
+    free(tmp);
+    return reflect_vec;
+}
+
+p_light  *ft_new_plight(t_color *color, t_point *point)
+{
+    p_light *light;
+
+    light = (p_light *)malloc(sizeof(p_light));
+    if (!light)
+        return NULL;
+    light->intensity = ft_new_color(color->r, color->g, color->b);
+    light->position = ft_new_point(point->x, point->y, point->z);
+    return light;
+}
+
+t_material *defaul_material()
+{
+    t_material *material;
+
+    material = (t_material *)malloc(sizeof(t_material));
+    if (!material)
+        return NULL;
+    material->color = ft_new_color(1,1,1);  
+    material->ambient = 0.1;
+    material->diffuse = 0.9;
+    material->specular = 0.9;
+    material->shininess = 200.0f;
+    return material;
+}
+
+t_color *ft_multiply_color_scalar(t_color *color, float scalar)
+{
+    t_color *new_color;
+
+    new_color = ft_new_color(0,0,0);
+    if (!new_color)
+        return (NULL);
+    new_color->r = color->r * scalar;
+    new_color->g = color->g * scalar;
+    new_color->b = color->b * scalar;
+    return (new_color);
+}
+t_color *get_lighting_color(t_material *material, p_light *light, t_point *point, t_vector *cam_v, t_vector *norm_v)
+{
+    t_color *eff_color;
+    t_vector *light_dir;
+    t_vector *light_dir_normal;
+    t_color *ambient;
+    t_color *diffuse;
+    t_color *specular;
+    t_vector *reflect_vec;
+    float   light_dot_normal;
+    float   reflect_dot_camera;
+
+
+    eff_color = ft_multiply_color(material->color, light->intensity);
+    light_dir = vector_sub(light->position, point);
+    light_dir_normal = vector_normilze(light_dir);
+    ambient = ft_multiply_color_scalar(eff_color, material->ambient);
+    light_dot_normal = vector_dot(light_dir_normal, norm_v);
+    if (light_dir_normal < 0)
+    {
+        diffuse = ft_new_color(0,0,0);
+        specular = ft_new_color(0,0,0);
+    }
+    else
+    {
+        diffuse = ft_multiply_color_scalar(eff_color, material->diffuse * light_dot_normal);
+        t_vector *tmp = light_dir;
+        negate_vector(tmp);
+        reflect_vec = reflect_vector(tmp, cam_v);
+        reflect_dot_camera = vector_dot(reflect_vec, cam_v);
+        if (reflect_dot_camera <= 0)
+            specular = ft_new_color(0,0,0);
+        else
+        {
+            float spec_factor = pow(reflect_dot_camera, material->shininess);
+            specular = ft_multiply_color_scalar(light->intensity, material->specular * spec_factor);
+        }
+    }
+    t_color *tmp1 = ft_add_color(ambient, diffuse);
+    t_color *total_color = ft_add_color(tmp1, specular);
+    return total_color;
+}
+
 t_vector *vector_normilze(t_vector *vec)
 {
     if (!vec) 
@@ -589,6 +702,5 @@ t_vector *vector_normilze(t_vector *vec)
     new->x = vec->x / magnitude;
     new->y = vec->y / magnitude;
     new->z = vec->z / magnitude;
-
     return new;
 }

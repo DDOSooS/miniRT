@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2025/01/05 10:19:22 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/01/05 18:08:22 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,20 @@ typedef struct	s_img
 	int		endian;
 }				t_img;
 
+typedef struct s_material
+{
+    t_color   *color;
+    double    ambient;
+    double    diffuse;
+    double    specular;
+    double    shininess;
+}   t_material;
+
+typedef struct light_s
+{
+    t_color *intensity;
+    t_point *position;
+} p_light;
 typedef struct var
 {
     void    *mlx;
@@ -97,6 +111,7 @@ typedef struct sphere
     t_vector        *sphere_coordinates;
     t_color         *sphere_color;
     float           **transform;
+    t_material       *material;
     struct sphere   *next;
 }   t_sphere;
 
@@ -144,6 +159,8 @@ typedef struct light
     double          light_ration;
     t_color         *light_color;
 } t_light;
+
+
 
 typedef struct objects
 {
@@ -195,6 +212,7 @@ int         gen_ray(t_scene *scene,float x, float y, t_ray **cam_r);
 // int check_intersection(t_ray *cast_ray,t_vector *inter_point ,t_vector *local_normal,t_vector *locol_color);
 t_vector    *vector_copy(t_vector *src);
 t_sphere *ft_new_sphere(char **components);
+t_vector *normilize_at_sphere_pos(t_sphere *sphere, t_point *p);
 /* colors operations*/
 t_color *ft_new_color(float r, float g, float b);
 t_color *ft_add_color(t_color *c1, t_color *c2);
@@ -203,6 +221,7 @@ t_color *ft_scale_color(t_color *c, float scalar);
 t_color *ft_multiply_color(t_color *c1, t_color *c2);
 void    negate_vector(t_vector *vector);
 int compare_vector(float a, float b);
+t_vector *reflect_vector(t_vector *in_vec, t_vector *norm_vec);
 /* end of color manipulation*/
 
 /* matrix operations*/
@@ -231,7 +250,9 @@ void print_matrix(float **matrix, int rows, int cols);
 float **shearing_matrix(int *coord);
 
 void ft_free_matrix(float **m, int n);
-
+t_material *defaul_material();
+p_light  *ft_new_plight(t_color *color, t_point *point);
+t_color *get_lighting_color(t_material *material, p_light *light, t_point *point, t_vector *cam_v, t_vector *norm_v);
 /* end of  matrix operation*/
 
 

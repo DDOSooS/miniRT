@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 20:24:10 by aghergho          #+#    #+#             */
-/*   Updated: 2025/01/04 16:17:19 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/01/05 17:14:44 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -644,6 +644,7 @@ t_sphere *ft_new_sphere(char **components)
     sphere->sphere_diameter = ft_atod(components[2]);
     ft_gen_colors(&sphere->sphere_color, components[3]);
     sphere->transform = identity_matrix(4);
+    sphere->material = defaul_material();
     sphere->next = NULL;
     return sphere;
 }

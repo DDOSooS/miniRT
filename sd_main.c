@@ -472,7 +472,8 @@ int main(int argc, char **argv)
     var_dump_all(map, scene);
     init_scene(scene);
 
-    render_spher(scene);
+
+    // render_spher(scene);
     // render_clock(scene);
     // render_sphere(scene);
 /*
@@ -646,7 +647,32 @@ int main(int argc, char **argv)
     printf("Intersect solid %d\n", t.n_sol);
     printf("Intersect solid 1 %f\n", t.t1);
     printf("Intersect solid 2 %f\n", t.t2);
+
+    ====> normal vector of a point on the sphere <====
+    
+    t_sphere *s = malloc(sizeof(t_sphere));
+    s->sphere_coordinates = ft_new_point(0, 0, 0);
+    s->sphere_diameter = 1;
+    s->transform = ft_translate_matrix(ft_new_point(0,1,0),1);
+
+    t_point *p  = normilize_at_sphere_pos(s,ft_new_point(0,1.70711,-0.70711));
+    printf("Translation %f %f %f\n", p->x, p->y, p->z);
+
+    // Phong reflection model
+    t_vector *res = reflect_vector(ft_new_vector(1,-1,0), ft_new_vector(0,1,0));
+    printf("Translation %f %f %f\n", res->x, res->y, res->z);
 */
+
+
+
+    t_vector *cam_vec = ft_new_vector(0,sqrt(2)/2.0f,-sqrt(2)/2.0f);
+    t_vector *norm_v = ft_new_vector(0,0,-1);
+    p_light *light = ft_new_plight(ft_new_color(1,1,1), ft_new_point(0,0,-10));
+    t_material*m  = defaul_material();
+    t_point *point = ft_new_point(0,0,0);
+    t_color *color = get_lighting_color(m,light,point,cam_vec, norm_v);
+    printf("Translation %f %f %f\n", color->r, color->g, color->b);
+
     return 0;
 }
 
