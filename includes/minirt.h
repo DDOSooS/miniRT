@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2025/01/05 18:08:22 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/01/06 20:43:29 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,9 +37,9 @@ typedef struct    s_vector
 
 typedef struct s_color
 {
-    int r;
-    int g;
-    int b;
+    float r;
+    float g;
+    float b;
 } t_color;
 
 
@@ -74,10 +74,10 @@ typedef struct	s_img
 typedef struct s_material
 {
     t_color   *color;
-    double    ambient;
-    double    diffuse;
-    double    specular;
-    double    shininess;
+    float    ambient;
+    float    diffuse;
+    float    specular;
+    float    shininess;
 }   t_material;
 
 typedef struct light_s
@@ -219,9 +219,11 @@ t_color *ft_add_color(t_color *c1, t_color *c2);
 t_color *ft_sub_color(t_color *c1, t_color *c2);
 t_color *ft_scale_color(t_color *c, float scalar);
 t_color *ft_multiply_color(t_color *c1, t_color *c2);
-void    negate_vector(t_vector *vector);
+t_vector    *negate_vector(t_vector *vector);
 int compare_vector(float a, float b);
-t_vector *reflect_vector(t_vector *in_vec, t_vector *norm_vec);
+t_vector *reflect_vector(t_vector *, t_vector *);
+t_color *ft_multiply_color_scalar(t_color *color, float scalar);
+
 /* end of color manipulation*/
 
 /* matrix operations*/
@@ -250,7 +252,7 @@ void print_matrix(float **matrix, int rows, int cols);
 float **shearing_matrix(int *coord);
 
 void ft_free_matrix(float **m, int n);
-t_material *defaul_material();
+t_material *default_material();
 p_light  *ft_new_plight(t_color *color, t_point *point);
 t_color *get_lighting_color(t_material *material, p_light *light, t_point *point, t_vector *cam_v, t_vector *norm_v);
 /* end of  matrix operation*/

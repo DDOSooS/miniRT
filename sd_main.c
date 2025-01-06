@@ -664,15 +664,62 @@ int main(int argc, char **argv)
 */
 
 
+    // t_vector *ref = reflect_vector(ft_new_vector(0,-1,0), ft_new_vector(sqrt(2) / 2.0f,sqrt(2) / 2.f, 0));
+    // printf("reflectoinnnnn %f %f %f\n", ref->x, ref->y, ref->z);
 
-    t_vector *cam_vec = ft_new_vector(0,sqrt(2)/2.0f,-sqrt(2)/2.0f);
+    t_material*m  = default_material();
+    t_point *point = ft_new_point(0,0,0);
+
+    // t_vector *cam_vec = ft_new_vector(0,0,-1);
+    t_vector *cam_vec = ft_new_vector(0,0,-1);
     t_vector *norm_v = ft_new_vector(0,0,-1);
     p_light *light = ft_new_plight(ft_new_color(1,1,1), ft_new_point(0,0,-10));
-    t_material*m  = defaul_material();
-    t_point *point = ft_new_point(0,0,0);
     t_color *color = get_lighting_color(m,light,point,cam_vec, norm_v);
-    printf("Translation %f %f %f\n", color->r, color->g, color->b);
+    printf("res color %f %f %f\n", color->r, color->g, color->b);
 
+// t_color *white = ft_new_color(1000000.0, 1.0, 1.0);
+//     printf("White color: %f %f %f\n", white->r, white->g, white->b);
+
+//     // Test 2: Color multiplication
+//     t_color *c1 = ft_new_color(1.0, 0.5, 0.0);
+//     t_color *c2 = ft_new_color(0.5, 0.5, 0.5);
+//     t_color *mult = ft_multiply_color(c1, c2);
+//     printf("Color multiplication: %f %f %f\n", mult->r, mult->g, mult->b);
+
+//     // Test 3: Scalar multiplication
+//     t_color *scalar_mult = ft_multiply_color_scalar(white, 0.1);
+//     printf("Scalar multiplication (0.1): %f %f %f\n", scalar_mult->r, scalar_mult->g, scalar_mult->b);
+
+//     // Test 4: Color addition
+//     t_color *sum = ft_add_color(c1, c2);
+//     printf("Color addition: %f %f %f\n", sum->r, sum->g, sum->b);
+
+//     // Test specific to your lighting scenario
+//     t_material *m = default_material();
+//     t_color *light_intensity = ft_new_color(1.0, 1.0, 1.0);
+    
+//     printf("\nTesting lighting components:\n");
+//     printf("Material color: %f %f %f\n", m->color->r, m->color->g, m->color->b);
+//     printf("Light intensity: %f %f %f\n", light_intensity->r, light_intensity->g, light_intensity->b);
+    
+//     t_color *eff_color = ft_multiply_color(m->color, light_intensity);
+//     printf("Effective color: %f %f %f\n", eff_color->r, eff_color->g, eff_color->b);
+    
+//     t_color *ambient = ft_multiply_color_scalar(eff_color, m->ambient);
+//     printf("Ambient component: %f %f %f\n", ambient->r, ambient->g, ambient->b);
+
+//     // Cleanup
+//     free(white);
+//     free(c1);
+//     free(c2);
+//     free(mult);
+//     free(scalar_mult);
+//     free(sum);
+//     free(light_intensity);
+//     free(eff_color);
+//     free(ambient);
+//     free(m->color);
+//     free(m);
     return 0;
 }
 
