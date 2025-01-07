@@ -630,7 +630,7 @@ p_light  *ft_new_plight(t_color *color, t_point *point)
     light = (p_light *)malloc(sizeof(p_light));
     if (!light)
         return NULL;
-    light->intensity = ft_new_color(1.0,1.0,1.0);
+    light->intensity = ft_new_color(color->r, color->g, color->b);
     light->position = ft_new_point(point->x, point->y, point->z);
     return light;
 }
@@ -664,17 +664,13 @@ t_color *get_lighting_color(t_material *material, p_light *light, t_point *point
 
     // Calculate effective color (material color * light intensity)
     eff_color = ft_multiply_color(material->color, light->intensity);
-
     // Calculate ambient contribution
     ambient = ft_multiply_color_scalar(eff_color, material->ambient);
-
     // Calculate vector to light source
     light_dir = vector_sub(light->position, point);
     light_dir_normal = vector_normilze(light_dir);
-    
     // Calculate light dot normal
     light_dot_normal = vector_dot(light_dir_normal, norm_v);
-
     if (light_dot_normal < 0)
     {
         diffuse = ft_new_color(0, 0, 0);
@@ -688,26 +684,20 @@ t_color *get_lighting_color(t_material *material, p_light *light, t_point *point
         // Calculate reflection
         t_vector *neg_light = negate_vector(vector_copy(light_dir_normal));
         t_vector *reflect_vec = reflect_vector(neg_light, norm_v);
-        
         reflect_dot_camera = vector_dot(reflect_vec, cam_v);
-        
         if (reflect_dot_camera <= 0)
             specular = ft_new_color(0, 0, 0);
         else
         {
             float spec_factor = pow(reflect_dot_camera, material->shininess);
             specular = ft_multiply_color_scalar(light->intensity, material->specular * spec_factor);
+          //specular = ft_multiply_color_scalar(light->intensity, material->specular * spec_factor);
         }
-        
         free(neg_light);
         free(reflect_vec);
     }
-
-    // Add all components
     t_color *tmp = ft_add_color(ambient, diffuse);
     total_color = ft_add_color(tmp, specular);
-    
-    // Cleanup
     free(eff_color);
     free(light_dir);
     free(light_dir_normal);
@@ -715,29 +705,28 @@ t_color *get_lighting_color(t_material *material, p_light *light, t_point *point
     free(diffuse);
     free(specular);
     free(tmp);
-    
     return total_color;
 }
 
-// Helper function to create default material
+
 t_material *default_material(void)
 {
     t_material *m = malloc(sizeof(t_material));
     if (!m)
         return NULL;
     
-    m->color = ft_new_color(1.0, 1.0, 1.0);  // White material
+    m->color = ft_new_color(1.0, 1.0, 1.0);  
     m->ambient = 0.1;
     m->diffuse = 0.9;
     m->specular = 0.9;
     m->shininess = 200.0;
     
-    printf("Created default material:\n");
-    printf("  Color: %f %f %f\n", m->color->r, m->color->g, m->color->b);
-    printf("  Ambient: %f\n", m->ambient);
-    printf("  Diffuse: %f\n", m->diffuse);
-    printf("  Specular: %f\n", m->specular);
-    printf("  Shininess: %f\n", m->shininess);
+    // printf("Created default material:\n");
+    // printf("  Color: %f %f %f\n", m->color->r, m->color->g, m->color->b);
+    // printf("  Ambient: %f\n", m->ambient);
+    // printf("  Diffuse: %f\n", m->diffuse);
+    // printf("  Specular: %f\n", m->specular);
+    // printf("  Shininess: %f\n", m->shininess);
     
     return m;
 }

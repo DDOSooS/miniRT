@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 20:24:10 by aghergho          #+#    #+#             */
-/*   Updated: 2025/01/06 20:18:16 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/01/07 09:14:28 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -567,9 +567,9 @@ int ft_gen_colors(t_color **color,char *components)
     tmp_colors = split(components, ",");
     if (!tmp_colors) 
         return 0;
-    (*color)->r= ft_atoi(tmp_colors[0]);
-    (*color)->g= ft_atoi(tmp_colors[1]);
-    (*color)->b= ft_atoi(tmp_colors[2]);
+    (*color)->r= ft_atod(tmp_colors[0]);
+    (*color)->g= ft_atod(tmp_colors[1]);
+    (*color)->b= ft_atod(tmp_colors[2]);
     ft_free_line_components(tmp_colors);
     return (1); 
 }

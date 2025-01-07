@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2025/01/06 20:43:29 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/01/07 09:18:37 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -265,6 +265,8 @@ t_intersection ft_intersect_sphere(t_ray *ray, t_sphere *sphere);
 t_intersection  ft_new_intersection(float t, void *object, int type);
 t_intersection *ray_hit(t_intersection *inters, int count);
 t_ray *transform(t_ray *ray, float **m);
+t_point *position(t_ray *ray, float distance);
+t_color *get_lighting_color(t_material *material, p_light *light, t_point *point, t_vector *cam_v, t_vector *norm_v);
 /* end of ray manipulation functions*/
 
 #endif

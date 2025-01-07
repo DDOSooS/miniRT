@@ -307,9 +307,9 @@ int get_pixel_color(t_vector *dir, t_scene *scene)
 
 void init_scene(t_scene *scene)
 {
-    scene->image_width = 100;
+    scene->image_width = 500;
     scene->aspect_ratio = 16.0f / 9.0f;
-    scene->image_height = 100;
+    scene->image_height = 500;
     scene->vp_hight = 2.0;
     scene->vp_width = scene->vp_hight * scene->aspect_ratio;
     scene->camera->focal_lenght = 500; 
@@ -413,17 +413,21 @@ int render_spher(t_scene *scene)
     // int arr[6] = {1,0,0,0,0,0};
     // spher->transform = ft_multiply_matrix(shearing_matrix(arr), ft_scaling_matrix(0.5,1,1,1),4,4);
     // print_matrix(spher->transform,4,4);
-    float wall_size = 6; //100 
+    float wall_size = 20; //100 
     float pixel_size = wall_size / scene->image_width;
     float half_size = wall_size / 2;
     t_sphere *spher = malloc(sizeof(t_sphere));
     spher->sphere_coordinates = ft_new_point(0,0,0);
-    spher->sphere_diameter = 1;
+    spher->sphere_diameter = 2;
+    t_color *white = ft_new_color(1.0,0.2,1.0);
+    spher->material = default_material();
+    spher->material->color = white;
+    p_light *light = ft_new_plight(ft_new_color(1.0,1.0,1.0), ft_new_point(-10, 10, -10));
     spher->transform = identity_matrix(4);
     float world_x,world_y, wall_z;
     t_point *r_origin = ft_new_point(0,0,-5);
     t_ray *o_ray ;
-    t_point *position;
+    t_point *pos;
     t_intersection inter;
     int color;
     wall_z = 10;
@@ -436,13 +440,20 @@ int render_spher(t_scene *scene)
         {
             //  NDC - Normalized Device Coordinates **************(RULE)*************
             world_x = half_size - pixel_size * x;
-            position = ft_new_point(world_x,world_y,wall_z);
-            o_ray = create_ray(r_origin, vector_normilze(vector_sub(position,r_origin)));
+            pos = ft_new_point(-world_x,world_y,wall_z);
+            o_ray = create_ray(r_origin, vector_normilze(vector_sub(pos,r_origin)));
             inter = ft_intersect_sphere(o_ray,spher);
             if (inter.t1)
             {
                 color = (255 << 24 | 255 << 16 | 0 << 8 << 0); 
-                my_pixel_put(&scene->data->img, x, y, color);
+                // o_ray->direction = vector_normilze(o_ray->direction);
+                t_point *p = position(o_ray, inter.t1);
+                t_vector *v = normilize_at_sphere_pos(spher, p);
+                t_vector *cam_v = negate_vector(o_ray->direction);
+                t_color *c = get_lighting_color(spher->material, light, p, cam_v, v);
+                int color;
+                color = ( ((int)(c->r * 255.0) << 16) | ((int)(c->g * 255.0) << 8) | (int)(c->b * 255.0));               
+                 my_pixel_put(&scene->data->img, x, y, color);
             }
         }
     }
@@ -473,7 +484,7 @@ int main(int argc, char **argv)
     init_scene(scene);
 
 
-    // render_spher(scene);
+    render_spher(scene);
     // render_clock(scene);
     // render_sphere(scene);
 /*
@@ -661,11 +672,8 @@ int main(int argc, char **argv)
     // Phong reflection model
     t_vector *res = reflect_vector(ft_new_vector(1,-1,0), ft_new_vector(0,1,0));
     printf("Translation %f %f %f\n", res->x, res->y, res->z);
-*/
-
-
-    // t_vector *ref = reflect_vector(ft_new_vector(0,-1,0), ft_new_vector(sqrt(2) / 2.0f,sqrt(2) / 2.f, 0));
-    // printf("reflectoinnnnn %f %f %f\n", ref->x, ref->y, ref->z);
+    t_vector *ref = reflect_vector(ft_new_vector(0,-1,0), ft_new_vector(sqrt(2) / 2.0f,sqrt(2) / 2.f, 0));
+    printf("reflectoinnnnn %f %f %f\n", ref->x, ref->y, ref->z);
 
     t_material*m  = default_material();
     t_point *point = ft_new_point(0,0,0);
@@ -673,53 +681,57 @@ int main(int argc, char **argv)
     // t_vector *cam_vec = ft_new_vector(0,0,-1);
     t_vector *cam_vec = ft_new_vector(0,0,-1);
     t_vector *norm_v = ft_new_vector(0,0,-1);
-    p_light *light = ft_new_plight(ft_new_color(1,1,1), ft_new_point(0,0,-10));
+    p_light *light = ft_new_plight(ft_new_color(1,1,1), ft_new_point(0,0,10));
     t_color *color = get_lighting_color(m,light,point,cam_vec, norm_v);
     printf("res color %f %f %f\n", color->r, color->g, color->b);
 
-// t_color *white = ft_new_color(1000000.0, 1.0, 1.0);
-//     printf("White color: %f %f %f\n", white->r, white->g, white->b);
+t_color *white = ft_new_color(1000000.0, 1.0, 1.0);
+    printf("White color: %f %f %f\n", white->r, white->g, white->b);
 
-//     // Test 2: Color multiplication
-//     t_color *c1 = ft_new_color(1.0, 0.5, 0.0);
-//     t_color *c2 = ft_new_color(0.5, 0.5, 0.5);
-//     t_color *mult = ft_multiply_color(c1, c2);
-//     printf("Color multiplication: %f %f %f\n", mult->r, mult->g, mult->b);
+    // Test 2: Color multiplication
+    t_color *c1 = ft_new_color(1.0, 0.5, 0.0);
+    t_color *c2 = ft_new_color(0.5, 0.5, 0.5);
+    t_color *mult = ft_multiply_color(c1, c2);
+    printf("Color multiplication: %f %f %f\n", mult->r, mult->g, mult->b);
 
-//     // Test 3: Scalar multiplication
-//     t_color *scalar_mult = ft_multiply_color_scalar(white, 0.1);
-//     printf("Scalar multiplication (0.1): %f %f %f\n", scalar_mult->r, scalar_mult->g, scalar_mult->b);
+    // Test 3: Scalar multiplication
+    t_color *scalar_mult = ft_multiply_color_scalar(white, 0.1);
+    printf("Scalar multiplication (0.1): %f %f %f\n", scalar_mult->r, scalar_mult->g, scalar_mult->b);
 
-//     // Test 4: Color addition
-//     t_color *sum = ft_add_color(c1, c2);
-//     printf("Color addition: %f %f %f\n", sum->r, sum->g, sum->b);
+    // Test 4: Color addition
+    t_color *sum = ft_add_color(c1, c2);
+    printf("Color addition: %f %f %f\n", sum->r, sum->g, sum->b);
 
-//     // Test specific to your lighting scenario
-//     t_material *m = default_material();
-//     t_color *light_intensity = ft_new_color(1.0, 1.0, 1.0);
+    // Test specific to your lighting scenario
+    t_material *m = default_material();
+    t_color *light_intensity = ft_new_color(1.0, 1.0, 1.0);
     
-//     printf("\nTesting lighting components:\n");
-//     printf("Material color: %f %f %f\n", m->color->r, m->color->g, m->color->b);
-//     printf("Light intensity: %f %f %f\n", light_intensity->r, light_intensity->g, light_intensity->b);
+    printf("\nTesting lighting components:\n");
+    printf("Material color: %f %f %f\n", m->color->r, m->color->g, m->color->b);
+    printf("Light intensity: %f %f %f\n", light_intensity->r, light_intensity->g, light_intensity->b);
     
-//     t_color *eff_color = ft_multiply_color(m->color, light_intensity);
-//     printf("Effective color: %f %f %f\n", eff_color->r, eff_color->g, eff_color->b);
+    t_color *eff_color = ft_multiply_color(m->color, light_intensity);
+    printf("Effective color: %f %f %f\n", eff_color->r, eff_color->g, eff_color->b);
     
-//     t_color *ambient = ft_multiply_color_scalar(eff_color, m->ambient);
-//     printf("Ambient component: %f %f %f\n", ambient->r, ambient->g, ambient->b);
+    t_color *ambient = ft_multiply_color_scalar(eff_color, m->ambient);
+    printf("Ambient component: %f %f %f\n", ambient->r, ambient->g, ambient->b);
 
-//     // Cleanup
-//     free(white);
-//     free(c1);
-//     free(c2);
-//     free(mult);
-//     free(scalar_mult);
-//     free(sum);
-//     free(light_intensity);
-//     free(eff_color);
-//     free(ambient);
-//     free(m->color);
-//     free(m);
+    // Cleanup
+    free(white);
+    free(c1);
+    free(c2);
+    free(mult);
+    free(scalar_mult);
+    free(sum);
+    free(light_intensity);
+    free(eff_color);
+    free(ambient);
+    free(m->color);
+    free(m);
+*/
+
+
+
     return 0;
 }
 
