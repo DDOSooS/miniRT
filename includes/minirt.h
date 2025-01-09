@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2025/01/07 09:18:37 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/01/09 18:30:43 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 #include "../minilibx-linux/mlx.h"
 #include "./get_next_line/get_next_line.h"
 #include "./libft/libft.h"
+#include <limits.h>
 
 // # define    WIN_WIDTH   1280
 // # define    WIN_HEIGHT  720
@@ -41,6 +42,13 @@ typedef struct s_color
     float g;
     float b;
 } t_color;
+
+typedef enum e_shape_type
+{
+    SHAPE_SPHERE,
+    SHAPE_PLANE,
+    SHAPE_CYLINDER
+} t_shape_type;
 
 
 typedef struct s_ray
@@ -190,6 +198,37 @@ typedef struct s_scene
     t_var       *data;
 }   t_scene;
 
+typedef struct s_compose
+{
+    t_intersection  intersection;
+    void            * obj;
+    int             obj_type;
+    float           t;
+    t_vector        *camv;
+    t_vector        *normv;
+    t_point         *point;
+    int             inside;
+}   t_compose;
+
+typedef struct s_shape
+{
+    t_shape_type type;
+    union
+    {
+        t_sphere *sphere;
+        t_plane *plane;
+        t_cylinder *cylinder;
+    } objects;
+    struct s_shape *next;
+} t_shape;
+
+typedef struct s_world
+{
+    int n_objects;
+    t_shape *shape;
+    p_light *light;
+} t_world;
+
 map_line    *ft_gen_scen_map(char *file_name);
 t_scene     *ft_generate_scene(map_line *compoenent);
 void        var_dump_lines(map_line *map);
@@ -212,7 +251,7 @@ int         gen_ray(t_scene *scene,float x, float y, t_ray **cam_r);
 // int check_intersection(t_ray *cast_ray,t_vector *inter_point ,t_vector *local_normal,t_vector *locol_color);
 t_vector    *vector_copy(t_vector *src);
 t_sphere *ft_new_sphere(char **components);
-t_vector *normilize_at_sphere_pos(t_sphere *sphere, t_point *p);
+// t_vector *normilize_at_sphere_pos(t_sphere *sphere, t_point *p);
 /* colors operations*/
 t_color *ft_new_color(float r, float g, float b);
 t_color *ft_add_color(t_color *c1, t_color *c2);
@@ -267,6 +306,11 @@ t_intersection *ray_hit(t_intersection *inters, int count);
 t_ray *transform(t_ray *ray, float **m);
 t_point *position(t_ray *ray, float distance);
 t_color *get_lighting_color(t_material *material, p_light *light, t_point *point, t_vector *cam_v, t_vector *norm_v);
+t_vector *normilize_at_sphere_pos(t_sphere *sphere, t_point *w_p);
 /* end of ray manipulation functions*/
 
+t_world *default_world();
+t_intersection *intersect_world(t_world *world, t_ray *ray);
+t_sphere *default_sphere();
+t_compose *prepare_computations(t_intersection inter, t_ray *ray);
 #endif

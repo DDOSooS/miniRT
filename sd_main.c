@@ -123,111 +123,9 @@ void var_dump_vector(t_vector *vec)
     printf("x-> (%f) y-> (%f) z-> (%f) ===\n",vec->x, vec->y, vec->z);
 }
 
-/*
-int check_sphere_intersection(t_ray *ray, t_sphere *sphere)
-{
-    t_vector    *oc;
-    double      a, b, c, delta;
-
-    oc = vector_sub(sphere->sphere_coordinates, ray->origin);
-    // Debug print
-    printf("Ray direction: x=%f, y=%f, z=%f\n", ray->direction->x, ray->direction->y, ray->direction->z);
-    printf("Sphere pos: x=%f, y=%f, z=%f\n", sphere->sphere_coordinates->x, 
-           sphere->sphere_coordinates->y, sphere->sphere_coordinates->z);
-    
-    a = 1;
-    b = -2.0 * vector_dot(ray->direction, oc);
-    c = vector_dot(oc, oc) - sphere->sphere_diameter * sphere->sphere_diameter;
-    delta = b * b - 4 * a * c;
-    printf("=== delta>> a=%f b=%f c=%f  delta::%f<<====\n", a,b,c,delta);
-    return (delta >= 0);  
-}
-Add this helper function
-double get_sphere_intersection_t(t_ray *ray, t_sphere *sphere)
-{
-    t_vector *oc = vector_sub(ray->origin, sphere->sphere_coordinates);
-    double a = vector_dot(ray->direction, ray->direction);
-    double b = 2.0 * vector_dot(ray->direction, oc);
-    double c = vector_dot(oc, oc) - (sphere->sphere_diameter * sphere->sphere_diameter / 4.0);
-    double delta = b * b - 4 * a * c;
-    
-    if (delta < 0) return -1;
-    
-    double t1 = (-b - sqrt(delta)) / (2.0 * a);
-    double t2 = (-b + sqrt(delta)) / (2.0 * a);
-    
-    return (t1 < t2 && t1 > 0) ? t1 : t2;
-}
-
-int check_intersection(t_ray *ray, t_scene *scene)
-{
-    t_vector *unit_dir = vector_normilze(ray->direction);
-    double a = 0.5 * (unit_dir->y + 1.0);
-    
-    // Get the actual intersection distance
-    double t = get_sphere_intersection_t(ray, scene->sphere);
-    printf("intersection === %f====\n", t);
-    if (t >= 0)  // If we hit the sphere
-    {
-        // Calculate intersection point and normal for proper shading
-        t_vector *hit_point = vector_add(ray->origin, vector_multiply_scalar(ray->direction, t));
-        t_vector *normal = vector_normilze(vector_sub(hit_point, scene->sphere->sphere_coordinates));
-        
-        // Simple diffuse shading
-        // double light_intensity = fmax(0.2, vector_dot(normal, scene->light->light_coordinate));
-        
-        return (255 << 24 | 
-                (int)(scene->sphere->sphere_color->r) << 16 | 
-                (int)(scene->sphere->sphere_color->b) << 8 | 
-                (int)(scene->sphere->sphere_color->b));
-    }
-
-    // Background color if no hit
-    int red   = (int)(255.0 * ((1.0 - a) * 1.0 + a * 0.5));
-    int green = (int)(255.0 * ((1.0 - a) * 1.0 + a * 0.7));
-    int blue  = (int)(255.0 * ((1.0 - a) * 1.0 + a * 1.0));
-    
-    return (255 << 24 | red << 16 | green << 8 | blue);
-}
-
-void update_camera_settings(t_scene *scene)
-{
-    scene->camera->focal_lenght = 1.0;
-    t_vector *vec_up = ft_new_vector(0,1,0);
-    // Calculate viewport vectors
-    double viewport_height = 2.0 * tan(scene->camera->camera_fov * PI / 360.0);
-    double viewport_width = viewport_height * scene->aspect_ratio;
-    
-    // Get camera orientation vectors
-    t_vector *w = vector_normilze(vector_multiply_scalar(scene->camera->camera_dir, -1));
-    t_vector *u = vector_normilze(vector_cross(vec_up, w));
-    t_vector *v = vector_cross(w, u);
-    
-    // Calculate viewport vectors
-    scene->vp_u = vector_multiply_scalar(u, viewport_width);
-    scene->vp_v = vector_multiply_scalar(v, -viewport_height);
-    
-    // Calculate pixel delta vectors
-    scene->camera->cam_u = vector_multiply_scalar(scene->vp_u, 1.0 / scene->image_width);
-    scene->camera->cam_v = vector_multiply_scalar(scene->vp_v, 1.0 / scene->image_height);
-    
-    // Calculate upper left corner
-    t_vector *viewport_center = vector_sub(scene->camera->camera_position, w);
-    t_vector *viewport_upper_left = vector_sub(viewport_center, 
-                                             vector_add(vector_multiply_scalar(scene->vp_u, 0.5),
-                                                      vector_multiply_scalar(scene->vp_v, 0.5)));
-    
-    scene->l_corner = vector_add(viewport_upper_left,
-                                vector_multiply_scalar(vector_add(scene->camera->cam_u,
-                                                               scene->camera->cam_v),
-                                                    0.5));
-}
-*/
-
 
 t_vector *pixel_dir(int x, int y, t_scene *scene)
 {
-    
     double pixel_x = x - scene->image_width / 2.0;
     double pixel_y = - (y - scene->image_height / 2.0);
     double pixel_z = scene->camera->focal_lenght;  
@@ -307,9 +205,9 @@ int get_pixel_color(t_vector *dir, t_scene *scene)
 
 void init_scene(t_scene *scene)
 {
-    scene->image_width = 500;
+    scene->image_width = 400;
     scene->aspect_ratio = 16.0f / 9.0f;
-    scene->image_height = 500;
+    scene->image_height = 400;
     scene->vp_hight = 2.0;
     scene->vp_width = scene->vp_hight * scene->aspect_ratio;
     scene->camera->focal_lenght = 500; 
@@ -405,65 +303,136 @@ void print_matrix(float **matrix, int rows, int cols) {
     }
 }
 
+
+
+
 int render_spher(t_scene *scene)
 {
-    // spher->transform = ft_scaling_matrix(1,0.5,1,1);
-    // spher->transform = ft_scaling_matrix(0.5,1,1,1);
-    // spher->transform = ft_multiply_matrix(rotate_z(PI / 4), ft_scaling_matrix(0.5,1,1,1),4,4);
-    // int arr[6] = {1,0,0,0,0,0};
-    // spher->transform = ft_multiply_matrix(shearing_matrix(arr), ft_scaling_matrix(0.5,1,1,1),4,4);
-    // print_matrix(spher->transform,4,4);
-    float wall_size = 20; //100 
+    // Wall and pixel calculations
+    float wall_size = 15;
     float pixel_size = wall_size / scene->image_width;
-    float half_size = wall_size / 2;
-    t_sphere *spher = malloc(sizeof(t_sphere));
-    spher->sphere_coordinates = ft_new_point(0,0,0);
-    spher->sphere_diameter = 2;
-    t_color *white = ft_new_color(1.0,0.2,1.0);
-    spher->material = default_material();
-    spher->material->color = white;
-    p_light *light = ft_new_plight(ft_new_color(1.0,1.0,1.0), ft_new_point(-10, 10, -10));
-    spher->transform = identity_matrix(4);
-    float world_x,world_y, wall_z;
-    t_point *r_origin = ft_new_point(0,0,-5);
-    t_ray *o_ray ;
-    t_point *pos;
-    t_intersection inter;
-    int color;
-    wall_z = 10;
+    float half_size = wall_size / 2.0;
+    float wall_z = 10.0;
+
+    t_sphere *sphere = malloc(sizeof(t_sphere));
+    if (!sphere)
+        return (0);
+    sphere->sphere_coordinates = ft_new_point(0, 0, 0);
+    sphere->sphere_diameter = 1.5;
+    sphere->transform = identity_matrix(4);
+    sphere->material = default_material();
+    sphere->material->color = ft_new_color(1, 0.2, 1); 
+    sphere->material->ambient = 0.1;
+    sphere->material->diffuse = 0.9;   
+    sphere->material->specular = 0.9;  
+    sphere->material->shininess = 200.0;
+
+    t_point *light_position = ft_new_point(0, 0, -5);
+    t_color *light_color = ft_new_color(1, 1, 1);
+    p_light *light = ft_new_plight(light_color, light_position);
+
+    t_point *ray_origin = ft_new_point(0, 0, -5);
 
     for (int y = 0; y < scene->image_height; y++)
     {
-        //  NDC - Normalized Device Coordinates **************(RULE)*************
-        world_y = half_size - pixel_size * y;
+        float world_y = half_size - pixel_size * y;
+        
         for (int x = 0; x < scene->image_width; x++)
         {
-            //  NDC - Normalized Device Coordinates **************(RULE)*************
-            world_x = half_size - pixel_size * x;
-            pos = ft_new_point(-world_x,world_y,wall_z);
-            o_ray = create_ray(r_origin, vector_normilze(vector_sub(pos,r_origin)));
-            inter = ft_intersect_sphere(o_ray,spher);
-            if (inter.t1)
+            float world_x = -half_size + pixel_size * x;
+
+            t_point *wall_point = ft_new_point(world_x, world_y, wall_z);
+            t_vector *ray_direction = vector_sub(wall_point, ray_origin);
+            t_ray *ray = create_ray(ray_origin, vector_normilze(ray_direction));
+
+            t_intersection intersection = ft_intersect_sphere(ray, sphere);
+
+            if (intersection.t1 > 0)
             {
-                color = (255 << 24 | 255 << 16 | 0 << 8 << 0); 
-                // o_ray->direction = vector_normilze(o_ray->direction);
-                t_point *p = position(o_ray, inter.t1);
-                t_vector *v = normilize_at_sphere_pos(spher, p);
-                t_vector *cam_v = negate_vector(o_ray->direction);
-                t_color *c = get_lighting_color(spher->material, light, p, cam_v, v);
-                int color;
-                color = ( ((int)(c->r * 255.0) << 16) | ((int)(c->g * 255.0) << 8) | (int)(c->b * 255.0));               
-                 my_pixel_put(&scene->data->img, x, y, color);
+                t_point *hit_point = position(ray, intersection.t1);
+                t_vector *normal = normilize_at_sphere_pos(sphere, hit_point);
+                t_vector *cam_v = negate_vector(vector_normilze(ray->direction));
+                
+                t_color *color = get_lighting_color(sphere->material, light, hit_point, cam_v, normal);
+
+                int color_value = (255 << 24) | 
+                                  ((int)(255.0 * color->r) << 16) | 
+                                  ((int)(255.0 * color->g) << 8) | 
+                                  ((int)(255.0 * color->b));
+                my_pixel_put(&scene->data->img, x, y, color_value);
+                free(hit_point);
+                free(normal);
+                free(cam_v);
+                free(color);
             }
+            free(wall_point);
+            free(ray_direction);
+            free(ray);
         }
     }
-    mlx_put_image_to_window(scene->data->mlx, 
-                        scene->data->win, 
-                        scene->data->img.img_ptr, 
-                        0, 0);
-    mlx_hook(scene->data->win, 17, 32, &ft_close_window, scene->data);
+
+    // Display the result
+    mlx_put_image_to_window(scene->data->mlx, scene->data->win, scene->data->img.img_ptr, 0, 0);
+    mlx_hook(scene->data->win, 17, 0, &ft_close_window, scene->data);
     mlx_loop(scene->data->mlx);
+
+    // Free all the setup memory
+    free(sphere->material);
+    free(sphere);
+    free(light_position);
+    free(light_color);
+    free(light);
+    free(ray_origin);
+
+    return (1);
 }
+
+#include <stdio.h>
+#include <stdlib.h>
+
+void var_dump_shape(t_shape *shape) {
+    while (shape != NULL) {
+        printf("Shape Type: ");
+        switch (shape->type) {
+            case SHAPE_SPHERE:
+                printf("Sphere\n");
+                // Assuming t_sphere has a radius and center properties for demonstration
+                printf("  Sphere Details: radius = %.2f, center = (%.2f, %.2f, %.2f)\n",
+                       shape->objects.sphere->sphere_diameter,
+                       shape->objects.sphere->sphere_coordinates->x,
+                       shape->objects.sphere->sphere_coordinates->y,
+                       shape->objects.sphere->sphere_coordinates->z);
+                break;
+        
+            default:
+                printf("Unknown shape type\n");
+        }
+        shape = shape->next;
+    }
+}
+
+void var_dump_light(p_light *light) {
+    // Assuming p_light has position and intensity properties for demonstration
+    printf("Light Details:\n");
+    printf("  Position: (%.2f, %.2f, %.2f)\n", light->position->x, light->position->y, light->position->z);
+    printf("  Intensity: %.2f\n", light->intensity);
+}
+
+void var_dump_world(t_world *world) {
+    if (!world) {
+        printf("World is NULL\n");
+        return;
+    }
+    
+    printf("World Dump:\n");
+    printf("Shapes:\n");
+    var_dump_shape(world->shape);
+
+    printf("Lights:\n");
+    var_dump_light(world->light);
+}
+
+
 
 int main(int argc, char **argv)
 {
@@ -485,8 +454,35 @@ int main(int argc, char **argv)
 
 
     render_spher(scene);
-    // render_clock(scene);
+    // render_clock(scene); 
     // render_sphere(scene);
+
+    /*
+        t_sphere *spher = malloc(sizeof(t_sphere));
+        spher->sphere_coordinates = ft_new_point(0,0,0);
+        spher->sphere_diameter = 1;
+        spher->material = default_material();
+        // spher->transform = ft_translate_matrix(ft_new_point(0,1,0),1);
+        spher->transform = identity_matrix(4);
+
+
+        // passed done
+        t_vector *vector = normilize_at_sphere_pos(spher, ft_new_point(0, 1.70711,-0.70711));
+        printf("Vector normilize at sphere pos: (%f, %f, %f)\n", vector->x, vector->y, vector->z);
+        
+        // passed done
+        t_vector *ve = reflect_vector(ft_new_vector(1,-1,0), ft_new_vector(0,1,0));
+        printf("Vector normilize at sphere pos: (%f, %f, %f)\n", ve->x, ve->y, ve->z);
+
+        // t_vector *cam = ft_new_vector(0, 0,-1);
+        t_vector *cam = ft_new_vector(0, 0,-1);
+        t_vector *norm_v = ft_new_vector(0,0,-1);
+        p_light *l = ft_new_plight(ft_new_color(1, 1, 1), ft_new_point(0, 0, 10));
+        t_color *color = get_lighting_color(spher->material, l, ft_new_point(0,0,0), cam, norm_v);
+        printf("Color: (%f, %f, %f)\n", color->r, color->g, color->b);
+    */
+
+
 /*
     float **matrix = ft_create_matrix(4,4);
     matrix[0][0]=3.0f;
@@ -730,9 +726,29 @@ t_color *white = ft_new_color(1000000.0, 1.0, 1.0);
     free(m);
 */
 
+    // t_world *world =  default_world();
+    // t_ray *ray = create_ray(ft_new_point(0, 0, -5), ft_new_vector(0, 0, 1));
+    // printf("================================================================\n");
+    // var_dump_world(world);
+    // printf("================================================================\n");
+    // printf("n_objects: %d\n",world->n_objects);
+    // t_intersection *hit = intersect_world(world, ray);
+    // if (hit)
+    // {
+    //     printf("Hit: %f\n", hit->t1);
+    //     printf("Object: %p\n", hit->object);
+    // }
+    // // t_ray *ray = create_ray(ft_new_point(0, 0, 0), ft_new_vector(0,0,1));
+    // // t_sphere * sph = default_sphere();
+    // // t_intersection inter = ft_new_intersection( 1, sph, 0);
+    // // t_compose *compose = prepare_computations(inter, ray);
 
-
-    return 0;
+    // // printf("inter %d\n", compose->t);
+    // // printf("point %f - |%f- |%f\n", compose->point->x, compose->point->y, compose->point->z);
+    // // printf("eyev %f - |%f - |%f\n", compose->camv->x, compose->camv->y, compose->camv->z);
+    // // printf("norm %f - |%f - |%f\n", compose->normv->x, compose->normv->y, compose->normv->z);
+    // // printf(" is inside %d points\n", compose->inside);
+    // return 0;
 }
 
 
