@@ -453,7 +453,7 @@ int main(int argc, char **argv)
     init_scene(scene);
 
 
-    render_spher(scene);
+    // render_spher(scene);
     // render_clock(scene); 
     // render_sphere(scene);
 
@@ -748,7 +748,32 @@ t_color *white = ft_new_color(1000000.0, 1.0, 1.0);
     // // printf("eyev %f - |%f - |%f\n", compose->camv->x, compose->camv->y, compose->camv->z);
     // // printf("norm %f - |%f - |%f\n", compose->normv->x, compose->normv->y, compose->normv->z);
     // // printf(" is inside %d points\n", compose->inside);
+
+
+    // t_sphere *sphere_outer = world->shape;
+
+    // sphere_outer->material->ambient = 1;
+    // sphere_inner->material->ambient = 1;
+
+    t_world *world = default_world();
+    world->light = ft_new_plight(ft_new_color(1,1,1),ft_new_point(0,0.25,0));
+    // printf( "spher diameter %f\n", sphere_inner->material->diffuse);
+    // printf("pixel color %f %f %f\n", sphere_inner->material->color->r, sphere_inner->material->color->g, sphere_inner->material->color->b);
+    // print_matrix(sphere_inner->transform,4,4);
+    t_ray *ray = create_ray(ft_new_point(0, 0, 0), ft_new_vector(0, 0, 1));
+    // p_light *light = ft_new_plight(ft_new_color(1,1,1),ft_new_point(0,0.25,0));
+    t_sphere *sphere_inner = world->shape->next->objects.sphere;  // Get second sphere
+    printf("Sphere color: %f %f %f\n", sphere_inner->material->color->r, 
+                                  sphere_inner->material->color->g, 
+                                  sphere_inner->material->color->b);
+    t_intersection inter = ft_new_intersection(0.5f, sphere_inner, 0);
+    t_compose *compose = prepare_computations(inter, ray);
+    t_color *pixel_color = shading_hit(world, compose);
+    
+    printf("pixel color %f %f %f\n", pixel_color->r, pixel_color->g, pixel_color->b);
+    // printf("world->light ntensity->f %f=  %f= %f\n", world->light->intensity->r, world->light->intensity->g, world->light->intensity->b);
     // return 0;
+    printf("inside world %d\n", compose->inside);
 }
 
 

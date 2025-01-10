@@ -604,7 +604,6 @@ p_light  *ft_new_plight(t_color *color, t_point *point)
     return light;
 }
 
-
 t_color *ft_multiply_color_scalar(t_color *color, float scalar)
 {
     t_color *new_color;
@@ -683,7 +682,9 @@ t_color *get_lighting_color(t_material *material, p_light *light, t_point *point
     t_color *tmp = ft_add_color(specular, diffuse);
     total_color = ft_add_color(tmp, ambient);
     total_color = clamp_color(total_color);
-
+    printf("  Ambient: %f\n", material->ambient);
+    printf("  Diffuse: %f\n", material->diffuse);
+    printf("  Specular: %f\n", material->specular);
     free(eff_color);
     free(light_dir);
     free(light_dir_normal);

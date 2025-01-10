@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2025/01/09 18:30:43 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/01/10 16:42:45 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -313,4 +313,5 @@ t_world *default_world();
 t_intersection *intersect_world(t_world *world, t_ray *ray);
 t_sphere *default_sphere();
 t_compose *prepare_computations(t_intersection inter, t_ray *ray);
+ t_color *shading_hit(t_world *world, t_compose *comp);
 #endif

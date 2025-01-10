@@ -69,6 +69,7 @@ t_intersection  ft_new_intersection(float t, void *object, int type)
     t_intersection intersection;
 
     intersection.t1 = t;
+    intersection.t2 = t;
     intersection.object = object;
     intersection.type = type;
     return (intersection);
@@ -117,7 +118,7 @@ t_vector *normilize_at_sphere_pos(t_sphere *sphere, t_point *w_p)
     if (!inv_m)
         inv_m = sphere->transform;
     obj_p = ft_multiply_matrix_vec(inv_m, w_p);
-    obj_n = vector_sub(w_p, ft_new_point(0,0,0));
+    obj_n = vector_sub(w_p, sphere->sphere_coordinates);
     ft_transpose_matrix(&inv_m, 4,4);
     tmp = ft_multiply_matrix_vec(inv_m, obj_n);
     tmp->w = 0;
@@ -159,7 +160,8 @@ p_light *default_light()
     light->intensity = ft_new_color(1, 1, 1);
     return light;
 }
-t_shape *ft_new_shape(void *shape_obj, int shape_type) {
+t_shape *ft_new_shape(void *shape_obj, int shape_type)
+{
     t_shape *new_shape = malloc(sizeof(t_shape));
     if (!new_shape)
         return NULL;
@@ -200,15 +202,26 @@ void ft_add_shape(t_world **root, void *new, int shape)
 
 t_world *default_world()
 {
-    
     t_world *world = malloc(sizeof(t_world));
     if (!world)
         return NULL;
     world->n_objects = 0;
+    
+    // Create first sphere with specific properties
     t_sphere *sphere1 = default_sphere();
+    sphere1->material->color = ft_new_color(0.8, 1.0, 0.6);
+    sphere1->material->ambient = 0.1;
+    sphere1->material->diffuse = 0.7;
+    sphere1->material->specular = 0.2;
+    
+    // Create second sphere with different properties
     t_sphere *sphere2 = default_sphere();
+    sphere2->material->color = ft_new_color(1.0, 1.0, 1.0);  // White color
+    sphere2->material->ambient = 0.1;
+    sphere2->material->diffuse = 0.9;  // Higher diffuse
+    sphere2->material->specular = 0.9; // Higher specular
     sphere2->transform = ft_scaling_matrix(0.5, 0.5, 0.5, 1);
-
+    
     p_light *light1 = default_light();
     world->shape = NULL;
     world->light = light1;
@@ -236,16 +249,16 @@ t_intersection *intersect_world(t_world *world, t_ray *ray)
     {
         inter[i] = ft_intersect_sphere(ray, current->objects.sphere);
         count += inter[i].n_sol;
-        printf("sol  -> %f---\n", inter[i].t1);
-        printf("sol  -> %f---\n", inter[i].t2);
+        // printf("sol  -> %f---\n", inter[i].t1);
+        // printf("sol  -> %f---\n", inter[i].t2);
         current = current->next;
         i++;
     }
-    printf("====== n COUNT SOLUTION %d ======= \n", count);
+    // printf("====== n COUNT SOLUTION %d ======= \n", count);
     res = ray_hit(inter, world->n_objects);
     if (res != inter)
         free(inter);
-    printf("sol  -> %f---\n", res->t1);
+    // printf("sol  -> %f---\n", res->t1);
 
     return res;
 }
@@ -260,7 +273,7 @@ t_compose *prepare_computations(t_intersection inter, t_ray *ray)
     comp->obj = inter.object;
     comp->obj_type = inter.type;
     comp->camv = negate_vector(ray->direction);
-    comp->point = position(ray, inter.t1);
+    comp->point = position(ray, comp->t);
     comp->normv = normilize_at_sphere_pos((t_sphere *)(inter.object),comp->point);
     if (vector_dot(comp->normv, comp->camv) < 0.0)
     {
@@ -272,5 +285,7 @@ t_compose *prepare_computations(t_intersection inter, t_ray *ray)
     return comp;
 }
 
-
-// t_color *
+inline t_color *shading_hit(t_world *world, t_compose *comp)
+{
+    return (get_lighting_color(((t_sphere *) (comp->obj))->material, world->light, comp->point, comp->camv,comp->normv));
+}
