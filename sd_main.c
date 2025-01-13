@@ -205,9 +205,9 @@ int get_pixel_color(t_vector *dir, t_scene *scene)
 
 void init_scene(t_scene *scene)
 {
-    scene->image_width = 400;
+    scene->image_width = 50;
     scene->aspect_ratio = 16.0f / 9.0f;
-    scene->image_height = 400;
+    scene->image_height = 100;
     scene->vp_hight = 2.0;
     scene->vp_width = scene->vp_hight * scene->aspect_ratio;
     scene->camera->focal_lenght = 500; 
@@ -319,7 +319,8 @@ int render_spher(t_scene *scene)
         return (0);
     sphere->sphere_coordinates = ft_new_point(0, 0, 0);
     sphere->sphere_diameter = 1.5;
-    sphere->transform = identity_matrix(4);
+    // sphere->transform = identity_matrix(4);
+    sphere->transform = rotate_x( 3 * PI / 2 );
     sphere->material = default_material();
     sphere->material->color = ft_new_color(1, 0.2, 1); 
     sphere->material->ambient = 0.1;
@@ -456,6 +457,31 @@ int main(int argc, char **argv)
     // render_spher(scene);
     // render_clock(scene); 
     // render_sphere(scene);
+
+
+    // t_point *from = ft_new_point(1,3,2);
+    // t_point *to = ft_new_point(4,-2,8);
+    // t_vector *up = ft_new_vector(1,1,0);
+
+    // float **m = get_view_transform(from,to, up);
+    // print_matrix(m,4,4);
+
+
+    t_world *world = default_world();
+
+    s_camera *cam = new_camera(100,50, PI/3);
+    cam->transform = get_view_transform(ft_new_point(0,1.5,-5), ft_new_point(0,1,0), ft_new_vector(0,1,0));
+
+    render_image(scene,world, cam);
+
+
+
+
+
+
+
+
+
 
     /*
         t_sphere *spher = malloc(sizeof(t_sphere));
@@ -724,56 +750,64 @@ t_color *white = ft_new_color(1000000.0, 1.0, 1.0);
     free(ambient);
     free(m->color);
     free(m);
-*/
+    t_world *world =  default_world();
+    t_ray *ray = create_ray(ft_new_point(0, 0, -5), ft_new_vector(0, 0, 1));
+    printf("================================================================\n");
+    var_dump_world(world);
+    printf("================================================================\n");
+    printf("n_objects: %d\n",world->n_objects);
+    t_intersection *hit = intersect_world(world, ray);
+    if (hit)
+    {
+        printf("Hit: %f\n", hit->t1);
+        printf("Object: %p\n", hit->object);
+    }
+    // t_ray *ray = create_ray(ft_new_point(0, 0, 0), ft_new_vector(0,0,1));
+    // t_sphere * sph = default_sphere();
+    // t_intersection inter = ft_new_intersection( 1, sph, 0);
+    // t_compose *compose = prepare_computations(inter, ray);
 
-    // t_world *world =  default_world();
-    // t_ray *ray = create_ray(ft_new_point(0, 0, -5), ft_new_vector(0, 0, 1));
-    // printf("================================================================\n");
-    // var_dump_world(world);
-    // printf("================================================================\n");
-    // printf("n_objects: %d\n",world->n_objects);
-    // t_intersection *hit = intersect_world(world, ray);
-    // if (hit)
-    // {
-    //     printf("Hit: %f\n", hit->t1);
-    //     printf("Object: %p\n", hit->object);
-    // }
-    // // t_ray *ray = create_ray(ft_new_point(0, 0, 0), ft_new_vector(0,0,1));
-    // // t_sphere * sph = default_sphere();
-    // // t_intersection inter = ft_new_intersection( 1, sph, 0);
-    // // t_compose *compose = prepare_computations(inter, ray);
-
-    // // printf("inter %d\n", compose->t);
-    // // printf("point %f - |%f- |%f\n", compose->point->x, compose->point->y, compose->point->z);
-    // // printf("eyev %f - |%f - |%f\n", compose->camv->x, compose->camv->y, compose->camv->z);
-    // // printf("norm %f - |%f - |%f\n", compose->normv->x, compose->normv->y, compose->normv->z);
-    // // printf(" is inside %d points\n", compose->inside);
+    // printf("inter %d\n", compose->t);
+    // printf("point %f - |%f- |%f\n", compose->point->x, compose->point->y, compose->point->z);
+    // printf("eyev %f - |%f - |%f\n", compose->camv->x, compose->camv->y, compose->camv->z);
+    // printf("norm %f - |%f - |%f\n", compose->normv->x, compose->normv->y, compose->normv->z);
+    // printf(" is inside %d points\n", compose->inside);
 
 
-    // t_sphere *sphere_outer = world->shape;
+    t_sphere *sphere_outer = world->shape;
 
-    // sphere_outer->material->ambient = 1;
-    // sphere_inner->material->ambient = 1;
+    sphere_outer->material->ambient = 1;
+    sphere_inner->material->ambient = 1;
 
-    t_world *world = default_world();
     world->light = ft_new_plight(ft_new_color(1,1,1),ft_new_point(0,0.25,0));
-    // printf( "spher diameter %f\n", sphere_inner->material->diffuse);
-    // printf("pixel color %f %f %f\n", sphere_inner->material->color->r, sphere_inner->material->color->g, sphere_inner->material->color->b);
-    // print_matrix(sphere_inner->transform,4,4);
-    t_ray *ray = create_ray(ft_new_point(0, 0, 0), ft_new_vector(0, 0, 1));
-    // p_light *light = ft_new_plight(ft_new_color(1,1,1),ft_new_point(0,0.25,0));
-    t_sphere *sphere_inner = world->shape->next->objects.sphere;  // Get second sphere
+    printf( "spher diameter %f\n", sphere_inner->material->diffuse);
+    printf("pixel color %f %f %f\n", sphere_inner->material->color->r, sphere_inner->material->color->g, sphere_inner->material->color->b);
+    print_matrix(sphere_inner->transform,4,4);
+    p_light *light = ft_new_plight(ft_new_color(1,1,1),ft_new_point(0,0.25,0));
+    t_sphere *sphere_inner = world->shape->next->objects.sphere;
+      // Get second sphere
+    t_sphere *sphere_outer = world->shape->objects.sphere;  // Get second sphere
+    sphere_inner->material->ambient = 1;
+    sphere_outer->material->ambient = 1;
     printf("Sphere color: %f %f %f\n", sphere_inner->material->color->r, 
                                   sphere_inner->material->color->g, 
                                   sphere_inner->material->color->b);
     t_intersection inter = ft_new_intersection(0.5f, sphere_inner, 0);
     t_compose *compose = prepare_computations(inter, ray);
     t_color *pixel_color = shading_hit(world, compose);
-    
+    t_world *world = default_world();
+    t_ray *ray = create_ray(ft_new_point(0, 0, -5), ft_new_vector(0, 0, 1));
+    t_color *pixel_color = get_color_at(world, ray);
+
     printf("pixel color %f %f %f\n", pixel_color->r, pixel_color->g, pixel_color->b);
-    // printf("world->light ntensity->f %f=  %f= %f\n", world->light->intensity->r, world->light->intensity->g, world->light->intensity->b);
-    // return 0;
+    printf("pixel color inner %f %f %f\n", sphere_inner->material->color->r, sphere_inner->material->color->g, sphere_inner->material->color->b);
+    printf("world->light ntensity->f %f=  %f= %f\n", world->light->intensity->r, world->light->intensity->g, world->light->intensity->b);
+    return 0;
     printf("inside world %d\n", compose->inside);
+*/
+
+
+
 }
 
 
