@@ -283,10 +283,10 @@ void print_matrix(float **matrix, int rows, int cols) {
 
 int render_spheres(t_scene *scene)
 {
-    float wall_size = 15.0;  // Reduced from 50 for better scaling
+    float wall_size = 30;  
     float pixel_size = wall_size / scene->image_width;
     float half_size = wall_size / 2.0;
-    float wall_z = 10.0;
+    float wall_z = 15;
 
     t_world *world = default_world();
     if (!world)
@@ -298,7 +298,7 @@ int render_spheres(t_scene *scene)
     for (int y = 0; y < scene->image_height; y++)
     {
         float world_y = half_size - pixel_size * y;
-        
+ 
         for (int x = 0; x < scene->image_width; x++)
         {
             float world_x = -half_size + pixel_size * x;
@@ -423,7 +423,10 @@ int main(int argc, char **argv)
     // var_dump_all(map, scene);
     init_scene(scene);
     render_spheres(scene);
+    t_world *world = default_world();
+    s_camera *camera = new_camera(800, 600, PI / 3);  // 800x600 resolution, 60-degree FOV
 
+    // render_image(scene, world, camera);
     return 0;
 }
 
