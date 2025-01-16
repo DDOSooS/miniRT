@@ -649,6 +649,8 @@ t_color *get_lighting_color(t_material *material, p_light *light, t_point *point
 
     eff_color = ft_multiply_color(material->color, light->intensity);
 
+    // printf("%f ambient\n", material->ambient);
+
     ambient = ft_multiply_color_scalar(eff_color, material->ambient);
     ambient = clamp_color(ambient);  
 
@@ -706,14 +708,7 @@ t_material *default_material(void)
     m->diffuse = 0.9;
     m->specular = 0.9;
     m->shininess = 200.0;
-    
-    // printf("Created default material:\n");
-    // printf("  Color: %f %f %f\n", m->color->r, m->color->g, m->color->b);
-    // printf("  Ambient: %f\n", m->ambient);
-    // printf("  Diffuse: %f\n", m->diffuse);
-    // printf("  Specular: %f\n", m->specular);
-    // printf("  Shininess: %f\n", m->shininess);
-    
+
     return m;
 }
 

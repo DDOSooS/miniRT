@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2025/01/13 19:10:29 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/01/14 15:48:45 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,8 +103,8 @@ typedef struct var
 
 typedef struct s_camera
 {
-    float   h_size;
-    float   v_size;
+    float   h_size; // hight resolution
+    float   w_size; // w height resolution
     float   half_h_size;
     float   half_w_size;
     float   fov; // field of view

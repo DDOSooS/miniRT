@@ -203,29 +203,6 @@ int get_pixel_color(t_vector *dir, t_scene *scene)
 }
 
 
-void init_scene(t_scene *scene)
-{
-    scene->image_width = 50;
-    scene->aspect_ratio = 16.0f / 9.0f;
-    scene->image_height = 100;
-    scene->vp_hight = 2.0;
-    scene->vp_width = scene->vp_hight * scene->aspect_ratio;
-    scene->camera->focal_lenght = 500; 
-    
-    scene->data = malloc(sizeof(t_var));
-    scene->data->mlx = mlx_init();
-    scene->data->win = mlx_new_window(scene->data->mlx, 
-                                     scene->image_width, 
-                                     scene->image_height, 
-                                     "MiniRT");
-    scene->data->img.img_ptr = mlx_new_image(scene->data->mlx, 
-                                            scene->image_width, 
-                                            scene->image_height);
-    scene->data->img.addr = mlx_get_data_addr(scene->data->img.img_ptr,
-                                             &scene->data->img.bits_per_pixel,
-                                             &scene->data->img.line_length,
-                                             &scene->data->img.endian);
-}
 
 int	ft_close(t_var *vars)
 {
@@ -304,35 +281,19 @@ void print_matrix(float **matrix, int rows, int cols) {
 }
 
 
-
-
-int render_spher(t_scene *scene)
+int render_spheres(t_scene *scene)
 {
-    // Wall and pixel calculations
-    float wall_size = 15;
+    float wall_size = 15.0;  // Reduced from 50 for better scaling
     float pixel_size = wall_size / scene->image_width;
     float half_size = wall_size / 2.0;
     float wall_z = 10.0;
 
-    t_sphere *sphere = malloc(sizeof(t_sphere));
-    if (!sphere)
+    t_world *world = default_world();
+    if (!world)
         return (0);
-    sphere->sphere_coordinates = ft_new_point(0, 0, 0);
-    sphere->sphere_diameter = 1.5;
-    // sphere->transform = identity_matrix(4);
-    sphere->transform = rotate_x( 3 * PI / 2 );
-    sphere->material = default_material();
-    sphere->material->color = ft_new_color(1, 0.2, 1); 
-    sphere->material->ambient = 0.1;
-    sphere->material->diffuse = 0.9;   
-    sphere->material->specular = 0.9;  
-    sphere->material->shininess = 200.0;
 
-    t_point *light_position = ft_new_point(0, 0, -5);
-    t_color *light_color = ft_new_color(1, 1, 1);
-    p_light *light = ft_new_plight(light_color, light_position);
-
-    t_point *ray_origin = ft_new_point(0, 0, -5);
+    // Move camera back for better view by -10 units
+    t_point *ray_origin = ft_new_point(0, 0, -10);
 
     for (int y = 0; y < scene->image_height; y++)
     {
@@ -341,57 +302,41 @@ int render_spher(t_scene *scene)
         for (int x = 0; x < scene->image_width; x++)
         {
             float world_x = -half_size + pixel_size * x;
-
             t_point *wall_point = ft_new_point(world_x, world_y, wall_z);
             t_vector *ray_direction = vector_sub(wall_point, ray_origin);
-            t_ray *ray = create_ray(ray_origin, vector_normilze(ray_direction));
-
-            t_intersection intersection = ft_intersect_sphere(ray, sphere);
-
-            if (intersection.t1 > 0)
+            ray_direction = vector_normilze(ray_direction);  
+            t_ray *ray = create_ray(ray_origin, ray_direction);
+            t_intersection *inter = intersect_world(world, ray);
+            if (inter && inter->t1 > 0)
             {
-                t_point *hit_point = position(ray, intersection.t1);
-                t_vector *normal = normilize_at_sphere_pos(sphere, hit_point);
-                t_vector *cam_v = negate_vector(vector_normilze(ray->direction));
-                
-                t_color *color = get_lighting_color(sphere->material, light, hit_point, cam_v, normal);
-
-                int color_value = (255 << 24) | 
-                                  ((int)(255.0 * color->r) << 16) | 
-                                  ((int)(255.0 * color->g) << 8) | 
-                                  ((int)(255.0 * color->b));
-                my_pixel_put(&scene->data->img, x, y, color_value);
-                free(hit_point);
-                free(normal);
-                free(cam_v);
-                free(color);
+                t_compose *comp = prepare_computations(inter, ray);
+                if (comp)
+                {
+                    t_color *color = shading_hit(world, comp);
+                    int color_value = (255 << 24) | 
+                                    ((int)(255.0 * color->r) << 16) | 
+                                    ((int)(255.0 * color->g) << 8) | 
+                                    ((int)(255.0 * color->b));
+                    my_pixel_put(&scene->data->img, x, y, color_value);
+                    free(color);
+                    free(comp);
+                }
             }
-            free(wall_point);
-            free(ray_direction);
-            free(ray);
+            else
+                my_pixel_put(&scene->data->img, x, y, (255 << 24) | (30 << 16) | (30 << 8) | 30);
         }
     }
 
-    // Display the result
-    mlx_put_image_to_window(scene->data->mlx, scene->data->win, scene->data->img.img_ptr, 0, 0);
+    mlx_put_image_to_window(scene->data->mlx, scene->data->win, 
+                           scene->data->img.img_ptr, 0, 0);
     mlx_hook(scene->data->win, 17, 0, &ft_close_window, scene->data);
     mlx_loop(scene->data->mlx);
-
-    // Free all the setup memory
-    free(sphere->material);
-    free(sphere);
-    free(light_position);
-    free(light_color);
-    free(light);
-    free(ray_origin);
 
     return (1);
 }
 
-#include <stdio.h>
-#include <stdlib.h>
-
-void var_dump_shape(t_shape *shape) {
+void var_dump_shape(t_shape *shape)
+{
     while (shape != NULL) {
         printf("Shape Type: ");
         switch (shape->type) {
@@ -412,15 +357,17 @@ void var_dump_shape(t_shape *shape) {
     }
 }
 
-void var_dump_light(p_light *light) {
-    // Assuming p_light has position and intensity properties for demonstration
+void var_dump_light(p_light *light)
+{
     printf("Light Details:\n");
     printf("  Position: (%.2f, %.2f, %.2f)\n", light->position->x, light->position->y, light->position->z);
     printf("  Intensity: %.2f\n", light->intensity);
 }
 
-void var_dump_world(t_world *world) {
-    if (!world) {
+void var_dump_world(t_world *world)
+{
+    if (!world)
+    {
         printf("World is NULL\n");
         return;
     }
@@ -433,7 +380,30 @@ void var_dump_world(t_world *world) {
     var_dump_light(world->light);
 }
 
-
+void init_scene(t_scene *scene)
+{
+    scene->image_width = 600;
+    scene->aspect_ratio = 16.0f / 9.0f;
+    // scene->image_height = (int)(scene->image_width / scene->aspect_ratio); // This will be about 225
+    scene->image_height = 600; 
+    scene->vp_hight = 2.0;
+    scene->vp_width = scene->vp_hight * scene->aspect_ratio;
+    scene->camera->focal_lenght = 500; 
+    
+    scene->data = malloc(sizeof(t_var));
+    scene->data->mlx = mlx_init();
+    scene->data->win = mlx_new_window(scene->data->mlx, 
+                                     scene->image_width, 
+                                     scene->image_height, 
+                                     "MiniRT");
+    scene->data->img.img_ptr = mlx_new_image(scene->data->mlx, 
+                                            scene->image_width, 
+                                            scene->image_height);
+    scene->data->img.addr = mlx_get_data_addr(scene->data->img.img_ptr,
+                                             &scene->data->img.bits_per_pixel,
+                                             &scene->data->img.line_length,
+                                             &scene->data->img.endian);
+}
 
 int main(int argc, char **argv)
 {
@@ -450,37 +420,12 @@ int main(int argc, char **argv)
         return (free(map), ft_putstr_fd("map is empty\n", 2), 1);
     scene = ft_generate_scene(map->lines);
     
-    var_dump_all(map, scene);
+    // var_dump_all(map, scene);
     init_scene(scene);
+    render_spheres(scene);
 
-
-    // render_spher(scene);
-    // render_clock(scene); 
-    // render_sphere(scene);
-
-
-    // t_point *from = ft_new_point(1,3,2);
-    // t_point *to = ft_new_point(4,-2,8);
-    // t_vector *up = ft_new_vector(1,1,0);
-
-    // float **m = get_view_transform(from,to, up);
-    // print_matrix(m,4,4);
-
-
-    t_world *world = default_world();
-
-    s_camera *cam = new_camera(100,50, PI/3);
-    cam->transform = get_view_transform(ft_new_point(0,1.5,-5), ft_new_point(0,1,0), ft_new_vector(0,1,0));
-
-    render_image(scene,world, cam);
-
-
-
-
-
-
-
-
+    return 0;
+}
 
 
     /*
@@ -805,9 +750,3 @@ t_color *white = ft_new_color(1000000.0, 1.0, 1.0);
     return 0;
     printf("inside world %d\n", compose->inside);
 */
-
-
-
-}
-
-
