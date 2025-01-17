@@ -87,24 +87,6 @@ t_intersection  ft_new_intersection(float t, void *object, int type)
     return (intersection);
 }
 
-// t_intersection *ray_hit(t_intersection *inters, int count)
-// {
-//     t_intersection * hit;
-//     float min_t = INT_MAX;
-//     int i;
-
-//     hit = NULL;
-//     i = -1;
-//     while (++i < count)
-//     {
-//         if (inters[i].t1 >= 0 && inters[i].t1 < min_t)
-//         {
-//             min_t = inters[i].t1;
-//             hit = &inters[i];
-//         }
-//     }
-//     return (hit);
-// }
 
 t_ray *transform(t_ray *ray, float **m)
 {
@@ -294,24 +276,21 @@ t_world *default_world()
     world->n_objects = 0;
     world->shape = NULL;
 
-    // First sphere - positioned closer
     t_sphere *sphere1 = default_sphere();
     sphere1->sphere_coordinates = ft_new_point(-1,0,0);
-    sphere1->transform = ft_translate_matrix(ft_new_point(-1, 0, 0), 1);  // Closer to camera
+    sphere1->transform = ft_translate_matrix(ft_new_point(-1, 0, 0), 1);  
     sphere1->material->color = ft_new_color(1, 0.2, 1);
     sphere1->material->diffuse = 0.7;
     sphere1->material->specular = 0.3;
 
-    // Second sphere - positioned closer
     t_sphere *sphere2 = default_sphere();
-    sphere2->sphere_coordinates = ft_new_point(3,0,0);
     sphere2->sphere_diameter = 1.5;
-    sphere2->transform = ft_translate_matrix(ft_new_point(2, 0, 0), 1);   // Closer to camera
+    sphere2->sphere_coordinates = ft_new_point(3,0,0);
+    sphere2->transform = ft_translate_matrix(ft_new_point(2, 0, 0), 1);   
     sphere2->material->color = ft_new_color(0.2, 1, 0.2);
     sphere2->material->diffuse = 0.7;
     sphere2->material->specular = 0.3;
 
-    // Move light closer too
     world->light = ft_new_plight(ft_new_color(1, 1, 1), ft_new_point(-20, 0,0));
 
     ft_add_shape(&world, sphere1, SHAPE_SPHERE);
@@ -366,11 +345,10 @@ t_ray *get_ray_pixel(s_camera *cam, float x, float y)
     pixel = ft_multiply_matrix_vec(inverse_matrix(cam->transform, 4), ft_new_point(w_x, w_y, -1)); 
     ray->origin = ft_multiply_matrix_vec( inverse_matrix(cam->transform,4) , ft_new_point(0,0,0));
     ray->direction = vector_normilze( vector_sub(pixel, ray->origin));
-    // printf("Ray Origin: (%.2f, %.2f, %.2f), Direction: (%.2f, %.2f, %.2f)\n",
-    //     ray->origin->x, ray->origin->y, ray->origin->z,
-    //     ray->direction->x, ray->direction->y, ray->direction->z);
     return (ray);
 }
+
+//shadow 
 
 int is_shadowed(t_world *world, t_point *point)
 {
@@ -381,7 +359,6 @@ int is_shadowed(t_world *world, t_point *point)
     t_ray *r = create_ray(point, direction);
     t_intersection *intersections = intersect_world(world, r);
     
-    // If we hit something and it's closer than the light source, we're in shadow
     if (intersections && intersections->t1 > 0 && intersections->t1 < distance)
     {
         free(v);
@@ -389,7 +366,6 @@ int is_shadowed(t_world *world, t_point *point)
         free(r);
         return 1;
     }
-    
     free(v);
     free(direction);
     free(r);
@@ -399,13 +375,27 @@ int is_shadowed(t_world *world, t_point *point)
 
 t_color *shading_hit(t_world *world, t_compose *comp)
 {
+    t_color *color;
     t_material *material;
+    
+
     if (comp->obj_type == SHAPE_SPHERE)
         material = ((t_sphere *)comp->obj)->material;
     
-    int in_shadow = is_shadowed(world, comp->point);
-    return get_lighting_color(material, world->light, comp->point,
-                            comp->camv, comp->normv, in_shadow);
+    // Check if point is in shadow before calculating full lighting ??
+    if (is_shadowed(world, comp->point))
+    {
+        //calculating  ambient light
+        t_color *ambient = ft_multiply_color_scalar(
+            ft_multiply_color(material->color, world->light->intensity),
+            material->ambient
+        );
+        return clamp_color(ambient);
+    }
+    
+    color = get_lighting_color(material, world->light, comp->point,
+                             comp->camv, comp->normv);
+    return color;
 }
 
 t_color *get_color_at(t_world *world, t_ray *ray)
@@ -416,12 +406,8 @@ t_color *get_color_at(t_world *world, t_ray *ray)
 
     inter = intersect_world(world, ray);
     if (!inter)
-    {
-        // printf("No intersection found\n");
         return ft_new_color(0, 0, 0);
-    }
-    // else
-        // printf("intersection found\n");
+
     comp = prepare_computations(inter, ray);
     res = shading_hit(world, comp);
 
@@ -438,44 +424,27 @@ int render_image(t_scene *scene, t_world *world, s_camera *cam)
     t_ray *ray;
     int pixel_color;
 
-    // printf("Starting render with dimensions: %d x %d\n", cam->h_size, cam->w_size);
-
     for (y = 0; y < cam->w_size; y++)
     {
         for (x = 0; x < cam->h_size; x++)
         {
-            // Get the ray for the current pixel
             ray = get_ray_pixel(cam, x, y);
-
-            // Get the color at the ray's intersection
             color = get_color_at(world, ray);
-
-            // Log the color values for debugging
-            printf("Pixel (%d, %d) Color: R: %.2f, G: %.2f, B: %.2f\n", x, y, color->r, color->g, color->b);
-
-            // Convert color to an integer pixel value (RGBA)
             pixel_color = (255 << 24) | 
                          ((int)(255 * color->r) << 16) | 
                          ((int)(255 * color->g) << 8) | 
                          ((int)(255 * color->b) << 0);
 
-            // Draw the pixel on the image
             my_pixel_put(&scene->data->img, x, y, pixel_color);
-
-            // Free allocated memory for the ray and color
             free(ray);
             free(color);
         }
     }
-
     printf("Putting image to window...\n");
     mlx_put_image_to_window(scene->data->mlx, scene->data->win, 
                             scene->data->img.img_ptr, 0, 0);
-
-    // Handle window closing
     mlx_hook(scene->data->win, 17, 0, &ft_close_window, scene->data);
     mlx_loop(scene->data->mlx);
-
     return 0;
 }
 
