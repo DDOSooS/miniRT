@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2025/01/16 20:09:55 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/01/17 16:38:31 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -310,7 +310,7 @@ float **shearing_matrix(int *coord);
 void ft_free_matrix(float **m, int n);
 t_material *default_material();
 p_light  *ft_new_plight(t_color *color, t_point *point);
-t_color *get_lighting_color(t_material *material, p_light *light, t_point *point, t_vector *cam_v, t_vector *norm_v);
+// t_color *get_lighting_color(t_material *material, p_light *light, t_point *point, t_vector *cam_v, t_vector *norm_v, int);
 /* end of  matrix operation*/
 
 
@@ -323,7 +323,7 @@ t_intersection *ray_hit(t_intersection *inters, int count);
 t_ray *transform(t_ray *ray, float **m);
 t_ray *transform(t_ray *ray, float **m);
 t_point *position(t_ray *ray, float distance);
-t_color *get_lighting_color(t_material *material, p_light *light, t_point *point, t_vector *cam_v, t_vector *norm_v);
+t_color *get_lighting_color(t_material *material, p_light *light, t_point *point, t_vector *cam_v, t_vector *norm_v, int);
 t_vector *normilize_at_sphere_pos(t_sphere *sphere, t_point *w_p);
 /* end of ray manipulation functions*/
 

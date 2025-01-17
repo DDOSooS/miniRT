@@ -305,6 +305,7 @@ t_world *default_world()
     // Second sphere - positioned closer
     t_sphere *sphere2 = default_sphere();
     sphere2->sphere_coordinates = ft_new_point(3,0,0);
+    sphere2->sphere_diameter = 1.5;
     sphere2->transform = ft_translate_matrix(ft_new_point(2, 0, 0), 1);   // Closer to camera
     sphere2->material->color = ft_new_color(0.2, 1, 0.2);
     sphere2->material->diffuse = 0.7;
@@ -398,27 +399,13 @@ int is_shadowed(t_world *world, t_point *point)
 
 t_color *shading_hit(t_world *world, t_compose *comp)
 {
-    t_color *color;
     t_material *material;
-    
     if (comp->obj_type == SHAPE_SPHERE)
         material = ((t_sphere *)comp->obj)->material;
     
-    // Check if point is in shadow before calculating full lighting
-    if (is_shadowed(world, comp->point))
-    {
-        // If in shadow, only calculate ambient light
-        t_color *ambient = ft_multiply_color_scalar(
-            ft_multiply_color(material->color, world->light->intensity),
-            material->ambient
-        );
-        return clamp_color(ambient);
-    }
-    
-    // If not in shadow, calculate full lighting
-    color = get_lighting_color(material, world->light, comp->point,
-                             comp->camv, comp->normv);
-    return color;
+    int in_shadow = is_shadowed(world, comp->point);
+    return get_lighting_color(material, world->light, comp->point,
+                            comp->camv, comp->normv, in_shadow);
 }
 
 t_color *get_color_at(t_world *world, t_ray *ray)
@@ -501,9 +488,9 @@ int render_image(t_scene *scene, t_world *world, s_camera *cam)
 //         case SHAPE_SPHERE:
 //             norm = normilize_at_sphere_pos(shape->objects.sphere, point);
 //             break;
-//         case SHAPE_PLANE:
-//             norm = normilize_at_plan_pos(shape->objects.sphere, point);
-//             break;
+//         // case SHAPE_PLANE:
+//         //     norm = normilize_at_plan_pos(shape->objects.sphere, point);
+//         //     break;
 //         default:
 //             printf("Unknown shape type\n");
 //             return NULL;

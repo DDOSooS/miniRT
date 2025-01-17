@@ -635,7 +635,8 @@ t_color *clamp_color(t_color *color)
     return color;
 }
 
-t_color *get_lighting_color(t_material *material, p_light *light, t_point *point, t_vector *cam_v, t_vector *norm_v)
+t_color *get_lighting_color(t_material *material, p_light *light, t_point *point, 
+                           t_vector *cam_v, t_vector *norm_v, int showed)
 {
     t_color *eff_color;
     t_vector *light_dir;
@@ -647,31 +648,40 @@ t_color *get_lighting_color(t_material *material, p_light *light, t_point *point
     float light_dot_normal;
     float reflect_dot_camera;
 
+    // Calculate effective color and ambient component
     eff_color = ft_multiply_color(material->color, light->intensity);
-
-    // printf("%f ambient\n", material->ambient);
-
     ambient = ft_multiply_color_scalar(eff_color, material->ambient);
-    ambient = clamp_color(ambient);  
+    ambient = clamp_color(ambient);
 
+    // If in shadow, return only ambient component
+    if (showed)
+    {
+        free(eff_color);
+        return ambient;
+    }
+
+    // Calculate diffuse and specular components only if not in shadow
     light_dir = vector_sub(light->position, point);
     light_dir_normal = vector_normilze(light_dir);
-
     light_dot_normal = vector_dot(light_dir_normal, norm_v);
+
     if (light_dot_normal < 0)
     {
-        diffuse = ft_new_color(0, 0, 0);  
-        specular = ft_new_color(0, 0, 0); 
+        diffuse = ft_new_color(0, 0, 0);
+        specular = ft_new_color(0, 0, 0);
     }
     else
     {
+        // Calculate diffuse
         diffuse = ft_multiply_color_scalar(eff_color, material->diffuse * light_dot_normal);
-        diffuse = clamp_color(diffuse);  
+        diffuse = clamp_color(diffuse);
 
+        // Calculate specular
         t_vector *reflect_vec = reflect_vector(negate_vector(light_dir_normal), norm_v);
         reflect_dot_camera = vector_dot(reflect_vec, cam_v);
+        
         if (reflect_dot_camera <= 0.0)
-            specular = ft_new_color(0, 0, 0); 
+            specular = ft_new_color(0, 0, 0);
         else
         {
             float spec_factor = powf(reflect_dot_camera, material->shininess);
@@ -681,10 +691,12 @@ t_color *get_lighting_color(t_material *material, p_light *light, t_point *point
         free(reflect_vec);
     }
 
+    // Combine all components
     t_color *tmp = ft_add_color(specular, diffuse);
     total_color = ft_add_color(tmp, ambient);
     total_color = clamp_color(total_color);
 
+    // Clean up
     free(eff_color);
     free(light_dir);
     free(light_dir_normal);
@@ -695,7 +707,6 @@ t_color *get_lighting_color(t_material *material, p_light *light, t_point *point
 
     return total_color;
 }
-
 
 t_material *default_material(void)
 {
