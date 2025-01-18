@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2025/01/17 16:42:34 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/01/17 21:06:18 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ typedef enum e_shape_type
 
 typedef struct s_ray
 {
-    t_color     *color;
+    t_color     *color; 
     t_vector    *origin;
     t_vector    *direction;
     // t_vector    *r_lab;    
@@ -140,6 +140,8 @@ typedef struct plane
     t_vector        *plane_cordinates;
     t_vector        *plane_normal;
     t_color          *plane_color;
+    t_material       *material;
+    float           **transform;
     struct plane    *next;
 } t_plane;
 
@@ -221,6 +223,7 @@ typedef struct s_compose
     t_vector        *normv;
     t_point         *point;
     int             inside;
+    t_vector        *over_point;
 }   t_compose;
 
 typedef struct s_shape
@@ -277,6 +280,8 @@ t_color *ft_scale_color(t_color *c, float scalar);
 t_color *ft_multiply_color(t_color *c1, t_color *c2);
 t_vector    *negate_vector(t_vector *vector);
 int compare_vector(float a, float b);
+t_vector *normalize_at_plane_pos(t_plane *plane, t_point *w_p) ;
+
 t_vector *reflect_vector(t_vector *, t_vector *);
 t_color *ft_multiply_color_scalar(t_color *color, float scalar);
 

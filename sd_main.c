@@ -284,8 +284,8 @@ void print_matrix(float **matrix, int rows, int cols) {
 int render_spheres(t_scene *scene)
 {
     float wall_size = 30;  
-    float pixel_size = wall_size / scene->image_width;
-    float half_size = wall_size / 2.0;
+    float pixel_size = wall_size / (float)scene->image_width;
+    float half_size = ((float)(wall_size)) / 2.0;
     float wall_z = 15;
 
     t_world *world = default_world();

@@ -87,7 +87,6 @@ t_intersection  ft_new_intersection(float t, void *object, int type)
     return (intersection);
 }
 
-
 t_ray *transform(t_ray *ray, float **m)
 {
     t_vector *dir;
@@ -195,6 +194,42 @@ void ft_add_shape(t_world **root, void *new, int shape)
     }
 }
 
+
+t_intersection ft_intersect_plane(t_ray *ray, t_plane *plane)
+{
+    t_intersection result = {0, 0,0, NULL, 0};
+    
+    // 1. Calculate denominator (dot product of ray direction and plane normal)
+    float denom = vector_dot(ray->direction, plane->plane_normal);
+    
+    // 2. Check for parallel ray (denominator near zero)
+    if (fabs(denom) < EPSILON)  
+    {
+        return result;  
+    }
+    
+    // 3. Calculate vector from ray origin to point on plane
+    t_vector *origin_to_plane = vector_sub(ray->origin, plane->plane_normal);
+    
+    // 4. Calculate intersection distance
+    float t = -(vector_dot(origin_to_plane, plane->plane_normal)) / denom;
+    
+    // 5. Free temporary vector
+    free(origin_to_plane);
+    
+    // 6. Check if intersection is behind ray
+    if (t < 0)
+    {
+        return result;  // Intersection is behind ray origin
+    }
+    
+    result.t1 = t;
+    result.object = plane;
+    result.type = SHAPE_PLANE;
+    
+    return result;
+}
+
 t_intersection *intersect_world(t_world *world, t_ray *ray)
 {
     t_intersection *res;
@@ -207,7 +242,12 @@ t_intersection *intersect_world(t_world *world, t_ray *ray)
     i = 0;
     while (current)
     {
-        inter[i] = ft_intersect_sphere(ray, current->objects.sphere);
+        if (current->type == SHAPE_SPHERE)  // Only consider spheres for now.
+            inter[i] = ft_intersect_sphere(ray, current->objects.sphere);
+        else if (current->type == SHAPE_PLANE)
+            inter[i] = ft_intersect_plane(ray, current->objects.plane);
+        // else if (current->type == SHAPE_CYLINDER)
+
         current = current->next;
         i++;
     }
@@ -215,27 +255,68 @@ t_intersection *intersect_world(t_world *world, t_ray *ray)
     return res;
 }
 
+t_vector *normalize_at_plane_pos(t_plane *plane, t_point *w_p)
+{
+    t_vector *vec, *tmp;
+    t_vector *obj_n;
+    float **inv_m;
+    
+    inv_m = inverse_matrix(plane->transform, 4);
+    if (!inv_m) {
+        inv_m = plane->transform; 
+    }
+    
+    obj_n = ft_new_vector(0, 1, 0); 
+    
+    ft_transpose_matrix(&inv_m, 4, 4);
+    tmp = ft_multiply_matrix_vec(inv_m, obj_n);
+    tmp->w = 0; 
+    
+    vec = vector_normilze(tmp);
+    
+    free(tmp);
+    free(obj_n);
+    if (inv_m != plane->transform) {
+        ft_free_matrix(inv_m, 4);
+    }
+    
+    return vec;
+}
+
+
 t_compose *prepare_computations(t_intersection *inter, t_ray *ray)
 {
-    t_compose *comp;
-
-    comp = malloc(sizeof(t_compose));
+    t_compose *comp = malloc(sizeof(t_compose));
 
     comp->t = inter->t1;
     comp->obj = inter->object;
     comp->obj_type = inter->type;
     comp->camv = negate_vector(ray->direction);
     comp->point = position(ray, comp->t);
-    comp->normv = normilize_at_sphere_pos((t_sphere *)(inter->object),comp->point);
+
+    // Determine the normal at the intersection point
+    if (comp->obj_type == SHAPE_SPHERE)
+        comp->normv = normilize_at_sphere_pos((t_sphere *)(inter->object), comp->point);
+    else if (comp->obj_type == SHAPE_PLANE)
+        comp->normv = normalize_at_plane_pos((t_plane *)(inter->object), comp->point);
+
+    comp->normv = vector_normilze(comp->normv);
+
     if (vector_dot(comp->normv, comp->camv) < 0.0)
     {
         comp->inside = 1;
         comp->normv = negate_vector(comp->normv);
     }
     else
+    {
         comp->inside = 0;
+    }
+
+    comp->over_point = vector_add(comp->point, vector_multiply_scalar(comp->normv, EPSILON));
+
     return comp;
 }
+
 
 
 float **get_view_transform(t_point *from_v, t_point *to_v, t_vector *up_v)
@@ -277,28 +358,54 @@ t_world *default_world()
     world->shape = NULL;
 
     t_sphere *sphere1 = default_sphere();
-    sphere1->sphere_coordinates = ft_new_point(-1,0,0);
-    sphere1->transform = ft_translate_matrix(ft_new_point(-1, 0, 0), 1);  
+    sphere1->sphere_diameter = 1.5;
+    sphere1->sphere_coordinates = ft_new_point(-3,0,0);
+    sphere1->transform = ft_translate_matrix(ft_new_point(-1, 0, 0), 1);
     sphere1->material->color = ft_new_color(1, 0.2, 1);
     sphere1->material->diffuse = 0.7;
     sphere1->material->specular = 0.3;
 
-    t_sphere *sphere2 = default_sphere();
     sphere2->sphere_diameter = 1.5;
     sphere2->sphere_coordinates = ft_new_point(3,0,0);
-    sphere2->transform = ft_translate_matrix(ft_new_point(2, 0, 0), 1);   
+    sphere2->transform = ft_translate_matrix(ft_new_point(2, 0, 0), 1);
     sphere2->material->color = ft_new_color(0.2, 1, 0.2);
     sphere2->material->diffuse = 0.7;
     sphere2->material->specular = 0.3;
 
-    world->light = ft_new_plight(ft_new_color(1, 1, 1), ft_new_point(-20, 0,0));
+        t_plane *plane = malloc(sizeof(t_plane));
+        // Create a gentle slope
+        plane->plane_normal = ft_new_vector(-0.2, 1, 0);
+        // Normalize the vector (very important!)
+        // plane->plane_normal = vector_normilze(plane->plane_normal);
+        plane->plane_cordinates = ft_new_point(0, -1, 0);
+        plane->plane_color = ft_new_color(0.8, 0.8, 0.8);
+        plane->transform = identity_matrix(4);
+        plane->material = default_material();
+        plane->material->color = ft_new_color(0.2, 1.2, 0.2);
+        plane->material->diffuse = 0.7;
+        plane->material->specular = 0.3;
 
+    t_plane *plane1 = malloc(sizeof(t_plane));
+    plane1->plane_normal = ft_new_vector(0, 0, 1);  // Facing towards camera
+    plane1->plane_cordinates = ft_new_point(0, 0, -10);
+    plane1->plane_color = ft_new_color(0.8, 1, 0.8);
+    plane1->transform = identity_matrix(4);
+    plane1->material = default_material();
+    plane1->material->color = ft_new_color(1, 1.2, 0.2);
+    plane1->material->diffuse = 0.7;
+    plane1->material->specular = 0.3;
+
+    // Light source
+    world->light = ft_new_plight(ft_new_color(1, 1, 1), ft_new_point(0, 0, -5));
+
+    // Add objects to world
     ft_add_shape(&world, sphere1, SHAPE_SPHERE);
     ft_add_shape(&world, sphere2, SHAPE_SPHERE);
+    ft_add_shape(&world, plane, SHAPE_PLANE);
+    ft_add_shape(&world, plane1, SHAPE_PLANE);
 
     return world;
 }
-
 s_camera  *new_camera(float hsize, float vsize, float fov)
 {
     s_camera *camera;
@@ -381,6 +488,8 @@ t_color *shading_hit(t_world *world, t_compose *comp)
 
     if (comp->obj_type == SHAPE_SPHERE)
         material = ((t_sphere *)comp->obj)->material;
+    if (comp->obj_type == SHAPE_PLANE)
+        material = ((t_plane *)comp->obj)->material;
     
     // Check if point is in shadow before calculating full lighting ??
     if (is_shadowed(world, comp->point))
