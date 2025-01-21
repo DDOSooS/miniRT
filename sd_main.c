@@ -293,7 +293,7 @@ int render_spheres(t_scene *scene)
         return (0);
 
     // Move camera back for better view by -10 units
-    t_point *ray_origin = ft_new_point(0, 0, -10 );
+    t_point *ray_origin = ft_new_point(-10, 0, -10 );
 
     for (int y = 0; y < scene->image_height; y++)
     {

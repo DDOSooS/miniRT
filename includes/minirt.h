@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minirt.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aghergho <aghergho@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2025/01/17 21:06:18 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/01/21 19:44:14 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -328,7 +328,7 @@ t_intersection *ray_hit(t_intersection *inters, int count);
 t_ray *transform(t_ray *ray, float **m);
 t_ray *transform(t_ray *ray, float **m);
 t_point *position(t_ray *ray, float distance);
-t_color *get_lighting_color(t_material *material, p_light *light, t_point *point, t_vector *cam_v, t_vector *norm_v);
+t_color *get_lighting_color(t_material *material, p_light *light, t_point *point, t_vector *cam_v, t_vector *norm_v, int);
 t_vector *normilize_at_sphere_pos(t_sphere *sphere, t_point *w_p);
 /* end of ray manipulation functions*/
 
@@ -341,5 +341,7 @@ t_color *get_color_at(t_world *world, t_ray *ray);
 float **get_view_transform(t_point *from_v, t_point *to_v, t_vector *up_v);
 t_ray *get_ray_pixel(s_camera *cam, float x, float y);
 t_color *clamp_color(t_color *color);
+
+int is_shadowed(t_world *world, t_point *point);
 
 #endif

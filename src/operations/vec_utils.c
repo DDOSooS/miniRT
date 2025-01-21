@@ -634,7 +634,7 @@ t_color *clamp_color(t_color *color)
     color->b = clamp(color->b, 0.0f, 1.0f);
     return color;
 }
-t_color *get_lighting_color(t_material *material, p_light *light, t_point *point, t_vector *cam_v, t_vector *norm_v)
+t_color *get_lighting_color(t_material *material, p_light *light, t_point *point, t_vector *cam_v, t_vector *norm_v, int shadow)
 {
     t_color *eff_color;
     t_vector *light_dir;
@@ -648,6 +648,8 @@ t_color *get_lighting_color(t_material *material, p_light *light, t_point *point
 
     eff_color = ft_multiply_color(material->color, light->intensity);
     ambient = ft_multiply_color_scalar(eff_color, material->ambient);
+    if (shadow)
+        return ambient;
     light_dir = vector_sub(light->position, point);
     light_dir_normal = vector_normilze(light_dir);
 

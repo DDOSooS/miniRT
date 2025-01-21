@@ -359,8 +359,9 @@ t_world *default_world()
     world->shape = NULL;
 
     t_sphere *sphere1 = default_sphere();
+    // sphere1->sphere_coordinates =  ft_new_point(0, 25,0 );
     sphere1->sphere_diameter = 1.5;
-    sphere1->sphere_coordinates = ft_new_point(0,0,0);
+    sphere1->sphere_coordinates = ft_new_point(-3,0,0);
     sphere1->transform = ft_translate_matrix(ft_new_point(-1, 0, 0), 1);
     sphere1->material->color = ft_new_color(1, 0.2, 1);
     sphere1->material->diffuse = 0.7;
@@ -375,7 +376,7 @@ t_world *default_world()
 
         t_plane *plane = malloc(sizeof(t_plane));
         // Create a gentle slope
-        plane->plane_normal = ft_new_vector(1, 1, 0);
+        plane->plane_normal = ft_new_vector(0, -1, 0);
         // Normalize the vector (very important!)
         // plane->plane_normal = vector_normilze(plane->plane_normal);
         plane->plane_cordinates = ft_new_point(0, -1, 0);
@@ -397,7 +398,7 @@ t_world *default_world()
     // plane1->material->specular = 0.9;
 
     // Light source
-    world->light = ft_new_plight(ft_new_color(1, 1, 1), ft_new_point(100, 50,0));
+    world->light = ft_new_plight(ft_new_color(1, 1, 1), ft_new_point(-100, 50,0));
 
     // Add objects to world
     ft_add_shape(&world, sphere1, SHAPE_SPHERE);
@@ -484,27 +485,28 @@ t_color *shading_hit(t_world *world, t_compose *comp)
 {
     t_color *color;
     t_material *material;
-    
+    int shadowed ;
 
     if (comp->obj_type == SHAPE_SPHERE)
         material = ((t_sphere *)comp->obj)->material;
-    if (comp->obj_type == SHAPE_PLANE)
+    else if (comp->obj_type == SHAPE_PLANE)
         material = ((t_plane *)comp->obj)->material;
     
+    shadowed = is_shadowed(world, comp->point);
     // Check if point is in shadow before calculating full lighting ??
-    if (is_shadowed(world, comp->point))
-    {
-        //calculating  ambient light
-        t_color *ambient = ft_multiply_color_scalar(
-            ft_multiply_color(material->color, world->light->intensity),
-            material->ambient
-        );
-        printf("hehoo\n");
-        return clamp_color(ambient);
-    }
+    // if (is_shadowed(world, comp->point))
+    // {
+    //     //calculating  ambient light
+    //     t_color *ambient = ft_multiply_color_scalar(
+    //         ft_multiply_color(material->color, world->light->intensity),
+    //         material->ambient
+    //     );
+    //     printf("hehoo\n");
+    //     return clamp_color(ambient);
+    // }
     
     color = get_lighting_color(material, world->light, comp->point,
-                             comp->camv, comp->normv);
+                             comp->camv, comp->normv, shadowed);
     return color;
 }
 
