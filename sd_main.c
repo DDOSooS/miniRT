@@ -284,8 +284,8 @@ void print_matrix(float **matrix, int rows, int cols) {
 int render_spheres(t_scene *scene)
 {
     float wall_size = 30;  
-    float pixel_size = wall_size / scene->image_width;
-    float half_size = wall_size / 2.0;
+    float pixel_size = wall_size / (float)scene->image_width;
+    float half_size = ((float)(wall_size)) / 2.0;
     float wall_z = 15;
 
     t_world *world = default_world();
@@ -293,7 +293,7 @@ int render_spheres(t_scene *scene)
         return (0);
 
     // Move camera back for better view by -10 units
-    t_point *ray_origin = ft_new_point(0, 0, -10);
+    t_point *ray_origin = ft_new_point(0, 0, -10 );
 
     for (int y = 0; y < scene->image_height; y++)
     {
@@ -324,6 +324,11 @@ int render_spheres(t_scene *scene)
             }
             else
                 my_pixel_put(&scene->data->img, x, y, (255 << 24) | (30 << 16) | (30 << 8) | 30);
+            if (world_x == 0 && world_y == 100)
+            {
+                my_pixel_put(&scene->data->img, x, y, (255 << 24) | (255 << 16) | (0 << 8) | 0);
+                printf("nono\n");
+            }
         }
     }
 

@@ -634,7 +634,6 @@ t_color *clamp_color(t_color *color)
     color->b = clamp(color->b, 0.0f, 1.0f);
     return color;
 }
-
 t_color *get_lighting_color(t_material *material, p_light *light, t_point *point, t_vector *cam_v, t_vector *norm_v)
 {
     t_color *eff_color;
@@ -648,42 +647,36 @@ t_color *get_lighting_color(t_material *material, p_light *light, t_point *point
     float reflect_dot_camera;
 
     eff_color = ft_multiply_color(material->color, light->intensity);
-
-    // printf("%f ambient\n", material->ambient);
-
     ambient = ft_multiply_color_scalar(eff_color, material->ambient);
-    ambient = clamp_color(ambient);  
-
     light_dir = vector_sub(light->position, point);
     light_dir_normal = vector_normilze(light_dir);
 
     light_dot_normal = vector_dot(light_dir_normal, norm_v);
-    if (light_dot_normal < 0)
-    {
-        diffuse = ft_new_color(0, 0, 0);  
-        specular = ft_new_color(0, 0, 0); 
-    }
-    else
-    {
-        diffuse = ft_multiply_color_scalar(eff_color, material->diffuse * light_dot_normal);
-        diffuse = clamp_color(diffuse);  
+    if (light_dot_normal < 0.1)
+        light_dot_normal = 0; // Minimum light level for ambient occlusion effect
 
+    diffuse = ft_multiply_color_scalar(eff_color, material->diffuse * light_dot_normal);
+
+    if (light_dot_normal > EPSILON)
+    {
         t_vector *reflect_vec = reflect_vector(negate_vector(light_dir_normal), norm_v);
         reflect_dot_camera = vector_dot(reflect_vec, cam_v);
         if (reflect_dot_camera <= 0.0)
-            specular = ft_new_color(0, 0, 0); 
+            specular = ft_new_color(0, 0, 0);
         else
         {
             float spec_factor = powf(reflect_dot_camera, material->shininess);
             specular = ft_multiply_color_scalar(light->intensity, material->specular * spec_factor);
-            specular = clamp_color(specular);
         }
         free(reflect_vec);
+    }
+    else
+    {
+        specular = ft_new_color(0, 0, 0);
     }
 
     t_color *tmp = ft_add_color(specular, diffuse);
     total_color = ft_add_color(tmp, ambient);
-    total_color = clamp_color(total_color);
 
     free(eff_color);
     free(light_dir);
@@ -695,8 +688,6 @@ t_color *get_lighting_color(t_material *material, p_light *light, t_point *point
 
     return total_color;
 }
-
-
 t_material *default_material(void)
 {
     t_material *m = malloc(sizeof(t_material));
