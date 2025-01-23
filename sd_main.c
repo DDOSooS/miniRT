@@ -286,14 +286,14 @@ int render_spheres(t_scene *scene)
     float wall_size = 30;  
     float pixel_size = wall_size / (float)scene->image_width;
     float half_size = ((float)(wall_size)) / 2.0;
-    float wall_z = 15;
+    float wall_z = 10;
 
     t_world *world = default_world();
     if (!world)
         return (0);
 
     // Move camera back for better view by -10 units
-    t_point *ray_origin = ft_new_point(-10, 0, -10 );
+    t_point *ray_origin = ft_new_point(0, 0, -10 );
 
     for (int y = 0; y < scene->image_height; y++)
     {
@@ -307,7 +307,8 @@ int render_spheres(t_scene *scene)
             ray_direction = vector_normilze(ray_direction);  
             t_ray *ray = create_ray(ray_origin, ray_direction);
             t_intersection *inter = intersect_world(world, ray);
-            if (inter && inter->t1 > 0)
+
+            if (inter  && inter->t1 > EPSILON)
             {
                 t_compose *comp = prepare_computations(inter, ray);
                 if (comp)
@@ -331,7 +332,7 @@ int render_spheres(t_scene *scene)
             }
         }
     }
-
+    printf("end of rendering\n");
     mlx_put_image_to_window(scene->data->mlx, scene->data->win, 
                            scene->data->img.img_ptr, 0, 0);
     mlx_hook(scene->data->win, 17, 0, &ft_close_window, scene->data);
@@ -428,8 +429,8 @@ int main(int argc, char **argv)
     // var_dump_all(map, scene);
     init_scene(scene);
     render_spheres(scene);
-    t_world *world = default_world();
-    s_camera *camera = new_camera(800, 600, PI / 3);  // 800x600 resolution, 60-degree FOV
+    // t_world *world = default_world();
+    // s_camera *camera = new_camera(800, 600, PI / 3);  // 800x600 resolution, 60-degree FOV
 
     // render_image(scene, world, camera);
     return 0;

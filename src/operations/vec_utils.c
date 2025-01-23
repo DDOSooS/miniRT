@@ -646,6 +646,10 @@ t_color *get_lighting_color(t_material *material, p_light *light, t_point *point
     float light_dot_normal;
     float reflect_dot_camera;
 
+    if (!material->color) 
+      printf("no material color is being defined\n");
+    if (!light->intensity)
+        printf("no intentsity color is being defined\n");
     eff_color = ft_multiply_color(material->color, light->intensity);
     ambient = ft_multiply_color_scalar(eff_color, material->ambient);
     if (shadow)

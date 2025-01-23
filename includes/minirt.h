@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2025/01/21 19:44:14 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/01/22 16:42:42 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,6 +152,8 @@ typedef struct cylinder
     t_color         *cylinder_color;
     double          raduis;
     double          height;
+    float           **transform;
+    t_material       *material;
     struct cylinder *next;
 } t_cylinder;
 
