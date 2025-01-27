@@ -286,19 +286,18 @@ int render_spheres(t_scene *scene)
     float wall_size = 30;  
     float pixel_size = wall_size / (float)scene->image_width;
     float half_size = ((float)(wall_size)) / 2.0;
-    float wall_z = 10;
+    float wall_z = 15;
 
     t_world *world = default_world();
     if (!world)
         return (0);
 
     // Move camera back for better view by -10 units
-    t_point *ray_origin = ft_new_point(0, 0, -10 );
+    t_point *ray_origin = ft_new_point(0, 0, -20 );
 
     for (int y = 0; y < scene->image_height; y++)
     {
         float world_y = half_size - pixel_size * y;
- 
         for (int x = 0; x < scene->image_width; x++)
         {
             float world_x = -half_size + pixel_size * x;
@@ -324,7 +323,10 @@ int render_spheres(t_scene *scene)
                 }
             }
             else
+            {
+                printf("1\n");
                 my_pixel_put(&scene->data->img, x, y, (255 << 24) | (30 << 16) | (30 << 8) | 30);
+            }
             if (world_x == 0 && world_y == 100)
             {
                 my_pixel_put(&scene->data->img, x, y, (255 << 24) | (255 << 16) | (0 << 8) | 0);
@@ -386,12 +388,12 @@ void var_dump_world(t_world *world)
     var_dump_light(world->light);
 }
 
-void init_scene(t_scene *scene)
+void init_scene(t_scene *scene, float width, float height)
 {
-    scene->image_width = 600;
+    scene->image_width = width;
     scene->aspect_ratio = 16.0f / 9.0f;
     // scene->image_height = (int)(scene->image_width / scene->aspect_ratio); // This will be about 225
-    scene->image_height = 600; 
+    scene->image_height = height; 
     scene->vp_hight = 2.0;
     scene->vp_width = scene->vp_hight * scene->aspect_ratio;
     scene->camera->focal_lenght = 500; 
@@ -427,14 +429,108 @@ int main(int argc, char **argv)
     scene = ft_generate_scene(map->lines);
     
     // var_dump_all(map, scene);
-    init_scene(scene);
-    render_spheres(scene);
-    // t_world *world = default_world();
-    // s_camera *camera = new_camera(800, 600, PI / 3);  // 800x600 resolution, 60-degree FOV
-
-    // render_image(scene, world, camera);
+    float width = 300;
+    float height = 300;
+    init_scene(scene, width, height);
+    // render_spheres(scene);
+    t_world *world = default_world();
+    
+    // Create camera with 1:1 pixel mapping
+    s_camera *camera = new_camera(
+        height,
+        width,
+        180,
+        ft_new_point(0, 0, -100), // Camera at origin
+        ft_new_vector(0, 0, 1)  // Looking along z-axis
+    );
+    
+    render_image(scene, world, camera);
     return 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     /*

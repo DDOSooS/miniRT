@@ -653,7 +653,10 @@ t_color *get_lighting_color(t_material *material, p_light *light, t_point *point
     eff_color = ft_multiply_color(material->color, light->intensity);
     ambient = ft_multiply_color_scalar(eff_color, material->ambient);
     if (shadow)
-        return ambient;
+    {
+        printf("there is a shadow \n");
+        return clamp_color (ambient);
+    }
     light_dir = vector_sub(light->position, point);
     light_dir_normal = vector_normilze(light_dir);
 
@@ -667,7 +670,7 @@ t_color *get_lighting_color(t_material *material, p_light *light, t_point *point
     {
         t_vector *reflect_vec = reflect_vector(negate_vector(light_dir_normal), norm_v);
         reflect_dot_camera = vector_dot(reflect_vec, cam_v);
-        if (reflect_dot_camera <= 0.0)
+        if (reflect_dot_camera < EPSILON)
             specular = ft_new_color(0, 0, 0);
         else
         {
@@ -692,7 +695,7 @@ t_color *get_lighting_color(t_material *material, p_light *light, t_point *point
     free(specular);
     free(tmp);
 
-    return total_color;
+    return clamp_color(total_color);
 }
 t_material *default_material(void)
 {

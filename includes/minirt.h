@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2025/01/22 16:42:42 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/01/27 18:06:28 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,6 +110,8 @@ typedef struct s_camera
     float   fov; // field of view
     float   **transform;
     float   pixel_size;
+    t_point *origin;
+    t_vector *direction;
 }   s_camera;
 
 typedef struct lines
@@ -126,7 +128,7 @@ typedef struct map
 
 typedef struct sphere
 {
-    double          sphere_diameter;
+    float          sphere_diameter;
     t_vector        *sphere_coordinates;
     t_color         *sphere_color;
     float           **transform;
@@ -266,9 +268,10 @@ t_vector    *vector_sub(t_vector *v1, t_vector *v2);
 t_vector    *vector_add(t_vector *v1, t_vector *v2);
 t_vector    *ft_new_vector(float x, float y, float z);
 void        var_dump_vector(t_vector *vec);
+void init_scene(t_scene *scene, float width, float height);
 t_ray       *create_ray(t_vector *origin, t_vector *direction);
 int         gen_ray(t_scene *scene,float x, float y, t_ray **cam_r);
-s_camera  *new_camera(float hsize, float vsize, float fov);
+s_camera  *new_camera(float h_size, float w_size,float,  t_point *, t_vector *);
 // int check_intersection(t_ray *ray, t_vector *sphere_center, float radius) ;
 // int check_intersection(t_ray *cast_ray,t_vector *inter_point ,t_vector *local_normal,t_vector *locol_color);
 t_vector    *vector_copy(t_vector *src);
