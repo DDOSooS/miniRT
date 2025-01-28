@@ -440,7 +440,7 @@ int main(int argc, char **argv)
         height,
         width,
         180,
-        ft_new_point(-20, -20, -100), // Camera at origin
+        ft_new_point(0, 10, -100), // Camera at origin
         ft_new_vector(0, 0, 1)  // Looking along z-axis
     );
     
