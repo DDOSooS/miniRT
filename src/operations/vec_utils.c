@@ -654,7 +654,7 @@ t_color *get_lighting_color(t_material *material, p_light *light, t_point *point
     ambient = ft_multiply_color_scalar(eff_color, material->ambient);
     if (shadow)
     {
-        printf("there is a shadow \n");
+        // printf("there is a shadow \n");
         return clamp_color (ambient);
     }
     light_dir = vector_sub(light->position, point);

@@ -222,9 +222,11 @@ t_intersection ft_intersect_plane(t_ray *ray, t_plane *plane)
     if (t < EPSILON)
         return result;  // Intersection is behind ray origin
     // 7. Set intersection details
+    result.n_sol =1;
     result.t1 = t;
     result.object = plane;
     result.type = SHAPE_PLANE;
+    // printf(" intersection with plane is being made\n");
     return result;
 }
 
@@ -325,7 +327,8 @@ t_vector *normalize_at_cylinder_pos(t_cylinder *cylinder, t_point *p)
     t_vector *normalized_vec;
     float **inv_m;
 
-
+    if (!cylinder)
+        printf("cylinder not defined\n");
     float maximum = cylinder->coordinates->y + cylinder->height / 2.0f;
     float minimum = cylinder->coordinates->y - cylinder->height / 2.0f;
 
@@ -440,34 +443,76 @@ t_world *default_world() {
 
     t_sphere *sphere1 = default_sphere();
     // Set radius to 3.5, so that diameter is 7
-    sphere1->sphere_diameter = 7; 
+    sphere1->sphere_diameter = 60; 
     // Position sphere at x = 7, y = 0, z = 0
-    sphere1->sphere_coordinates = ft_new_point(0, 0, 0);
+    sphere1->sphere_coordinates = ft_new_point(-10, -30, -20);
     // Apply a scale transformation if needed
 // ft_scale_matrix(&sphere1->transform, 1, 1);// No scaling needed for now
-    sphere1->material->color = ft_new_color(1, 0.2, 1);
-    // sphere1->material->diffuse = 0.7;/
+    sphere1->material->color = ft_new_color(0.9, 0.5, 0.2);
+
 
     t_sphere *sphere2 = default_sphere();
-    // Set radius to 45, so that diameter is 90
-    sphere2->sphere_diameter = 190; 
-     // Position sphere at x = 0, y = 0, z = 0
-    sphere2->sphere_coordinates = ft_new_point(0, 0, 0);
-    // Apply a scale transformation if needed
-// ft_scale_matrix(&sphere2->transform, 5, 1);// No scaling needed for now
-    sphere2->material->color = ft_new_color(1,0, 0);
-    // sphere2->material->diffuse = 0.7;
-    // sphere2->material->specular = 0.3;
+    sphere2->sphere_diameter = 40; 
+    sphere2->sphere_coordinates = ft_new_point(70, -30, 0);
+    sphere2->material->color = ft_new_color(0.9, 0.5, 0.2);
+    sphere2->transform = identity_matrix(4);
 
+    // t_sphere *sphere3 = default_sphere();
+    // sphere3->sphere_diameter = 60; 
+    // sphere3->sphere_coordinates = ft_new_point(0, , -20);
+    // sphere3->material->color = ft_new_color(0.9, 0.5, 0.2);
+    
+    
+    t_plane *plane2 = malloc(sizeof(t_plane));
+    // Create a gentle slope
+    plane2->plane_normal = ft_new_vector(0, 0, -1);
+    // Normalize the vector (very important!)
+    // plane->plane_normal = vector_normilze(plane->plane_normal);
+    plane2->plane_cordinates = ft_new_point(0,1, 100);
+    plane2->plane_color = ft_new_color(0.8, 0.8, 0.8);
+    plane2->transform = identity_matrix(4);
+    plane2->material = default_material();
+    plane2->material->color = ft_new_color(1, 1, 1);
+    plane2->material->diffuse = 0.7;
+    plane2->material->specular = 0.3;
+
+
+    t_plane *plane = malloc(sizeof(t_plane));
+    // Create a gentle slope
+    plane->plane_normal = ft_new_vector(0, -1, 0);
+    // Normalize the vector (very important!)
+    // plane->plane_normal = vector_normilze(plane->plane_normal);
+    plane->plane_cordinates = ft_new_point(0,1, 0);
+    plane->plane_color = ft_new_color(0.8, 0.8, 0.8);
+    plane->transform = identity_matrix(4);
+    plane->material = default_material();
+    plane->material->color = ft_new_color(1, 0, -10);
+    plane->material->diffuse = 0.7;
+    plane->material->specular = 0.3;
+
+
+        t_cylinder *cylinder1 = malloc(sizeof(t_cylinder));
+    cylinder1->raduis = 50;
+    cylinder1->height = 60;
+    cylinder1->transform = identity_matrix(4);
+    cylinder1->material = default_material();
+    cylinder1->material->color = ft_new_color(0, 0, -1);
+    cylinder1->orientation = ft_new_vector(0,1,0);
+    cylinder1->coordinates = ft_new_point(-4,0,0);
+    cylinder1->next = NULL;
     // Light positioned appropriately for the new scale
     world->light = ft_new_plight
     (
         ft_new_color(1, 1, 1),
-        ft_new_point(0, 0, -100)  // Positioned relative to pixel coordinates
+        ft_new_point(-40, -20, -100)  // Positioned relative to pixel coordinates
     );
 
+    // ft_add_shape(&world, sphere2, SHAPE_SPHERE);
+    ft_add_shape(&world, plane, SHAPE_PLANE);
+    ft_add_shape(&world, plane2, SHAPE_PLANE);
+    // ft_add_shape(&world, cylinder1, SHAPE_CYLINDER);
+    ft_add_shape(&world, sphere1, SHAPE_SPHERE);
     ft_add_shape(&world, sphere2, SHAPE_SPHERE);
-    // ft_add_shape(&world, sphere1, SHAPE_SPHERE);
     return world;
 }
 
@@ -478,7 +523,6 @@ s_camera *new_camera(float h_size, float w_size, float fov, t_point *p, t_vector
     float aspect;
     float half_view;
    
-    
     camera = malloc(sizeof(s_camera));
     if (!camera)
         return NULL;
@@ -486,27 +530,23 @@ s_camera *new_camera(float h_size, float w_size, float fov, t_point *p, t_vector
     camera->direction = dir;
     camera->h_size = h_size;
     camera->w_size = w_size;
-    // Calculate the aspect ratio
     aspect = camera->w_size / camera->h_size;
-    camera->fov = fov; // Store FOV for reference
-    // Determine half view based on the FOV
+    camera->fov = fov; 
     half_view = tan(fov / 2.0f);
     if (aspect >= 1.0f)
     {
-        // Landscape orientation
         camera->half_w_size = half_view;
         camera->half_h_size = half_view / aspect;
     }
     else
     {
-        // Portrait orientation
         camera->half_w_size = half_view * aspect;
         camera->half_h_size = half_view;
     }
-    // Calculate the size of a single pixel in world units
     camera->pixel_size = camera->half_w_size * 2.0f / camera->w_size;
-    printf("pixel_size = %f \n", camera->pixel_size);
     camera->transform = get_view_transform(p, vector_add(p, dir), ft_new_vector(0, 1, 0));
+    // Calculate the size of a single pixel in world units
+    // printf("pixel_size = %f \n", camera->pixel_size);
     return camera;
 }
 

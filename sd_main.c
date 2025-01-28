@@ -429,8 +429,8 @@ int main(int argc, char **argv)
     scene = ft_generate_scene(map->lines);
     
     // var_dump_all(map, scene);
-    float width = 300;
-    float height = 300;
+    float width = 700;
+    float height = 400;
     init_scene(scene, width, height);
     // render_spheres(scene);
     t_world *world = default_world();
@@ -440,7 +440,7 @@ int main(int argc, char **argv)
         height,
         width,
         180,
-        ft_new_point(0, 0, -100), // Camera at origin
+        ft_new_point(-20, -20, -100), // Camera at origin
         ft_new_vector(0, 0, 1)  // Looking along z-axis
     );
     
