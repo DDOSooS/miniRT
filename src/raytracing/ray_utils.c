@@ -151,9 +151,9 @@ p_light *default_light()
 t_shape *ft_new_shape(void *shape_obj, int shape_type)
 {
     t_shape *new_shape = malloc(sizeof(t_shape));
+
     if (!new_shape)
         return NULL;
-    
     new_shape->type = shape_type;
     new_shape->next = NULL;
     if (shape_type == SHAPE_SPHERE) 
@@ -215,8 +215,9 @@ t_intersection ft_intersect_plane(t_ray *ray, t_plane *plane)
 t_intersection ft_intersect_cylinder(t_ray *ray, t_cylinder *cylinder)
 {
     t_intersection result = {-1, -1, -1, NULL, SHAPE_CYLINDER};
-
     float half_height = cylinder->height / 2.0f;
+    
+    // Body intersection calculations (your existing code)
     float a = ray->direction->x * ray->direction->x + 
               ray->direction->z * ray->direction->z;
     float b = 2.0f * (ray->origin->x * ray->direction->x + 
@@ -225,33 +226,73 @@ t_intersection ft_intersect_cylinder(t_ray *ray, t_cylinder *cylinder)
               ray->origin->z * ray->origin->z - 
               cylinder->raduis * cylinder->raduis;
     float discriminant = b * b - 4.0f * a * c;
-    if (discriminant < 0)
-        return result;
-    float sqrt_disc = sqrtf(discriminant);
-    float t1 = (-b - sqrt_disc) / (2.0f * a);
-    float t2 = (-b + sqrt_disc) / (2.0f * a);
-    int valid_intersections = 0;
-    float valid_t1 = -1, valid_t2 = -1;
-    float y1 = ray->origin->y + t1 * ray->direction->y;
-    float y2 = ray->origin->y + t2 * ray->direction->y;
-    if (y1 >= -half_height && y1 <= half_height)
+    
+    float body_t1 = -1, body_t2 = -1;
+    if (discriminant >= 0)
     {
-        valid_t1 = t1;
-        valid_intersections++;
+        float sqrt_disc = sqrtf(discriminant);
+        float t1 = (-b - sqrt_disc) / (2.0f * a);
+        float t2 = (-b + sqrt_disc) / (2.0f * a);
+        
+        float y1 = ray->origin->y + t1 * ray->direction->y;
+        float y2 = ray->origin->y + t2 * ray->direction->y;
+        
+        if (y1 >= -half_height && y1 <= half_height)
+            body_t1 = t1;
+        if (y2 >= -half_height && y2 <= half_height)
+            body_t2 = t2;
     }
-    if (y2 >= -half_height && y2 <= half_height)
+    
+    // Cap intersection calculations
+    float cap_t1 = -1, cap_t2 = -1;
+    
+    if (fabs(ray->direction->y) > 1e-6) // Avoid division by zero
     {
-        if (valid_intersections == 0) 
-            valid_t1 = t2;
-        else 
-            valid_t2 = t2;
-        valid_intersections++;
+        // Bottom cap
+        float t_bottom = (-half_height - ray->origin->y) / ray->direction->y;
+        float x_bottom = ray->origin->x + t_bottom * ray->direction->x;
+        float z_bottom = ray->origin->z + t_bottom * ray->direction->z;
+        
+        // Top cap
+        float t_top = (half_height - ray->origin->y) / ray->direction->y;
+        float x_top = ray->origin->x + t_top * ray->direction->x;
+        float z_top = ray->origin->z + t_top * ray->direction->z;
+        
+        // Check if intersection points are within the cap radius
+        if (x_bottom * x_bottom + z_bottom * z_bottom <= cylinder->raduis * cylinder->raduis)
+            cap_t1 = t_bottom;
+        if (x_top * x_top + z_top * z_top <= cylinder->raduis * cylinder->raduis)
+            cap_t2 = t_top;
     }
-    result.n_sol = valid_intersections;
-    result.t1 = valid_t1;
-    result.t2 = valid_t2;
-    if (valid_intersections > 0) 
+    
+    // Combine all intersections and sort them
+    float intersections[4] = {body_t1, body_t2, cap_t1, cap_t2};
+    int valid_count = 0;
+    float valid_t[2] = {-1, -1};
+    
+    for (int i = 0; i < 4; i++)
+    {
+        if (intersections[i] > 0)
+        {
+            if (valid_count == 0 || intersections[i] < valid_t[0])
+            {
+                valid_t[1] = valid_t[0];
+                valid_t[0] = intersections[i];
+            }
+            else if (valid_count == 1)
+            {
+                valid_t[1] = intersections[i];
+            }
+            valid_count++;
+        }
+    }
+    
+    result.n_sol = valid_count;
+    result.t1 = valid_t[0];
+    result.t2 = valid_t[1];
+    if (valid_count > 0)
         result.object = cylinder;
+    
     return result;
 }
 
@@ -310,6 +351,8 @@ t_vector *normalize_at_cylinder_pos(t_cylinder *cylinder, t_point *p)
     t_vector *normalized_vec;
     float **inv_m;
 
+    if (!cylinder)
+        printf("cylinder not defined\n");
     float maximum = cylinder->coordinates->y + cylinder->height / 2.0f;
     float minimum = cylinder->coordinates->y - cylinder->height / 2.0f;
     float dist = p->x * p->x + p->z * p->z;
@@ -361,7 +404,7 @@ t_compose *prepare_computations(t_intersection *inter, t_ray *ray)
 }
 
 
-float **get_view_transform(t_point *from_v, t_point *to_v, t_vector *up_v)
+float **get_view_transform(t_point *from_v, t_vector *to_v, t_vector *up_v)
 {
     float **view_transform;
     t_vector *forward_v;
@@ -369,8 +412,8 @@ float **get_view_transform(t_point *from_v, t_point *to_v, t_vector *up_v)
     t_vector *up_n;
     float **res;
 
-    forward_v = vector_sub(to_v, from_v);
-    forward_v = vector_normilze(forward_v);
+    // forward_v = vector_sub(to_v, from_v);
+    forward_v = vector_normilze(to_v);
     up_n = vector_normilze(up_v);
     left_v = vector_cross(forward_v, up_n);
     up_v = vector_cross(left_v, forward_v);
@@ -403,14 +446,14 @@ t_world *default_world()
 
     t_sphere *sphere1 = default_sphere();
     sphere1->sphere_diameter = 60; 
-    sphere1->sphere_coordinates = ft_new_point(-50, 0, -20);
+    sphere1->sphere_coordinates = ft_new_point(0, 0, 0);
     sphere1->material->color = ft_new_color(0.9, 0.5, 0.2);
 
 
     t_sphere *sphere2 = default_sphere();
     sphere2->sphere_diameter = 40; 
     sphere2->sphere_coordinates = ft_new_point(50, 0, 0);
-    sphere2->material->color = ft_new_color(0.9, 0.5, 0.2);
+    sphere2->material->color = ft_new_color(1, 0, 0.2);
     sphere2->transform = identity_matrix(4);
 
     // t_sphere *sphere3 = default_sphere();
@@ -442,11 +485,11 @@ t_world *default_world()
 
 
     t_cylinder *cylinder1 = malloc(sizeof(t_cylinder));
-    cylinder1->raduis = 50;
+    cylinder1->raduis = 30;
     cylinder1->height = 60;
     cylinder1->transform = identity_matrix(4);
     cylinder1->material = default_material();
-    cylinder1->material->color = ft_new_color(0, 0, -1);
+    cylinder1->material->color = ft_new_color(1, 0, 0);
     cylinder1->orientation = ft_new_vector(0,1,0);
     cylinder1->coordinates = ft_new_point(-4,0,0);
     cylinder1->next = NULL;
@@ -460,13 +503,14 @@ t_world *default_world()
 
     ft_add_shape(&world, sphere1, SHAPE_SPHERE);
     ft_add_shape(&world, plane, SHAPE_PLANE);
-    ft_add_shape(&world, plane2, SHAPE_PLANE);
+    // ft_add_shape(&world, plane2, SHAPE_PLANE);
     // ft_add_shape(&world, cylinder1, SHAPE_CYLINDER);
-    // ft_add_shape(&world, sphere1, SHAPE_SPHERE);
+    // if (world->shape->objects.cylinder)
+        // printf("cylinder is  being created. height:%d==\n", world->shape->objects.cylinder->height);
+    ft_add_shape(&world, sphere1, SHAPE_SPHERE);
     ft_add_shape(&world, sphere2, SHAPE_SPHERE);
     return world;
 }
-
 
 s_camera *new_camera(float h_size, float w_size, float fov, t_point *p, t_vector *dir)
 {
@@ -495,25 +539,42 @@ s_camera *new_camera(float h_size, float w_size, float fov, t_point *p, t_vector
         camera->half_h_size = half_view;
     }
     camera->pixel_size = camera->half_w_size * 2.0f / camera->w_size;
-    camera->transform = get_view_transform(p, vector_add(p, dir), ft_new_vector(0, 1, 0));
+    camera->transform = get_view_transform(p,  vector_normilze(dir), ft_new_vector(0, 1, 0));
     // Calculate the size of a single pixel in world units
     // printf("pixel_size = %f \n", camera->pixel_size);
     return camera;
 }
 
-t_ray *get_ray_pixel(s_camera *cam, float x, float y)
+t_ray *get_ray_pixel(s_camera *cam, float x, float y, float edge)
 {
     t_ray *ray;
+    t_point *pixel_world;
     t_point *pixel;
     float world_x, world_y;
+    float **inv;
 
     ray = malloc(sizeof(t_ray));
-    world_x = cam->half_w_size - (x + 0.5) * cam->pixel_size;
-    world_y = cam->half_h_size - (y + 0.5) * cam->pixel_size;
+    if (!ray)
+        return NULL;
 
-    pixel = ft_multiply_matrix_vec(inverse_matrix(cam->transform, 4), ft_new_point(-world_x, -world_y, -1));
-    ray->origin = ft_multiply_matrix_vec(inverse_matrix(cam->transform, 4), ft_new_point(0, 0, 0));
-    ray->direction = vector_normilze(vector_sub(pixel, ray->origin));
+    // Calculate the pixel's position in the camera space (normalized coordinates)
+    world_x = cam->half_w_size - (x + edge) * cam->pixel_size;
+    world_y = cam->half_h_size - (y + edge) * cam->pixel_size;
+
+    //Transform the pixel from the camera space to world space
+    inv = inverse_matrix(cam->transform, 4);
+    if (!inv)
+        inv = cam->transform;
+   // In get_ray_pixel:
+    // float forward_z = (cam->direction->z < 0) ? 1.0f : -1.0f;
+    pixel = ft_new_point(-world_x, -world_y, -1);
+	pixel_world = ft_multiply_matrix_vec(inv, pixel);
+    free(pixel);
+    ray->origin = ft_multiply_matrix_vec(inv, ft_new_point(0, 0, 0));
+	ray->direction = vector_normilze(vector_sub(pixel_world, ray->origin));
+    free(pixel_world);
+    // if(inv != cam->transform)
+    // free_matrix(inv);
     return (ray);
 }
 //shadow
@@ -570,7 +631,7 @@ t_color *get_color_at(t_world *world, t_ray *ray)
     t_color *res;
 
     inter = intersect_world(world, ray);
-    if (!inter || inter->n_sol == 0)
+    if (!inter || inter->n_sol <= 0)
     {
         return ft_new_color(0, 0, 0);
     }
@@ -589,19 +650,24 @@ int render_image(t_scene *scene, t_world *world, s_camera *cam)
     t_color *color;
     t_ray *ray;
     int pixel_color;
+    float edge;
 
     for (y = 0; y < cam->h_size; y++)
     {
         for (x = 0; x < cam->w_size; x++)
         {
-            ray = get_ray_pixel(cam, x, y);
-            color = get_color_at(world, ray);
-            pixel_color = (255 << 24) |
-                         ((int)(255 * color->r) << 16) |
-                         ((int)(255 * color->g) << 8) |
-                         ((int)(255 * color->b) << 0);
-
-            my_pixel_put(&scene->data->img, x, y, pixel_color);
+            edge = 0;
+            for (int j = 0; j < 4; j++)
+            {
+                ray = get_ray_pixel(cam, x, y, edge);
+                color = get_color_at(world, ray);
+                pixel_color = (255 << 24) |
+                            ((int)(255 * color->r) << 16) |
+                            ((int)(255 * color->g) << 8) |
+                            ((int)(255 * color->b) << 0);
+                my_pixel_put(&scene->data->img, x, y, pixel_color);
+                edge += 0.25;
+            }
             // free(ray);
             // free(color);
         }

@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2025/01/27 18:06:28 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/01/29 17:33:47 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -344,7 +344,7 @@ t_compose *prepare_computations(t_intersection *inter, t_ray *ray);
 t_color *shading_hit(t_world *world, t_compose *comp);
 t_color *get_color_at(t_world *world, t_ray *ray);
 float **get_view_transform(t_point *from_v, t_point *to_v, t_vector *up_v);
-t_ray *get_ray_pixel(s_camera *cam, float x, float y);
+t_ray *get_ray_pixel(s_camera *cam, float x, float y, float edge);
 t_color *clamp_color(t_color *color);
 
 int is_shadowed(t_world *world, t_point *point);

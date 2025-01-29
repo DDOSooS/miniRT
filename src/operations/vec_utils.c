@@ -490,9 +490,11 @@ float **inverse_matrix(float **m, int n)
     float det;
     int i, j, sign;
 
+
     det = determinant(m, n);
     if (det == 0)
         return (NULL);
+        
     inverse = ft_create_matrix(n, n);
     if (!inverse)
         return (NULL);
@@ -509,6 +511,7 @@ float **inverse_matrix(float **m, int n)
     }
     ft_transpose_matrix(&inverse, n, n);
     ft_scale_matrix(&inverse, (float)(1.0f / det), n);
+
     return (inverse);
 }
 
