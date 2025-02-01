@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2025/01/30 09:43:05 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/02/01 03:53:31 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -348,5 +348,7 @@ t_ray *get_ray_pixel(s_camera *cam, float x, float y, float edge);
 t_color *clamp_color(t_color *color);
 
 int is_shadowed(t_world *world, t_point *point);
-
+float clamp(float value, float min, float max); 
+t_vector *ft_scale_vector(t_vector *vector, float scale);
+t_point *ft_multiply_matrix_point(float **m, t_point *v);
 #endif

@@ -28,6 +28,19 @@ t_point *ft_new_point(float x, float y, float z)
     return (new);
 }
 
+t_vector *ft_scale_vector(t_vector *vector, float scale)
+{
+    t_vector *new;
+
+    new = ft_new_vector(0,0,0);
+    if (!new)
+        return (NULL);
+    new->x = vector->x * scale;
+    new->y = vector->y * scale;
+    new->z = vector->z * scale;
+    return (new);
+}
+
 t_color *ft_new_color(float r, float g, float b)
 {
     t_color *new;
@@ -179,6 +192,22 @@ t_vector *ft_multiply_matrix_vec(float **m, t_vector *v)
     t_vector *result;
 
     result = ft_new_vector(0,0,0);
+    if (!result)
+        return (NULL);
+    result->x = m[0][0] * v->x + m[0][1] * v->y + m[0][2] * v->z + m[0][3] * v->w;
+    result->y = m[1][0] * v->x + m[1][1] * v->y + m[1][2] * v->z + m[1][3] * v->w;
+    result->z = m[2][0] * v->x + m[2][1] * v->y + m[2][2] * v->z + m[2][3] * v->w;
+    result->w = m[3][0] * v->x + m[3][1] * v->y + m[3][2] * v->z + m[3][3] * v->w;
+    // printf("=====================================\n");
+    // printf("Translation %f %f %f\n", result->x, result->y, result->z);
+    // printf("=====================================\n");
+    return (result);
+}
+t_point *ft_multiply_matrix_point(float **m, t_point *v)
+{
+    t_vector *result;
+
+    result = ft_new_point(0,0,0);
     if (!result)
         return (NULL);
     result->x = m[0][0] * v->x + m[0][1] * v->y + m[0][2] * v->z + m[0][3] * v->w;
@@ -490,7 +519,6 @@ float **inverse_matrix(float **m, int n)
     float det;
     int i, j, sign;
 
-
     det = determinant(m, n);
     if (det == 0)
         return (NULL);
@@ -511,7 +539,6 @@ float **inverse_matrix(float **m, int n)
     }
     ft_transpose_matrix(&inverse, n, n);
     ft_scale_matrix(&inverse, (float)(1.0f / det), n);
-
     return (inverse);
 }
 
@@ -532,7 +559,6 @@ float **identity_matrix(int n)
         }
     return (identity);
 }
-
 
 t_vector *vector_sub(t_vector *v1, t_vector *v2)
 {

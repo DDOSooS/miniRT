@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 20:24:10 by aghergho          #+#    #+#             */
-/*   Updated: 2025/01/07 09:14:28 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/01/30 14:03:34 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -328,7 +328,6 @@ int ft_check_camera_component(char **components, int *counter)
 {
     if (ft_count_components(components) != 4)
         return (0);
-      
     if (!ft_check_elements(components[1]))
         return (0);
     if (!ft_check_elements(components[2]))
@@ -567,9 +566,9 @@ int ft_gen_colors(t_color **color,char *components)
     tmp_colors = split(components, ",");
     if (!tmp_colors) 
         return 0;
-    (*color)->r= ft_atod(tmp_colors[0]);
-    (*color)->g= ft_atod(tmp_colors[1]);
-    (*color)->b= ft_atod(tmp_colors[2]);
+    (*color)->r= clamp (ft_atod(tmp_colors[0])  / 255.0f,0,1);
+    (*color)->g= clamp(ft_atod(tmp_colors[1])  / 255.0f,0,1);
+    (*color)->b= clamp(ft_atod(tmp_colors[2])  / 255.0f,0,1);
     ft_free_line_components(tmp_colors);
     return (1); 
 }
@@ -645,6 +644,7 @@ t_sphere *ft_new_sphere(char **components)
     ft_gen_colors(&sphere->sphere_color, components[3]);
     sphere->transform = identity_matrix(4);
     sphere->material = default_material();
+    ft_gen_colors(&sphere->material->color, components[3]);
     sphere->next = NULL;
     return sphere;
 }

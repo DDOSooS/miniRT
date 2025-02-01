@@ -28,7 +28,7 @@ void var_dump_all(t_map *map, t_scene *scene)
         if (scene->ambient)
         {
             printf("Ambient Ratio: %f\n", scene->ambient->ambient_ration);
-            printf("Ambient Color: [%d, %d, %d]\n", scene->ambient->ambient_color->r, scene->ambient->ambient_color->g, scene->ambient->ambient_color->b);
+            printf("Ambient Color: [%f, %f, %f]\n", scene->ambient->ambient_color->r, scene->ambient->ambient_color->g, scene->ambient->ambient_color->b);
         } else {
             printf("Ambient is NULL\n");
         }
@@ -38,7 +38,7 @@ void var_dump_all(t_map *map, t_scene *scene)
         if (scene->light) {
             printf("Light Coordinates: [%f, %f, %f]\n", scene->light->light_coordinate->x, scene->light->light_coordinate->y, scene->light->light_coordinate->z);
             printf("Light Ratio: %f\n", scene->light->light_ration);
-            printf("Light Color: [%d, %d, %d]\n", scene->light->light_color->r, scene->light->light_color->g, scene->light->light_color->b);
+            printf("Light Color: [%f, %f, %f]\n", scene->light->light_color->r, scene->light->light_color->g, scene->light->light_color->b);
         } else {
             printf("Light is NULL\n");
         }
@@ -50,7 +50,7 @@ void var_dump_all(t_map *map, t_scene *scene)
             while (sphere) {
                 printf("Sphere Coordinates: [%f, %f, %f]\n", sphere->sphere_coordinates->x, sphere->sphere_coordinates->y, sphere->sphere_coordinates->z);
                 printf("Sphere Diameter: %f\n", sphere->sphere_diameter);
-                printf("Sphere Color: [%d, %d, %d]\n", sphere->sphere_color->r, sphere->sphere_color->g, sphere->sphere_color->b);
+                printf("Sphere Color: [%f, %f, %f]\n", sphere->sphere_color->r, sphere->sphere_color->g, sphere->sphere_color->b);
                 sphere = sphere->next;
             }
         } else {
@@ -64,7 +64,7 @@ void var_dump_all(t_map *map, t_scene *scene)
             while (plane) {
                 printf("Plane Coordinates: [%f, %f, %f]\n", plane->plane_cordinates->x, plane->plane_cordinates->y, plane->plane_cordinates->z);
                 printf("Plane Normal: [%f, %f, %f]\n", plane->plane_normal->x, plane->plane_normal->y, plane->plane_normal->z);
-                printf("Plane Color: [%d, %d, %d]\n", plane->plane_color->r, plane->plane_color->g, plane->plane_color->b);
+                printf("Plane Color: [%f, %f, %f]\n", plane->plane_color->r, plane->plane_color->g, plane->plane_color->b);
                 plane = plane->next;
             }
         } else {
@@ -79,7 +79,7 @@ void var_dump_all(t_map *map, t_scene *scene)
                 printf("Cylinder Coordinates: [%f, %f, %f]\n", cylinder->coordinates->x, cylinder->coordinates->y, cylinder->coordinates->z);
                 printf("Cylinder Orientation: [%f, %f, %f]\n", cylinder->orientation->x, cylinder->orientation->y, cylinder->orientation->z);
                 printf("Cylinder raduis: %f, Height: %f\n", cylinder->raduis, cylinder->height);
-                printf("Cylinder Color: [%d, %d, %d]\n", cylinder->cylinder_color->r, cylinder->cylinder_color->g, cylinder->cylinder_color->b);
+                printf("Cylinder Color: [%f, %f, %f]\n", cylinder->cylinder_color->r, cylinder->cylinder_color->g, cylinder->cylinder_color->b);
                 cylinder = cylinder->next;
             }
         } else {
@@ -441,7 +441,7 @@ int main(int argc, char **argv)
         height,
         width,
         180,
-        ft_new_point(0, 150, -300), // Camera at origin
+        ft_new_point(0, 40, -100), // Camera at origin
         ft_new_vector(0, 0, 1)  // Looking along z-axis
     );
     
