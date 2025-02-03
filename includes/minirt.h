@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2025/02/03 12:36:13 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/02/03 15:59:10 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@
 
 // # define    WIN_WIDTH   1280
 // # define    WIN_HEIGHT  720
-# define    EPSILON     1e-5f
+# define    EPSILON     1e-4f
 # define    PI          3.14159265359
 
 typedef struct    s_vector
@@ -228,7 +228,7 @@ typedef struct s_compose
     t_vector        normv;
     t_point         point;
     int             inside;
-    t_vector        over_point;
+    t_point        over_point;
 }   t_compose;
 
 typedef struct s_shape
@@ -355,4 +355,5 @@ float clamp(float value, float min, float max);
 t_vector ft_scale_vector(t_vector vector, float scale);
 t_point ft_multiply_matrix_point(float **m, t_point v);
 float **create_rotation_matrix_from_vector(t_vector orientation);
+t_point ft_scale_point(t_point vector, float scale);
 #endif

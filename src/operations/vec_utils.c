@@ -29,6 +29,18 @@ t_vector ft_scale_vector(t_vector vector, float scale)
     new.x = vector.x * scale;
     new.y = vector.y * scale;
     new.z = vector.z * scale;
+    new.w = vector.w * scale;
+    return (new);
+}
+
+t_point ft_scale_point(t_point vector, float scale)
+{
+    t_vector new;
+
+    new.x = vector.x * scale;
+    new.y = vector.y * scale;
+    new.z = vector.z * scale;
+    new.w = vector.w * scale;
     return (new);
 }
 
@@ -159,7 +171,7 @@ float ** ft_multiply_matrix(float **m1, float **m2, int n_cols, int n_row)
     }
     return (result);
 }
-
+ 
 t_vector ft_multiply_matrix_vec(float **m, t_vector v)
 {
     t_vector result;

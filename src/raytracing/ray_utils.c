@@ -459,7 +459,7 @@ t_compose *prepare_computations(t_intersection *inter, t_ray *ray)
     }
     else
         comp->inside = 0;
-    t_vector offset = ft_scale_vector(comp->normv, EPSILON);
+    t_point offset = ft_scale_point(comp->normv, EPSILON);
     comp->over_point = point_add(comp->point, offset);
     return comp;
 }
@@ -520,7 +520,7 @@ t_world *default_world()
 
     t_sphere *sphere2 = default_sphere();
     sphere2->sphere_diameter = 20; 
-    sphere2->sphere_coordinates = ft_new_point(10, 0, -60);
+    sphere2->sphere_coordinates = ft_new_point(-50, 0, -140);
     sphere2->material->color = ft_new_color(1, 0, 0.2);
     sphere2->transform = identity_matrix(4);
 
@@ -550,13 +550,13 @@ t_world *default_world()
     // plane->material->specular = 0.3;
 
     t_cylinder *cylinder1 = malloc(sizeof(t_cylinder));
-    cylinder1->raduis = 50;
-    cylinder1->height = 100;
+    cylinder1->raduis = 40;
+    cylinder1->height = 50;
     cylinder1->material = default_material();
-    cylinder1->material->color = ft_new_color(1, 0, 0);
+    cylinder1->material->color = ft_new_color(1, 0, -150);
     cylinder1->orientation = ft_new_vector(0,0,0);
     // cylinder1->transform = create_rotation_matrix_from_vector(cylinder1->orientation);
-    cylinder1->coordinates = ft_new_point(0,0,-100);
+    cylinder1->coordinates = ft_new_point(0,0,0);
     cylinder1->transform = identity_matrix(4);
     cylinder1->transform[0][3] = cylinder1->coordinates.x;
     cylinder1->transform[1][3] = cylinder1->coordinates.y;
@@ -570,9 +570,9 @@ t_world *default_world()
         ft_new_point(0, 10, -200)
     );
     // ft_add_shape(&world, sphere1, SHAPE_SPHERE);
-    // ft_add_shape(&world, plane, SHAPE_PLANE);
+    ft_add_shape(&world, plane, SHAPE_PLANE);
     ft_add_shape(&world, plane2, SHAPE_PLANE);
-    // ft_add_shape(&world, cylinder1, SHAPE_CYLINDER);
+    ft_add_shape(&world, cylinder1, SHAPE_CYLINDER);
     // if (world->shape->objects.cylinder)
     // printf("cylinder is  being created. height:%d==\n", world->shape->objects.cylinder->height);
     // ft_add_shape(&world, sphere1, SHAPE_SPHERE);
@@ -647,7 +647,7 @@ int is_shadowed(t_world *world, t_point point)
 
     t_ray *r = create_ray(point, direction);
     t_intersection *intersections = intersect_world(world, r);
-    if (intersections && intersections->t1 > 0 && intersections->t1 < distance)
+    if (intersections && intersections->t1 >=  EPSILON && intersections->t1 < distance)
     {
         free(r);
         // free_intersection(intersections);
