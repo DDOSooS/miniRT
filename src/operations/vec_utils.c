@@ -230,9 +230,7 @@ void ft_scale_matrix(float ***m, float scale,int n)
     for (int i = 0; i < n ; i++)
     {
         for (int j = 0; j < n; j++)
-        {
             (*m)[i][j] *= scale;
-        }
     }
 }
 
@@ -361,6 +359,7 @@ t_vector *vector_copy(t_vector *v)
     vec_copy->z = v->z;
     return (vec_copy);   
 }
+
 float **get_minor(float **m, int row, int col, int n)
 {
     int i, j;
@@ -388,7 +387,7 @@ float **get_minor(float **m, int row, int col, int n)
     return (minor);
 }
 
-float radian( float degree)
+inline float radian( float degree)
 {
     return (degree * PI / 180);
 }
@@ -489,7 +488,6 @@ float **shearing_matrix(int *coord)
     return (shearing_matrix);
 }
 
-
 float determinant(float **m, int n)
 {
     float det;
@@ -586,12 +584,12 @@ t_vector *vector_cross(t_vector *v1, t_vector *v2)
     return (cross_v);
 }
 
-float vector_dot(t_vector *v1, t_vector *v2)
+inline float vector_dot(t_vector *v1, t_vector *v2)
 {
     return v1->x * v2->x + v1->y * v2->y + v1->z * v2->z ;
 }
 
-double vec_lenght(t_vector *v)
+inline double vec_lenght(t_vector *v)
 {
     return (sqrt(v->x * v->x + v->y * v->y + v->z * v->z));
 }
@@ -608,8 +606,8 @@ t_vector *vector_multiply_scalar(t_vector *v, float scalar)
     new->z = v->z * scalar;
     new->w = v->w * scalar;
     return (new);
-
 }
+
 //Phong reflection model
 t_vector *reflect_vector(t_vector *in, t_vector *normal)
 {
@@ -619,7 +617,6 @@ t_vector *reflect_vector(t_vector *in, t_vector *normal)
     free(scaled_normal);
     return result;
 }
-
 
 p_light  *ft_new_plight(t_color *color, t_point *point)
 {
@@ -664,6 +661,8 @@ t_color *clamp_color(t_color *color)
     return color;
 }
 
+/*
+
 t_color *get_lighting_color(t_material *material, p_light *light, t_point *point, t_vector *cam_v, t_vector *norm_v, int shadow)
 {
     t_color *eff_color;
@@ -676,23 +675,17 @@ t_color *get_lighting_color(t_material *material, p_light *light, t_point *point
     float light_dot_normal;
     float reflect_dot_camera;
 
-    if (!material->color) 
-      printf("no material color is being defined\n");
-    if (!light->intensity)
-        printf("no intentsity color is being defined\n");
     eff_color = ft_multiply_color(material->color, light->intensity);
     ambient = ft_multiply_color_scalar(eff_color, material->ambient);
     if (shadow)
-    {
-        // printf("there is a shadow \n");
-        return clamp_color (ambient);
-    }
+        return clamp_color(ft_multiply_color_scalar(ambient, 0.9)); // Ensure slight brightness in shadows
+
     light_dir = vector_sub(light->position, point);
     light_dir_normal = vector_normilze(light_dir);
 
     light_dot_normal = vector_dot(light_dir_normal, norm_v);
-    if (light_dot_normal < 0.1)
-        light_dot_normal = 0; // Minimum light level for ambient occlusion effect
+    if (light_dot_normal < EPSILON)
+        light_dot_normal = 0.1; // Minimum light level for ambient occlusion effect
 
     diffuse = ft_multiply_color_scalar(eff_color, material->diffuse * light_dot_normal);
 
@@ -701,7 +694,7 @@ t_color *get_lighting_color(t_material *material, p_light *light, t_point *point
         t_vector *reflect_vec = reflect_vector(negate_vector(light_dir_normal), norm_v);
         reflect_dot_camera = vector_dot(reflect_vec, cam_v);
         if (reflect_dot_camera < EPSILON)
-            specular = ft_new_color(0, 0, 0);
+            specular = ft_new_color(0.05, 0.05, 0.05);
         else
         {
             float spec_factor = powf(reflect_dot_camera, material->shininess);
@@ -710,10 +703,7 @@ t_color *get_lighting_color(t_material *material, p_light *light, t_point *point
         free(reflect_vec);
     }
     else
-    {
         specular = ft_new_color(0, 0, 0);
-    }
-
     t_color *tmp = ft_add_color(specular, diffuse);
     total_color = ft_add_color(tmp, ambient);
 
@@ -724,9 +714,58 @@ t_color *get_lighting_color(t_material *material, p_light *light, t_point *point
     free(diffuse);
     free(specular);
     free(tmp);
-
+    // printf("Final color: r=%f, g=%f, b=%f\n", total_color->r, total_color->g, total_color->b);
     return clamp_color(total_color);
 }
+*/
+
+t_color *get_lighting_color(t_material *material, p_light *light, t_point *point, t_vector *cam_v, t_vector *norm_v, int shadow)
+{
+    t_color *eff_color;
+    t_vector *light_dir;
+    t_vector *light_dir_normal;
+    t_color *ambient;
+    t_color *diffuse;
+    t_color *specular;
+    t_color *total_color;
+    float light_dot_normal;
+    float reflect_dot_camera;
+
+    eff_color = ft_multiply_color(material->color, light->intensity);
+    ambient = ft_multiply_color_scalar(eff_color, material->ambient);
+    ambient = clamp_color(ambient);  
+    if (shadow)
+        return clamp_color(ft_multiply_color_scalar(ambient, 1));
+    light_dir = vector_sub(light->position, point);
+    light_dir_normal = vector_normilze(light_dir);
+
+    light_dot_normal = vector_dot(light_dir_normal, norm_v);
+    if (light_dot_normal < EPSILON)
+    {
+        diffuse = ft_new_color(0, 0, 0);  
+        specular = ft_new_color(0, 0, 0); 
+    }
+    else
+    {
+        diffuse = ft_multiply_color_scalar(eff_color, material->diffuse * light_dot_normal);
+        // diffuse = clamp_color(diffuse);  
+        t_vector *reflect_vec = reflect_vector(negate_vector(light_dir_normal), norm_v);
+        reflect_dot_camera = vector_dot(reflect_vec, cam_v);
+        if (reflect_dot_camera <= EPSILON)
+            specular = ft_new_color(0, 0, 0); 
+        else
+        {
+            float spec_factor = powf(reflect_dot_camera, material->shininess);
+            specular = ft_multiply_color_scalar(light->intensity, material->specular * spec_factor);
+            // specular = clamp_color(specular);
+        }
+    }
+    t_color *tmp = ft_add_color(specular, diffuse);
+    total_color = ft_add_color(tmp, ambient);
+    total_color = clamp_color(total_color);
+    return ( total_color);
+}
+
 t_material *default_material(void)
 {
     t_material *m = malloc(sizeof(t_material));
@@ -738,7 +777,6 @@ t_material *default_material(void)
     m->diffuse = 0.9;
     m->specular = 0.9;
     m->shininess = 200.0;
-
     return m;
 }
 

@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2025/02/01 03:53:31 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/02/02 17:25:31 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,7 +149,7 @@ typedef struct plane
 
 typedef struct cylinder
 {
-    t_vector        *coordinates;
+    t_point        *coordinates;
     t_vector        *orientation;
     t_color         *cylinder_color;
     double          raduis;
@@ -351,4 +351,5 @@ int is_shadowed(t_world *world, t_point *point);
 float clamp(float value, float min, float max); 
 t_vector *ft_scale_vector(t_vector *vector, float scale);
 t_point *ft_multiply_matrix_point(float **m, t_point *v);
+float **create_rotation_matrix_from_vector(t_vector *orientation);
 #endif
