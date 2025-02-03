@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2025/02/02 17:25:31 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/02/03 12:36:13 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,9 +53,9 @@ typedef enum e_shape_type
 
 typedef struct s_ray
 {
-    t_color     *color; 
-    t_vector    *origin;
-    t_vector    *direction;
+    // t_color     color; 
+    t_vector    origin;
+    t_vector    direction;
     // t_vector    *r_lab;    
 } t_ray;
 
@@ -81,7 +81,7 @@ typedef struct	s_img
 
 typedef struct s_material
 {
-    t_color   *color;
+    t_color   color;
     float    ambient;
     float    diffuse;
     float    specular;
@@ -90,9 +90,10 @@ typedef struct s_material
 
 typedef struct light_s
 {
-    t_color *intensity;
-    t_point *position;
+    t_color intensity;
+    t_point position;
 } p_light;
+
 typedef struct var
 {
     void    *mlx;
@@ -110,8 +111,8 @@ typedef struct s_camera
     float   fov; // field of view
     float   **transform;
     float   pixel_size;
-    t_point *origin;
-    t_vector *direction;
+    t_point origin;
+    t_vector direction;
 }   s_camera;
 
 typedef struct lines
@@ -129,8 +130,8 @@ typedef struct map
 typedef struct sphere
 {
     float          sphere_diameter;
-    t_vector        *sphere_coordinates;
-    t_color         *sphere_color;
+    t_vector        sphere_coordinates;
+    t_color         sphere_color;
     float           **transform;
     t_material       *material;
     struct sphere   *next;
@@ -139,9 +140,9 @@ typedef struct sphere
 
 typedef struct plane
 {
-    t_vector        *plane_cordinates;
-    t_vector        *plane_normal;
-    t_color          *plane_color;
+    t_vector        plane_cordinates;
+    t_vector        plane_normal;
+    t_color          plane_color;
     t_material       *material;
     float           **transform;
     struct plane    *next;
@@ -149,9 +150,9 @@ typedef struct plane
 
 typedef struct cylinder
 {
-    t_point        *coordinates;
-    t_vector        *orientation;
-    t_color         *cylinder_color;
+    t_point        coordinates;
+    t_vector        orientation;
+    t_color         cylinder_color;
     double          raduis;
     double          height;
     float           **transform;
@@ -164,12 +165,12 @@ typedef struct camera
     int             camera_fov;
     float           focal_lenght;
     int             hor_size;
-    t_vector        *camera_position;
-    t_vector        *camera_dir;
-    t_vector        *cam_u;
-    t_vector        *cam_v;
-    t_vector        *projection_center;
-    t_vector        *alignement_vector;
+    t_vector        camera_position;
+    t_vector        camera_dir;
+    t_vector        cam_u;
+    t_vector        cam_v;
+    t_vector        projection_center;
+    t_vector        alignement_vector;
 } t_camera;
 
 
@@ -177,14 +178,14 @@ typedef struct camera
 typedef struct ambient
 {
     double          ambient_ration;
-    t_color         *ambient_color;
+    t_color         ambient_color;
 } t_ambient;
 
 typedef struct light
 {
-    t_vector        *light_coordinate;
+    t_vector        light_coordinate;
     double          light_ration;
-    t_color         *light_color;
+    t_color         light_color;
 } t_light;
 
 
@@ -203,11 +204,11 @@ typedef struct s_scene
     float       aspect_ratio;
     float       vp_hight;
     float       vp_width;
-    t_vector    *l_corner;
-    t_vector    *vp_u;
-    t_vector    *vp_v;
-    t_vector    *vp_center;
-    t_vector    *left_corner;
+    t_vector    l_corner;
+    t_vector    vp_u;
+    t_vector    vp_v;
+    t_vector    vp_center;
+    t_vector    left_corner;
     t_camera    *camera;
     t_ambient   *ambient;
     t_light     *light;
@@ -223,11 +224,11 @@ typedef struct s_compose
     void            * obj;
     int             obj_type;
     float           t;
-    t_vector        *camv;
-    t_vector        *normv;
-    t_point         *point;
+    t_vector        camv;
+    t_vector        normv;
+    t_point         point;
     int             inside;
-    t_vector        *over_point;
+    t_vector        over_point;
 }   t_compose;
 
 typedef struct s_shape
@@ -257,38 +258,40 @@ int render_image(t_scene *scene ,t_world *t_world, s_camera *cam);
 t_scene     *ft_generate_scene(map_line *compoenent);
 void        var_dump_lines(map_line *map);
 int         ft_check_map_components(t_map **map);
-float       ft_vec_lenght(t_vector *v);
-double       vec_lenght(t_vector *v);
-float       vector_dot(t_vector *v1, t_vector *v2);
-t_vector    *ft_new_vector(float x, float y, float z);
-t_vector    *vector_normilze(t_vector *vec);
-t_vector    *vector_multiply_scalar(t_vector *v, float scalar);
-t_vector    *vector_cross(t_vector *v1, t_vector *v2);
-t_vector    *vector_sub(t_vector *v1, t_vector *v2);
-t_vector    *vector_add(t_vector *v1, t_vector *v2);
-t_vector    *ft_new_vector(float x, float y, float z);
-void        var_dump_vector(t_vector *vec);
+float       ft_vec_lenght(t_vector*v);
+double       vec_lenght(t_vector v);
+float       vector_dot(t_vector v1, t_vector v2);
+t_vector    ft_new_vector(float x, float y, float z);
+t_vector    vector_normilze(t_vector vec);
+t_vector    vector_multiply_scalar(t_vector v, float scalar);
+t_vector    vector_cross(t_vector v1, t_vector v2);
+t_vector    vector_sub(t_vector v1, t_vector v2);
+t_vector    vector_add(t_vector v1, t_vector v2);
+// t_vector    *ft_new_vector(float x, float y, float z);
+void        var_dump_vector(t_vector vec);
 void init_scene(t_scene *scene, float width, float height);
-t_ray       *create_ray(t_vector *origin, t_vector *direction);
+t_ray       *create_ray(t_vector origin, t_vector direction);
 int         gen_ray(t_scene *scene,float x, float y, t_ray **cam_r);
-s_camera  *new_camera(float h_size, float w_size,float,  t_point *, t_vector *);
+s_camera  *new_camera(float h_size, float w_size,float,  t_point , t_vector );
 // int check_intersection(t_ray *ray, t_vector *sphere_center, float radius) ;
 // int check_intersection(t_ray *cast_ray,t_vector *inter_point ,t_vector *local_normal,t_vector *locol_color);
-t_vector    *vector_copy(t_vector *src);
+t_vector    vector_copy(t_vector src);
 t_sphere *ft_new_sphere(char **components);
 // t_vector *normilize_at_sphere_pos(t_sphere *sphere, t_point *p);
-/* colors operations*/
-t_color *ft_new_color(float r, float g, float b);
-t_color *ft_add_color(t_color *c1, t_color *c2);
-t_color *ft_sub_color(t_color *c1, t_color *c2);
-t_color *ft_scale_color(t_color *c, float scalar);
-t_color *ft_multiply_color(t_color *c1, t_color *c2);
-t_vector    *negate_vector(t_vector *vector);
-int compare_vector(float a, float b);
-t_vector *normalize_at_plane_pos(t_plane *plane, t_point *w_p) ;
 
-t_vector *reflect_vector(t_vector *, t_vector *);
-t_color *ft_multiply_color_scalar(t_color *color, float scalar);
+
+/* colors operations*/
+t_color ft_new_color(float r, float g, float b);
+t_color ft_add_color(t_color c1, t_color c2);
+t_color ft_sub_color(t_color c1, t_color c2);
+t_color ft_scale_color(t_color c, float scalar);
+t_color ft_multiply_color(t_color c1, t_color c2);
+t_vector    negate_vector(t_vector vector);
+int compare_vector(float a, float b);
+t_vector normalize_at_plane_pos(t_plane *plane, t_point w_p) ;
+
+t_vector reflect_vector(t_vector , t_vector );
+t_color ft_multiply_color_scalar(t_color color, float scalar);
 
 /* end of color manipulation*/
 
@@ -296,7 +299,7 @@ t_color *ft_multiply_color_scalar(t_color *color, float scalar);
 float **ft_create_matrix(int n_rows, int n_cols);
 float ** ft_multiply_matrix(float **m1, float **m2, int n_cols, int n_row);
 int ft_compare_matrix(float **m1, float **m2, int n_col, int n_row);
-t_vector *ft_multiply_matrix_vec(float **m, t_vector *v);
+t_vector ft_multiply_matrix_vec(float **m, t_vector v);
 float **identity_matrix(int n);
 void ft_transpose_matrix(float ***m, int n_rows, int n_col);
 float **get_minor(float **m, int row, int col, int n);
@@ -304,12 +307,12 @@ float determinant(float **m, int n);
 float **inverse_matrix(float **m, int n);
 void ft_scale_matrix(float ***m, float scale,int n);
 float **ft_scaling_matrix(float x, float y, float z, int inverse);
-float **ft_translate_matrix(t_point *point, int inverse);
-t_point *ft_transform(t_point *p1 , t_point *p2, int inverse);
+float **ft_translate_matrix(t_point point, int inverse);
+t_point ft_transform(t_point p1 , t_point p2, int inverse);
 float **shearing_matrix(int *coord);
-t_point *ft_new_point(float x, float y, float z);
+t_point ft_new_point(float x, float y, float z);
 void print_matrix(float **matrix, int rows, int cols) ;
-t_point *ft_scale(t_point *scale, t_point *point, int inverse);
+t_point ft_scale(t_point scale, t_point point, int inverse);
 
 float **rotate_x(float rad);
 float **rotate_y(float rad);
@@ -319,37 +322,37 @@ float **shearing_matrix(int *coord);
 
 void ft_free_matrix(float **m, int n);
 t_material *default_material();
-p_light  *ft_new_plight(t_color *color, t_point *point);
+p_light  *ft_new_plight(t_color color, t_point point);
 // t_color *get_lighting_color(t_material *material, p_light *light, t_point *point, t_vector *cam_v, t_vector *norm_v, int);
 /* end of  matrix operation*/
 
 
 /* ray manipulation*/
-t_point *position(t_ray *ray, float distance);
-t_ray *create_ray(t_point *origin, t_vector *dir);
+t_point position(t_ray *ray, float distance);
+t_ray *create_ray(t_point origin, t_vector dir);
 t_intersection ft_intersect_sphere(t_ray *ray, t_sphere *sphere);
 t_intersection  ft_new_intersection(float t, void *object, int type);
 t_intersection *ray_hit(t_intersection *inters, int count);
 t_ray *transform(t_ray *ray, float **m);
 t_ray *transform(t_ray *ray, float **m);
-t_point *position(t_ray *ray, float distance);
-t_color *get_lighting_color(t_material *material, p_light *light, t_point *point, t_vector *cam_v, t_vector *norm_v, int);
-t_vector *normilize_at_sphere_pos(t_sphere *sphere, t_point *w_p);
+t_point position(t_ray *ray, float distance);
+t_color get_lighting_color(t_material *material, p_light *light, t_point point, t_vector cam_v, t_vector norm_v, int);
+t_vector normilize_at_sphere_pos(t_sphere *sphere, t_point w_p);
 /* end of ray manipulation functions*/
 
 t_world *default_world();
 t_intersection *intersect_world(t_world *world, t_ray *ray);
 t_sphere *default_sphere();
 t_compose *prepare_computations(t_intersection *inter, t_ray *ray);
-t_color *shading_hit(t_world *world, t_compose *comp);
-t_color *get_color_at(t_world *world, t_ray *ray);
-float **get_view_transform(t_point *from_v, t_point *to_v, t_vector *up_v);
+t_color shading_hit(t_world *world, t_compose *comp);
+t_color get_color_at(t_world *world, t_ray *ray);
+float **get_view_transform(t_point from_v, t_point to_v, t_vector up_v);
 t_ray *get_ray_pixel(s_camera *cam, float x, float y, float edge);
-t_color *clamp_color(t_color *color);
+t_color clamp_color(t_color color);
 
-int is_shadowed(t_world *world, t_point *point);
+int is_shadowed(t_world *world, t_point point);
 float clamp(float value, float min, float max); 
-t_vector *ft_scale_vector(t_vector *vector, float scale);
-t_point *ft_multiply_matrix_point(float **m, t_point *v);
-float **create_rotation_matrix_from_vector(t_vector *orientation);
+t_vector ft_scale_vector(t_vector vector, float scale);
+t_point ft_multiply_matrix_point(float **m, t_point v);
+float **create_rotation_matrix_from_vector(t_vector orientation);
 #endif

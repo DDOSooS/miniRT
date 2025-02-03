@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 20:24:10 by aghergho          #+#    #+#             */
-/*   Updated: 2025/01/30 14:03:34 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/02/03 12:16:38 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -559,21 +559,21 @@ map_line *ft_gen_scen_map(char *file_name)
 
 /* =====================   map Components generation   ==========================  */
 
-int ft_gen_colors(t_color **color,char *components)
+int ft_gen_colors(t_color *color,char *components)
 {
     char    **tmp_colors;
  
     tmp_colors = split(components, ",");
     if (!tmp_colors) 
         return 0;
-    (*color)->r= clamp (ft_atod(tmp_colors[0])  / 255.0f,0,1);
-    (*color)->g= clamp(ft_atod(tmp_colors[1])  / 255.0f,0,1);
-    (*color)->b= clamp(ft_atod(tmp_colors[2])  / 255.0f,0,1);
+    (color)->r= clamp (ft_atod(tmp_colors[0])  / 255.0f,0,1);
+    (color)->g= clamp(ft_atod(tmp_colors[1])  / 255.0f,0,1);
+    (color)->b= clamp(ft_atod(tmp_colors[2])  / 255.0f,0,1);
     ft_free_line_components(tmp_colors);
     return (1); 
 }
 
-int ft_gen_elements(t_vector **coordinates, char *components)
+int ft_gen_elements(t_vector *coordinates, char *components)
 {
     char **tmp_cord;
 
@@ -591,7 +591,6 @@ int ft_add_ambient(t_scene **scene, char **components)
 
     // tmp = (*scene)->ambient;
     tmp = malloc(sizeof(t_ambient));
-    tmp->ambient_color = malloc(sizeof(t_color));
     tmp->ambient_ration = ft_atod(components[1]);
     ft_gen_colors(&tmp->ambient_color, components[2]);
     (*scene)->ambient = tmp;
@@ -606,12 +605,9 @@ int ft_add_camera(t_scene **scene, char **components)
     ft_gen_elements(&camera->camera_position, components[1]);
     ft_gen_elements(&camera->camera_dir, components[2]);
     camera->camera_fov = ft_atod(components[3]);
-    camera->cam_u = NULL;
-    camera->cam_v = NULL;
-    camera->projection_center = NULL;
+
     camera->focal_lenght = 0;
     camera->hor_size = 0;
-    camera->alignement_vector = NULL;
     // printf("==> x %f <== y %f==> z %f <==\n", camera->camera_dir->x, camera->camera_dir->y, camera->camera_dir->z);
     (*scene)->camera = camera;
     return 1;
@@ -623,7 +619,6 @@ int ft_add_light(t_scene **scene, char **components)
 
     // light = (*scene)->light;
     light = malloc(sizeof(t_light));
-    light->light_color = malloc(sizeof(t_color));
     ft_gen_elements(&light->light_coordinate, components[1]);
     light->light_ration = ft_atod(components[2]);
     ft_gen_colors(&light->light_color, components[3]);
@@ -638,7 +633,6 @@ t_sphere *ft_new_sphere(char **components)
     sphere = malloc(sizeof(t_sphere));
     if (!sphere)
         return NULL;
-    sphere->sphere_color = malloc(sizeof(t_color));
     ft_gen_elements(&sphere->sphere_coordinates, components[1]);
     sphere->sphere_diameter = ft_atod(components[2]);
     ft_gen_colors(&sphere->sphere_color, components[3]);
@@ -676,7 +670,6 @@ t_plane *ft_new_plane(char **components)
     plane = malloc(sizeof(t_plane));
     if (!plane)
         return NULL;
-    plane->plane_color = malloc(sizeof(t_color));
     ft_gen_elements(&plane->plane_cordinates, components[1]);
     ft_gen_elements(&plane->plane_normal, components[2]);
     ft_gen_colors(&plane->plane_color, components[3]);
@@ -709,7 +702,6 @@ t_cylinder *ft_new_cylinder(char **components)
     new = malloc(sizeof(t_cylinder));
     if (!new)
         return (NULL);
-    new->cylinder_color = malloc(sizeof(t_color));
     ft_gen_elements(&new->coordinates, components[1]);
     ft_gen_elements(&new->orientation, components[2]);
     new->raduis = ft_atod(components[3]);

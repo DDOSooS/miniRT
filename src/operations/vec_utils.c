@@ -1,122 +1,95 @@
 # include "../../includes/minirt.h"
 
-t_vector *ft_new_vector(float x, float y, float z)
+t_vector ft_new_vector(float x, float y, float z)
 {
-    t_vector *new;
+    t_vector new;
 
-    new = malloc(sizeof(t_vector));
-    if (!new)
-        return (NULL);
-    new->x = x;
-    new->y = y;
-    new->z = z;
-    new->w = 0;
+    new.x = x;
+    new.y = y;
+    new.z = z;
+    new.w = 0;
     return (new);
 }
 
-t_point *ft_new_point(float x, float y, float z)
+t_point ft_new_point(float x, float y, float z)
 {
-    t_point *new;
+    t_point new;
 
-    new = malloc(sizeof(t_point));
-    if (!new)
-        return (NULL);
-    new->x = x;
-    new->y = y;
-    new->z = z;
-    new->w = 1;
+    new.x = x;
+    new.y = y;
+    new.z = z;
+    new.w = 1;
     return (new);
 }
 
-t_vector *ft_scale_vector(t_vector *vector, float scale)
+t_vector ft_scale_vector(t_vector vector, float scale)
 {
-    t_vector *new;
+    t_vector new;
 
-    new = ft_new_vector(0,0,0);
-    if (!new)
-        return (NULL);
-    new->x = vector->x * scale;
-    new->y = vector->y * scale;
-    new->z = vector->z * scale;
+    new.x = vector.x * scale;
+    new.y = vector.y * scale;
+    new.z = vector.z * scale;
     return (new);
 }
 
-t_color *ft_new_color(float r, float g, float b)
+t_color ft_new_color(float r, float g, float b)
 {
-    t_color *new;
+    t_color new;
 
-    new = malloc(sizeof(t_color));
-    if (!new)
-    return (NULL);
-    new->r = r;
-    new->g = g;
-    new->b = b;
+    new.r = r;
+    new.g = g;
+    new.b = b;
     return (new);
 }
 
-t_color *ft_add_color(t_color *c1, t_color *c2)
+t_color ft_add_color(t_color c1, t_color c2)
 {
-    t_color *new;
+    t_color new;
 
-    new = ft_new_color(0,0,0);
-    if (!new)
-        return (NULL);
-    new->r = c1->r + c2->r;
-    new->g = c1->g + c2->g;
-    new->b = c1->b + c2->b;
+    new.r = c1.r + c2.r;
+    new.g = c1.g + c2.g;
+    new.b = c1.b + c2.b;
     return (new);
 }
 
-t_color *ft_sub_color(t_color *c1, t_color *c2)
+t_color ft_sub_color(t_color c1, t_color c2)
 {
-    t_color *new;
+    t_color new;
 
-    new = ft_new_color(0,0,0);
-    if (!new)
-        return (NULL);
-    new->r = c1->r - c2->r;
-    new->g = c1->g - c2->g;
-    new->b = c1->b - c2->b;
+    new.r = c1.r - c2.r;
+    new.g = c1.g - c2.g;
+    new.b = c1.b - c2.b;
     return (new);
 }
 
-t_color *ft_scale_color(t_color *c, float scalar)
+t_color ft_scale_color(t_color c, float scalar)
 {
-    t_color *new;
+    t_color new;
 
-    new = ft_new_color(0,0,0);
-    if (!new)
-        return (NULL);
-    new->r = c->r * scalar;
-    new->g = c->g * scalar;
-    new->b = c->b * scalar;
+    new.r = c.r * scalar;
+    new.g = c.g * scalar;
+    new.b = c.b * scalar;
     return (new);
 }
 
-t_color *ft_multiply_color(t_color *c1, t_color *c2)
+t_color ft_multiply_color(t_color c1, t_color c2)
 {
-    t_color *new;
+    t_color new;
 
-    new = ft_new_color(0,0,0);
-    if (!new)
-        return (NULL);
-    new->r = c1->r * c2->r;
-    new->g = c1->g * c2->g;
-    new->b = c1->b * c2->b;
+    new.r = c1.r * c2.r;
+    new.g = c1.g * c2.g;
+    new.b = c1.b * c2.b;
     return (new);
 }
 
 
-t_vector *negate_vector(t_vector *vector)
+t_vector negate_vector(t_vector vector)
 {
-    t_vector *new;
+    t_vector new;
 
-    new = ft_new_vector(0,0,0);
-    if (!new)
-        return (NULL);
-    new->x = -vector->x;
-    new->y = -vector->y;
-    new->z = -vector->z;
+    new.x = -vector.x;
+    new.y = -vector.y;
+    new.z = -vector.z;
     return (new);
 }
 
@@ -187,33 +160,27 @@ float ** ft_multiply_matrix(float **m1, float **m2, int n_cols, int n_row)
     return (result);
 }
 
-t_vector *ft_multiply_matrix_vec(float **m, t_vector *v)
+t_vector ft_multiply_matrix_vec(float **m, t_vector v)
 {
-    t_vector *result;
+    t_vector result;
 
-    result = ft_new_vector(0,0,0);
-    if (!result)
-        return (NULL);
-    result->x = m[0][0] * v->x + m[0][1] * v->y + m[0][2] * v->z + m[0][3] * v->w;
-    result->y = m[1][0] * v->x + m[1][1] * v->y + m[1][2] * v->z + m[1][3] * v->w;
-    result->z = m[2][0] * v->x + m[2][1] * v->y + m[2][2] * v->z + m[2][3] * v->w;
-    result->w = m[3][0] * v->x + m[3][1] * v->y + m[3][2] * v->z + m[3][3] * v->w;
+    result.x = m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z + m[0][3] * v.w;
+    result.y = m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z + m[1][3] * v.w;
+    result.z = m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z + m[2][3] * v.w;
+    result.w = m[3][0] * v.x + m[3][1] * v.y + m[3][2] * v.z + m[3][3] * v.w;
     // printf("=====================================\n");
     // printf("Translation %f %f %f\n", result->x, result->y, result->z);
     // printf("=====================================\n");
     return (result);
 }
-t_point *ft_multiply_matrix_point(float **m, t_point *v)
+t_point ft_multiply_matrix_point(float **m, t_point v)
 {
-    t_vector *result;
+    t_vector result;
 
-    result = ft_new_point(0,0,0);
-    if (!result)
-        return (NULL);
-    result->x = m[0][0] * v->x + m[0][1] * v->y + m[0][2] * v->z + m[0][3] * v->w;
-    result->y = m[1][0] * v->x + m[1][1] * v->y + m[1][2] * v->z + m[1][3] * v->w;
-    result->z = m[2][0] * v->x + m[2][1] * v->y + m[2][2] * v->z + m[2][3] * v->w;
-    result->w = m[3][0] * v->x + m[3][1] * v->y + m[3][2] * v->z + m[3][3] * v->w;
+    result.x = m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z + m[0][3] * v.w;
+    result.y = m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z + m[1][3] * v.w;
+    result.z = m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z + m[2][3] * v.w;
+    result.w = m[3][0] * v.x + m[3][1] * v.y + m[3][2] * v.z + m[3][3] * v.w;
     // printf("=====================================\n");
     // printf("Translation %f %f %f\n", result->x, result->y, result->z);
     // printf("=====================================\n");
@@ -222,11 +189,8 @@ t_point *ft_multiply_matrix_point(float **m, t_point *v)
 
 void ft_scale_matrix(float ***m, float scale,int n)
 {
-    t_vector *result;
     int i, j;
-    result = ft_new_vector(0,0,0);
-    if (!result)
-        return ;
+
     for (int i = 0; i < n ; i++)
     {
         for (int j = 0; j < n; j++)
@@ -249,7 +213,7 @@ void ft_transpose_matrix(float ***m, int n_rows, int n_col)
     }
 }
 
-float **ft_translate_matrix(t_point *point, int inverse)
+float **ft_translate_matrix(t_point point, int inverse)
 {
     float **translation_matrix;
 
@@ -266,10 +230,10 @@ float **ft_translate_matrix(t_point *point, int inverse)
                 translation_matrix[i][j] = 0;
         }
     }
-    translation_matrix[0][3] = inverse * point->x;
-    translation_matrix[1][3] = inverse * point->y;
-    translation_matrix[2][3] = inverse * point->z;
-    translation_matrix[3][3] = inverse * point->w;
+    translation_matrix[0][3] = inverse * point.x;
+    translation_matrix[1][3] = inverse * point.y;
+    translation_matrix[2][3] = inverse * point.z;
+    translation_matrix[3][3] = inverse * point.w;
     return (translation_matrix);
 }
 
@@ -281,9 +245,9 @@ void ft_free_matrix(float **m, int n)
     m = NULL;
 }
 
-t_point *ft_transform(t_point *p1 , t_point *p2, int inverse)
+t_point ft_transform(t_point p1 , t_point p2, int inverse)
 {
-    t_point *transformed_point;
+    t_point transformed_point;
     float **matrix;
 
     matrix = ft_translate_matrix(p1, inverse);
@@ -331,32 +295,23 @@ float **ft_scaling_matrix(float x, float y, float z, int inverse)
 //     return (scaled_point);
 // }
 
-t_vector *vector_add(t_vector *v1, t_vector *v2)
+t_vector vector_add(t_vector v1, t_vector v2)
 {
-    t_vector *vec_add;
+    t_vector vec_add;
 
-    vec_add = ft_new_vector(0,0,0);
-    if (!vec_add)
-        return (NULL);
-    vec_add->x = v1->x + v2->x;
-    vec_add->y = v1->y + v2->y;
-    vec_add->z = v1->z + v2->z;
+    vec_add.x = v1.x + v2.x;
+    vec_add.y = v1.y + v2.y;
+    vec_add.z = v1.z + v2.z;
     return (vec_add);
 }
 
-t_vector *vector_copy(t_vector *v)
+t_vector vector_copy(t_vector v)
 {
-    t_vector *vec_copy;
+    t_vector vec_copy;
 
-    vec_copy = ft_new_vector(0,0,0);
-    if (!vec_copy)
-    {
-        free(vec_copy);
-        return (NULL);
-    }
-    vec_copy->x = v->x;
-    vec_copy->y = v->y;
-    vec_copy->z = v->z;
+    vec_copy.x = v.x;
+    vec_copy.y = v.y;
+    vec_copy.z = v.z;
     return (vec_copy);   
 }
 
@@ -558,88 +513,75 @@ float **identity_matrix(int n)
     return (identity);
 }
 
-t_vector *vector_sub(t_vector *v1, t_vector *v2)
+t_vector vector_sub(t_vector v1, t_vector v2)
 {
-    t_vector *vec_sub;
+    t_vector vec_sub;
 
-    vec_sub = ft_new_vector(0,0,0);
-    if (!vec_sub)
-        return (NULL);
-    vec_sub->x = v1->x - v2->x;
-    vec_sub->y = v1->y - v2->y;
-    vec_sub->z = v1->z - v2->z;
+    vec_sub.x = v1.x - v2.x;
+    vec_sub.y = v1.y - v2.y;
+    vec_sub.z = v1.z - v2.z;
     return (vec_sub);
 }
 
-t_vector *vector_cross(t_vector *v1, t_vector *v2)
+t_vector vector_cross(t_vector v1, t_vector v2)
 {
-    t_vector *cross_v;
+    t_vector cross_v;
 
-    cross_v = ft_new_vector(0,0,0);
-    if (!cross_v)
-        return (NULL);
-    cross_v->x = v1->y * v2->z - v1->z * v2->y;
-    cross_v->y = v1->z * v2->x - v1->x * v2->z;
-    cross_v->z = v1->x *v2->y - v1->y * v2->x;
+    cross_v.x = v1.y * v2.z - v1.z * v2.y;
+    cross_v.y = v1.z * v2.x - v1.x * v2.z;
+    cross_v.z = v1.x *v2.y - v1.y * v2.x;
     return (cross_v);
 }
 
-inline float vector_dot(t_vector *v1, t_vector *v2)
+inline float vector_dot(t_vector v1, t_vector v2)
 {
-    return v1->x * v2->x + v1->y * v2->y + v1->z * v2->z ;
+    return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z ;
 }
 
-inline double vec_lenght(t_vector *v)
+inline double vec_lenght(t_vector v)
 {
-    return (sqrt(v->x * v->x + v->y * v->y + v->z * v->z));
+    return (sqrt(v.x * v.x + v.y * v.y + v.z * v.z));
 }
 
-t_vector *vector_multiply_scalar(t_vector *v, float scalar)
+t_vector vector_multiply_scalar(t_vector v, float scalar)
 {
-    t_vector *new;
+    t_vector new;
 
-    new = ft_new_vector(0,0,0);
-    if (!new)
-        return (NULL);
-    new->x = v->x * scalar;
-    new->y = v->y * scalar;
-    new->z = v->z * scalar;
-    new->w = v->w * scalar;
+    new.x = v.x * scalar;
+    new.y = v.y * scalar;
+    new.z = v.z * scalar;
+    new.w = v.w * scalar;
     return (new);
 }
 
 //Phong reflection model
-t_vector *reflect_vector(t_vector *in, t_vector *normal)
+t_vector reflect_vector(t_vector in, t_vector normal)
 {
     float dot = vector_dot(in, normal);
-    t_vector *scaled_normal = vector_multiply_scalar(normal, 2.0f * dot);
-    t_vector *result = vector_sub( in, scaled_normal); 
-    free(scaled_normal);
+    t_vector scaled_normal = vector_multiply_scalar(normal, 2.0f * dot);
+    t_vector result = vector_sub( in, scaled_normal); 
     return result;
 }
 
-p_light  *ft_new_plight(t_color *color, t_point *point)
+p_light  *ft_new_plight(t_color color, t_point point)
 {
     p_light *light;
 
     light = (p_light *)malloc(sizeof(p_light));
     if (!light)
         return NULL;
-    light->intensity = ft_new_color(color->r, color->g, color->b);
-    light->position = ft_new_point(point->x, point->y, point->z);
+    light->intensity = ft_new_color(color.r, color.g, color.b);
+    light->position = ft_new_point(point.x, point.y, point.z);
     return light;
 }
 
-t_color *ft_multiply_color_scalar(t_color *color, float scalar)
+t_color ft_multiply_color_scalar(t_color color, float scalar)
 {
-    t_color *new_color;
+    t_color new_color;
 
-    new_color = ft_new_color(0,0,0);
-    if (!new_color)
-        return (NULL);
-    new_color->r = color->r * scalar;
-    new_color->g = color->g * scalar;
-    new_color->b = color->b * scalar;
+    new_color.r = color.r * scalar;
+    new_color.g = color.g * scalar;
+    new_color.b = color.b * scalar;
     return (new_color);
 }
 
@@ -653,81 +595,24 @@ float clamp(float value, float min, float max)
         return value;
 }
 
-t_color *clamp_color(t_color *color)
+t_color clamp_color(t_color color)
 {
-    color->r = clamp(color->r, 0.0f, 1.0f);
-    color->g = clamp(color->g, 0.0f, 1.0f);
-    color->b = clamp(color->b, 0.0f, 1.0f);
+    color.r = clamp(color.r, 0.0f, 1.0f);
+    color.g = clamp(color.g, 0.0f, 1.0f);
+    color.b = clamp(color.b, 0.0f, 1.0f);
     return color;
 }
 
-/*
 
-t_color *get_lighting_color(t_material *material, p_light *light, t_point *point, t_vector *cam_v, t_vector *norm_v, int shadow)
+t_color get_lighting_color(t_material *material, p_light *light, t_point point, t_vector cam_v, t_vector norm_v, int shadow)
 {
-    t_color *eff_color;
-    t_vector *light_dir;
-    t_vector *light_dir_normal;
-    t_color *ambient;
-    t_color *diffuse;
-    t_color *specular;
-    t_color *total_color;
-    float light_dot_normal;
-    float reflect_dot_camera;
-
-    eff_color = ft_multiply_color(material->color, light->intensity);
-    ambient = ft_multiply_color_scalar(eff_color, material->ambient);
-    if (shadow)
-        return clamp_color(ft_multiply_color_scalar(ambient, 0.9)); // Ensure slight brightness in shadows
-
-    light_dir = vector_sub(light->position, point);
-    light_dir_normal = vector_normilze(light_dir);
-
-    light_dot_normal = vector_dot(light_dir_normal, norm_v);
-    if (light_dot_normal < EPSILON)
-        light_dot_normal = 0.1; // Minimum light level for ambient occlusion effect
-
-    diffuse = ft_multiply_color_scalar(eff_color, material->diffuse * light_dot_normal);
-
-    if (light_dot_normal > EPSILON)
-    {
-        t_vector *reflect_vec = reflect_vector(negate_vector(light_dir_normal), norm_v);
-        reflect_dot_camera = vector_dot(reflect_vec, cam_v);
-        if (reflect_dot_camera < EPSILON)
-            specular = ft_new_color(0.05, 0.05, 0.05);
-        else
-        {
-            float spec_factor = powf(reflect_dot_camera, material->shininess);
-            specular = ft_multiply_color_scalar(light->intensity, material->specular * spec_factor);
-        }
-        free(reflect_vec);
-    }
-    else
-        specular = ft_new_color(0, 0, 0);
-    t_color *tmp = ft_add_color(specular, diffuse);
-    total_color = ft_add_color(tmp, ambient);
-
-    free(eff_color);
-    free(light_dir);
-    free(light_dir_normal);
-    free(ambient);
-    free(diffuse);
-    free(specular);
-    free(tmp);
-    // printf("Final color: r=%f, g=%f, b=%f\n", total_color->r, total_color->g, total_color->b);
-    return clamp_color(total_color);
-}
-*/
-
-t_color *get_lighting_color(t_material *material, p_light *light, t_point *point, t_vector *cam_v, t_vector *norm_v, int shadow)
-{
-    t_color *eff_color;
-    t_vector *light_dir;
-    t_vector *light_dir_normal;
-    t_color *ambient;
-    t_color *diffuse;
-    t_color *specular;
-    t_color *total_color;
+    t_color eff_color;
+    t_vector light_dir;
+    t_vector light_dir_normal;
+    t_color ambient;
+    t_color diffuse;
+    t_color specular;
+    t_color total_color;
     float light_dot_normal;
     float reflect_dot_camera;
 
@@ -749,7 +634,7 @@ t_color *get_lighting_color(t_material *material, p_light *light, t_point *point
     {
         diffuse = ft_multiply_color_scalar(eff_color, material->diffuse * light_dot_normal);
         // diffuse = clamp_color(diffuse);  
-        t_vector *reflect_vec = reflect_vector(negate_vector(light_dir_normal), norm_v);
+        t_vector reflect_vec = reflect_vector(negate_vector(light_dir_normal), norm_v);
         reflect_dot_camera = vector_dot(reflect_vec, cam_v);
         if (reflect_dot_camera <= EPSILON)
             specular = ft_new_color(0, 0, 0); 
@@ -760,7 +645,7 @@ t_color *get_lighting_color(t_material *material, p_light *light, t_point *point
             // specular = clamp_color(specular);
         }
     }
-    t_color *tmp = ft_add_color(specular, diffuse);
+    t_color tmp = ft_add_color(specular, diffuse);
     total_color = ft_add_color(tmp, ambient);
     total_color = clamp_color(total_color);
     return ( total_color);
@@ -771,7 +656,6 @@ t_material *default_material(void)
     t_material *m = malloc(sizeof(t_material));
     if (!m)
         return NULL;
-    
     m->color = ft_new_color(1.0, 1.0, 1.0);  
     m->ambient = 0.1;
     m->diffuse = 0.9;
@@ -780,21 +664,16 @@ t_material *default_material(void)
     return m;
 }
 
-t_vector *vector_normilze(t_vector *vec)
+t_vector vector_normilze(t_vector vec)
 {
-    if (!vec) 
-        return NULL;
-
+    t_vector new ;  
+    // if (!vec) 
+    //     return (t_vector ){0,0,0};
     float magnitude = vec_lenght(vec);
     if (magnitude == 0) 
         return ft_new_vector(0, 0, 0);
-
-    t_vector *new = ft_new_vector(0, 0, 0);
-    if (!new)
-        return NULL;
-
-    new->x = vec->x / magnitude;
-    new->y = vec->y / magnitude;
-    new->z = vec->z / magnitude;
+    new.x = vec.x / magnitude;
+    new.y = vec.y / magnitude;
+    new.z = vec.z / magnitude;
     return new;
 }

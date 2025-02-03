@@ -43,8 +43,6 @@ Total Size of the Projection:
 
 The sphere will cover a total width on the wall equal to twice the projected radius:
 
-total_projection_size = 2 × projected_radius =2× 3 = 6
- 
-units
+total_projection_size = 2 × projected_radius = 2× 3 = 6 units
 total_projection_size=2×projected_radius=2×3=6units
 ```
