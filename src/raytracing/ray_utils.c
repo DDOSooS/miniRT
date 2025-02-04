@@ -503,9 +503,82 @@ float **create_rotation_matrix_from_vector(t_vector orientation)
     return ft_multiply_matrix(rot_y, rot_x,4,4);
 }
 
-
-t_world *default_world()
+void ft_add_cylinder_shape(t_world *world, t_cylinder *cylinder)
 {
+    t_cylinder *tmp;
+
+    tmp = cylinder;
+    while (tmp)
+    {
+        ft_add_shape(&world,tmp, SHAPE_CYLINDER);
+        tmp = tmp->next;
+    }
+}
+
+
+void ft_add_plane_shape(t_world *world, t_plane *plane)
+{
+    t_plane *tmp;
+
+    tmp = plane;
+    while (tmp)
+    {
+        ft_add_shape(&world, tmp, SHAPE_PLANE);
+        tmp = tmp->next;
+    }
+}
+
+void ft_add_sphere_shape(t_world *world, t_sphere *sphere)
+{
+    t_sphere *tmp;
+
+    tmp = sphere;
+    while (tmp)
+    {
+        ft_add_shape(&world, tmp, SHAPE_SPHERE);
+        tmp = tmp->next;
+    }
+}
+
+void ft_add_plight(t_world *world, t_light *light)
+{
+    world->light = malloc(sizeof(p_light));
+    world->light->position = ft_new_point(light->light_coordinate.x, light->light_coordinate.y, light->light_coordinate.z);
+    world->light->intensity = ft_new_color(light->light_color.r, light->light_color.g, light->light_color.b);
+}
+
+t_world *default_world(t_scene *scene)
+{
+
+    t_world *world = malloc(sizeof(t_world));
+    if (!world)
+        return NULL;
+    world->n_objects = 0;
+    world->shape = NULL;
+    if (scene->cylinder)
+        ft_add_cylinder_shape(world, scene->cylinder);
+    if (scene->plane)
+        ft_add_plane_shape(world, scene->plane);
+    if (scene->sphere)
+        ft_add_sphere_shape(world, scene->sphere);
+    ft_add_plight(world, scene->light);
+    
+    // while (world->shape->objects.cylinder)
+    // {
+    //     printf("cylinder shape \n");
+    //     world->shape->objects.cylinder = world->shape->objects.cylinder->next;
+    // }
+    // while (world->shape->objects.sphere)
+    // {
+    //     printf("sphere shape \n");
+    //     world->shape->objects.sphere = world->shape->objects.sphere->next;
+    // }
+    // while (world->shape->objects.plane)
+    // {
+    //     printf("plane shape \n");
+    //     world->shape->objects.plane = world->shape->objects.plane->next;
+    // }
+    /*
     t_world *world = malloc(sizeof(t_world));
     if (!world)
         return NULL;
@@ -577,6 +650,7 @@ t_world *default_world()
     // printf("cylinder is  being created. height:%d==\n", world->shape->objects.cylinder->height);
     // ft_add_shape(&world, sphere1, SHAPE_SPHERE);
     // ft_add_shape(&world, sphere2, SHAPE_SPHERE);
+    */
     return world;
 }
 

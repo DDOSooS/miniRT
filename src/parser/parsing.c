@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 20:24:10 by aghergho          #+#    #+#             */
-/*   Updated: 2025/02/03 12:16:38 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/02/04 08:52:52 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -622,6 +622,7 @@ int ft_add_light(t_scene **scene, char **components)
     ft_gen_elements(&light->light_coordinate, components[1]);
     light->light_ration = ft_atod(components[2]);
     ft_gen_colors(&light->light_color, components[3]);
+    light->light_coordinate.w = 1;
     (*scene)->light = light;
     return 1;
 }
@@ -660,6 +661,7 @@ int ft_add_sphere(t_scene **scene, char **components)
             tmp =tmp->next;
         tmp->next = sphere;
     }
+    // (*scene)->sphere = 
     return 1;
 }
 
@@ -673,6 +675,9 @@ t_plane *ft_new_plane(char **components)
     ft_gen_elements(&plane->plane_cordinates, components[1]);
     ft_gen_elements(&plane->plane_normal, components[2]);
     ft_gen_colors(&plane->plane_color, components[3]);
+    plane->transform = identity_matrix(4);
+    plane->material = default_material();
+    plane->material->color = plane->plane_color;
     plane->next = NULL;
     return plane;
 }
@@ -707,6 +712,12 @@ t_cylinder *ft_new_cylinder(char **components)
     new->raduis = ft_atod(components[3]);
     new->height = ft_atod(components[4]);
     ft_gen_colors(&new->cylinder_color, components[5]);
+    new->transform = identity_matrix(4);
+    new->transform[0][3] = new->coordinates.x;
+    new->transform[1][3] = new->coordinates.y;
+    new->transform[2][3] = new->coordinates.z;
+    new->material = default_material();
+    new->material->color = new->cylinder_color;
     new->next = NULL;
     return new;
 }

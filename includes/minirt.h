@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2025/02/03 15:59:10 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/02/04 06:51:51 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -183,7 +183,7 @@ typedef struct ambient
 
 typedef struct light
 {
-    t_vector        light_coordinate;
+    t_point         light_coordinate;
     double          light_ration;
     t_color         light_color;
 } t_light;
@@ -340,7 +340,7 @@ t_color get_lighting_color(t_material *material, p_light *light, t_point point, 
 t_vector normilize_at_sphere_pos(t_sphere *sphere, t_point w_p);
 /* end of ray manipulation functions*/
 
-t_world *default_world();
+t_world *default_world(t_scene *);
 t_intersection *intersect_world(t_world *world, t_ray *ray);
 t_sphere *default_sphere();
 t_compose *prepare_computations(t_intersection *inter, t_ray *ray);

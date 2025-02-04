@@ -1,5 +1,95 @@
 #include "./includes/minirt.h"
 
+
+void var_dump_all(t_map *map, t_scene *scene)
+{
+    // ---  t_scene ---
+    if (scene)
+    {
+        //  camera
+        printf("\n--- Camera  %p---\n" , scene->camera);
+        if (scene->camera)
+        {
+            printf("Camera Position: [%f, %f, %f]\n", scene->camera->camera_position.x, scene->camera->camera_position.y, scene->camera->camera_position.z);
+            printf("Camera Coordinates: [%f, %f, %f]\n", scene->camera->camera_dir.x, scene->camera->camera_dir.y, scene->camera->camera_dir.z);
+            printf("Camera FOV: %d\n", scene->camera->camera_fov);
+        } else
+        { 
+            printf("Camera is NULL\n");
+        }
+
+        //  ambient
+        printf("\n--- Ambient ---\n");
+        if (scene->ambient)
+        {
+            printf("Ambient Ratio: %f\n", scene->ambient->ambient_ration);
+            printf("Ambient Color: [%f, %f, %f]\n", scene->ambient->ambient_color.r, scene->ambient->ambient_color.g, scene->ambient->ambient_color.b);
+        } else {
+            printf("Ambient is NULL\n");
+        }
+
+        //  light
+        printf("\n--- Light ---\n");
+        if (scene->light) {
+            printf("Light Coordinates: [%f, %f, %f]\n", scene->light->light_coordinate.x, scene->light->light_coordinate.y, scene->light->light_coordinate.z);
+            printf("Light Ratio: %f\n", scene->light->light_ration);
+            printf("Light Color: [%f, %f, %f]\n", scene->light->light_color.r, scene->light->light_color.g, scene->light->light_color.b);
+        } else {
+            printf("Light is NULL\n");
+        }
+
+        //  spheres
+        printf("\n--- Spheres ---\n");
+        t_sphere *sphere = scene->sphere;
+        if (sphere) {
+            while (sphere) {
+                printf("Sphere Coordinates: [%f, %f, %f]\n", sphere->sphere_coordinates.x, sphere->sphere_coordinates.y, sphere->sphere_coordinates.z);
+                printf("Sphere Diameter: %f\n", sphere->sphere_diameter);
+                printf("Sphere Color: [%f, %f, %f]\n", sphere->sphere_color.r, sphere->sphere_color.g, sphere->sphere_color.b);
+                sphere = sphere->next;
+                printf("================================\n");
+            }
+        } else {
+            printf("No Spheres in Scene\n");
+        }
+
+        //  planes
+        printf("\n--- Planes ---\n");
+        t_plane *plane = scene->plane;
+        if (plane) {
+            while (plane) {
+                printf("Plane Coordinates: [%f, %f, %f]\n", plane->plane_cordinates.x, plane->plane_cordinates.y, plane->plane_cordinates.z);
+                printf("Plane Normal: [%f, %f, %f]\n", plane->plane_normal.x, plane->plane_normal.y, plane->plane_normal.z);
+                printf("Plane Color: [%f, %f, %f]\n", plane->plane_color.r, plane->plane_color.g, plane->plane_color.b);
+                plane = plane->next;
+                printf("================================\n");
+
+            }
+        } else {
+            printf("No Planes in Scene\n");
+        }
+
+        //  cylinders
+        printf("\n--- Cylinders ---\n");
+        t_cylinder *cylinder = scene->cylinder;
+        if (cylinder) {
+            while (cylinder) {
+                printf("Cylinder Coordinates: [%f, %f, %f]\n", cylinder->coordinates.x, cylinder->coordinates.y, cylinder->coordinates.z);
+                printf("Cylinder Orientation: [%f, %f, %f]\n", cylinder->orientation.x, cylinder->orientation.y, cylinder->orientation.z);
+                printf("Cylinder raduis: %f, Height: %f\n", cylinder->raduis, cylinder->height);
+                printf("Cylinder Color: [%f, %f, %f]\n", cylinder->cylinder_color.r, cylinder->cylinder_color.g, cylinder->cylinder_color.b);
+                cylinder = cylinder->next;
+                printf("================================\n");
+            }
+        } else {
+            printf("No Cylinders in Scene\n");
+        }
+    }
+    else {
+        printf("Scene is NULL\n");
+    }
+}
+
 t_map *ft_init_map()
 {
     t_map *new;
@@ -89,7 +179,7 @@ int main(int argc, char **argv)
     float height = 400;
     init_scene(scene, width, height);
     // render_spheres(scene);
-    t_world *world = default_world();
+    t_world *world = default_world(scene);
     
     // Create camera with 1:1 pixel mapping
     s_camera *camera = new_camera
@@ -97,10 +187,11 @@ int main(int argc, char **argv)
         height,
         width,
         180,    
-        ft_new_point(-20, 100,-210), // Camera at origin
+        ft_new_point(-20, 10,-210), // Camera at origin
         ft_new_vector(0, 0, 1)  // Looking along z-axis
     );
-    
+    printf("world _nobject = %d\n", world->n_objects);
+    // var_dump_all(map,scene);
     render_image(scene, world, camera);
     return 0;
 }
