@@ -10,9 +10,9 @@ void var_dump_all(t_map *map, t_scene *scene)
         printf("\n--- Camera  %p---\n" , scene->camera);
         if (scene->camera)
         {
-            printf("Camera Position: [%f, %f, %f]\n", scene->camera->camera_position.x, scene->camera->camera_position.y, scene->camera->camera_position.z);
-            printf("Camera Coordinates: [%f, %f, %f]\n", scene->camera->camera_dir.x, scene->camera->camera_dir.y, scene->camera->camera_dir.z);
-            printf("Camera FOV: %d\n", scene->camera->camera_fov);
+            printf("Camera Position: [%f, %f, %f]\n", scene->camera->origin.x, scene->camera->origin.y, scene->camera->origin.z);
+            printf("Camera Coordinates: [%f, %f, %f]\n", scene->camera->direction.x, scene->camera->direction.y, scene->camera->direction.z);
+            printf("Camera FOV: %f\n", scene->camera->fov);
         } else
         { 
             printf("Camera is NULL\n");
@@ -136,23 +136,18 @@ void my_pixel_put(t_img *img, int x, int y, int color)
 
 void init_scene(t_scene *scene, float width, float height)
 {
-    scene->image_width = width;
-    scene->aspect_ratio = 16.0f / 9.0f;
-    // scene->image_height = (int)(scene->image_width / scene->aspect_ratio); // This will be about 225
-    scene->image_height = height; 
-    scene->vp_hight = 2.0;
-    scene->vp_width = scene->vp_hight * scene->aspect_ratio;
-    scene->camera->focal_lenght = 500; 
+    scene->camera->w_size = width;
+    scene->camera->h_size = height; 
     
     scene->data = malloc(sizeof(t_var));
     scene->data->mlx = mlx_init();
     scene->data->win = mlx_new_window(scene->data->mlx, 
-                                     scene->image_width, 
-                                     scene->image_height, 
+                                     scene->camera->w_size, 
+                                     scene->camera->h_size, 
                                      "MiniRT");
     scene->data->img.img_ptr = mlx_new_image(scene->data->mlx, 
-                                            scene->image_width, 
-                                            scene->image_height);
+                                            scene->camera->w_size, 
+                                            scene->camera->h_size);
     scene->data->img.addr = mlx_get_data_addr(scene->data->img.img_ptr,
                                              &scene->data->img.bits_per_pixel,
                                              &scene->data->img.line_length,
@@ -178,10 +173,10 @@ int main(int argc, char **argv)
     float width = 700;
     float height = 400;
     init_scene(scene, width, height);
-    // render_spheres(scene);
+
     t_world *world = default_world(scene);
-    
-    // Create camera with 1:1 pixel mapping
+/*
+    Create camera with 1:1 pixel mapping
     s_camera *camera = new_camera
     (
         height,
@@ -191,8 +186,9 @@ int main(int argc, char **argv)
         ft_new_vector(0, 0, 1)  // Looking along z-axis
     );
     printf("world _nobject = %d\n", world->n_objects);
-    // var_dump_all(map,scene);
-    render_image(scene, world, camera);
+*/    
+    var_dump_all(map,scene);
+    render_image(scene, world, scene->camera);
     return 0;
 }
 

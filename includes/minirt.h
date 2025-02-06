@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2025/02/04 06:51:51 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/02/06 08:56:23 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -199,17 +199,7 @@ typedef struct objects
 
 typedef struct s_scene
 {
-    int         image_height;
-    int         image_width;
-    float       aspect_ratio;
-    float       vp_hight;
-    float       vp_width;
-    t_vector    l_corner;
-    t_vector    vp_u;
-    t_vector    vp_v;
-    t_vector    vp_center;
-    t_vector    left_corner;
-    t_camera    *camera;
+    s_camera    *camera;
     t_ambient   *ambient;
     t_light     *light;
     t_sphere    *sphere;

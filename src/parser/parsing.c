@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 20:24:10 by aghergho          #+#    #+#             */
-/*   Updated: 2025/02/04 08:52:52 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/02/06 09:03:14 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -599,16 +599,16 @@ int ft_add_ambient(t_scene **scene, char **components)
 
 int ft_add_camera(t_scene **scene, char **components)
 {
-    t_camera *camera;
-
-    camera = malloc(sizeof(t_camera));
-    ft_gen_elements(&camera->camera_position, components[1]);
-    ft_gen_elements(&camera->camera_dir, components[2]);
-    camera->camera_fov = ft_atod(components[3]);
-
-    camera->focal_lenght = 0;
-    camera->hor_size = 0;
-    // printf("==> x %f <== y %f==> z %f <==\n", camera->camera_dir->x, camera->camera_dir->y, camera->camera_dir->z);
+    s_camera *camera;
+    
+    t_point position;
+    t_vector dir;
+    float     fov;
+    
+    ft_gen_elements(&position, components[1]);
+    ft_gen_elements(&dir, components[2]);
+    fov = ft_atod(components[3]);
+    camera = new_camera(400,700, fov, position, dir);
     (*scene)->camera = camera;
     return 1;
 }
