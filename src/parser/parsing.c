@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 20:24:10 by aghergho          #+#    #+#             */
-/*   Updated: 2025/02/06 09:03:14 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/02/26 15:09:28 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,8 @@ double ft_atod(char *str)
     {
         sign = -1;
         i++;
-    } else if (str[i] == '+') 
+    }
+    else if (str[i] == '+') 
         i++;
     while (str[i] && (str[i] >= '0' && str[i] <= '9'))
     {
@@ -530,6 +531,8 @@ int    ft_add_line(map_line **map, char *line)
     return (1);
 }
 
+
+
 map_line *ft_gen_scen_map(char *file_name)
 {
     map_line *map;
@@ -543,7 +546,6 @@ map_line *ft_gen_scen_map(char *file_name)
         return (printf("error : failed to open file\n"),NULL);
     map = NULL;
     line = get_next_line(fd);
-
     while (line)
     {
         if (line && !is_empty_line(line))
@@ -553,7 +555,6 @@ map_line *ft_gen_scen_map(char *file_name)
         line = get_next_line(fd);
     }
     close(fd);
-    
     return (map);
 }
 
@@ -600,7 +601,6 @@ int ft_add_ambient(t_scene **scene, char **components)
 int ft_add_camera(t_scene **scene, char **components)
 {
     s_camera *camera;
-    
     t_point position;
     t_vector dir;
     float     fov;
@@ -608,7 +608,15 @@ int ft_add_camera(t_scene **scene, char **components)
     ft_gen_elements(&position, components[1]);
     ft_gen_elements(&dir, components[2]);
     fov = ft_atod(components[3]);
-    camera = new_camera(400,700, fov, position, dir);
+    camera = malloc(sizeof(s_camera));
+    if (!camera)
+        return 0;
+    camera->fov  = fov;
+    camera->h_size = 400;
+    camera->w_size = 700;
+    camera->direction = dir;
+    camera->origin = position;
+    ft_set_camera(&camera);
     (*scene)->camera = camera;
     return 1;
 }
@@ -661,7 +669,6 @@ int ft_add_sphere(t_scene **scene, char **components)
             tmp =tmp->next;
         tmp->next = sphere;
     }
-    // (*scene)->sphere = 
     return 1;
 }
 

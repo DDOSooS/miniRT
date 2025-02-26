@@ -138,7 +138,6 @@ void init_scene(t_scene *scene, float width, float height)
 {
     scene->camera->w_size = width;
     scene->camera->h_size = height; 
-    
     scene->data = malloc(sizeof(t_var));
     scene->data->mlx = mlx_init();
     scene->data->win = mlx_new_window(scene->data->mlx, 
@@ -168,26 +167,12 @@ int main(int argc, char **argv)
     if (!map->lines || !ft_check_map_components(&map))
         return (free(map), ft_putstr_fd("map is empty\n", 2), 1);
     scene = ft_generate_scene(map->lines);
-    
-    // var_dump_all(map, scene);
     float width = 700;
     float height = 400;
     init_scene(scene, width, height);
+    // var_dump_all(map,scene);
 
     t_world *world = default_world(scene);
-/*
-    Create camera with 1:1 pixel mapping
-    s_camera *camera = new_camera
-    (
-        height,
-        width,
-        180,    
-        ft_new_point(-20, 10,-210), // Camera at origin
-        ft_new_vector(0, 0, 1)  // Looking along z-axis
-    );
-    printf("world _nobject = %d\n", world->n_objects);
-*/    
-    var_dump_all(map,scene);
     render_image(scene, world, scene->camera);
     return 0;
 }

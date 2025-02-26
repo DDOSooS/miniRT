@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2025/02/06 08:56:23 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/02/26 19:04:52 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -260,15 +260,11 @@ t_vector    vector_add(t_vector v1, t_vector v2);
 // t_vector    *ft_new_vector(float x, float y, float z);
 void        var_dump_vector(t_vector vec);
 void init_scene(t_scene *scene, float width, float height);
-t_ray       *create_ray(t_vector origin, t_vector direction);
-int         gen_ray(t_scene *scene,float x, float y, t_ray **cam_r);
-s_camera  *new_camera(float h_size, float w_size,float,  t_point , t_vector );
-// int check_intersection(t_ray *ray, t_vector *sphere_center, float radius) ;
-// int check_intersection(t_ray *cast_ray,t_vector *inter_point ,t_vector *local_normal,t_vector *locol_color);
+t_ray       create_ray(t_vector origin, t_vector direction);
+int         gen_ray(t_scene *scene,float x, float y, t_ray cam_r);
+void ft_set_camera(s_camera **camera);
 t_vector    vector_copy(t_vector src);
 t_sphere *ft_new_sphere(char **components);
-// t_vector *normilize_at_sphere_pos(t_sphere *sphere, t_point *p);
-
 
 /* colors operations*/
 t_color ft_new_color(float r, float g, float b);
@@ -318,26 +314,26 @@ p_light  *ft_new_plight(t_color color, t_point point);
 
 
 /* ray manipulation*/
-t_point position(t_ray *ray, float distance);
-t_ray *create_ray(t_point origin, t_vector dir);
-t_intersection ft_intersect_sphere(t_ray *ray, t_sphere *sphere);
+t_point position(t_ray ray, float distance);
+t_ray create_ray(t_point origin, t_vector dir);
+t_intersection ft_intersect_sphere(t_ray ray, t_sphere *sphere);
 t_intersection  ft_new_intersection(float t, void *object, int type);
 t_intersection *ray_hit(t_intersection *inters, int count);
-t_ray *transform(t_ray *ray, float **m);
-t_ray *transform(t_ray *ray, float **m);
-t_point position(t_ray *ray, float distance);
-t_color get_lighting_color(t_material *material, p_light *light, t_point point, t_vector cam_v, t_vector norm_v, int);
+t_ray transform(t_ray ray, float **m);
+t_ray transform(t_ray ray, float **m);
+t_point position(t_ray ray, float distance);
+t_color get_lighting_color(t_material *material, p_light *light, t_compose *comp, int);
 t_vector normilize_at_sphere_pos(t_sphere *sphere, t_point w_p);
 /* end of ray manipulation functions*/
 
 t_world *default_world(t_scene *);
-t_intersection *intersect_world(t_world *world, t_ray *ray);
+t_intersection *intersect_world(t_world *world, t_ray ray);
 t_sphere *default_sphere();
-t_compose *prepare_computations(t_intersection *inter, t_ray *ray);
+t_compose *prepare_computations(t_intersection *inter, t_ray ray);
 t_color shading_hit(t_world *world, t_compose *comp);
-t_color get_color_at(t_world *world, t_ray *ray);
+t_color get_color_at(t_world *world, t_ray ray);
 float **get_view_transform(t_point from_v, t_point to_v, t_vector up_v);
-t_ray *get_ray_pixel(s_camera *cam, float x, float y, float edge);
+t_ray get_ray_pixel(s_camera *cam, float x, float y, float edge);
 t_color clamp_color(t_color color);
 
 int is_shadowed(t_world *world, t_point point);

@@ -142,8 +142,7 @@ int ft_compare_matrix(float **m1, float **m2, int n_col, int n_row)
     i = -1;
     while(++i < n_row)
     {
-        j = 0;
-        --j;
+        j = -1;
         while(++j < n_col)
         {
             if (fabs(m1[i][j] - m2[i][j]) >= EPSILON)
@@ -616,7 +615,7 @@ t_color clamp_color(t_color color)
 }
 
 
-t_color get_lighting_color(t_material *material, p_light *light, t_point point, t_vector cam_v, t_vector norm_v, int shadow)
+t_color get_lighting_color(t_material *material, p_light *light, t_compose *comp, int shadow)
 {
     t_color eff_color;
     t_vector light_dir;
@@ -633,10 +632,10 @@ t_color get_lighting_color(t_material *material, p_light *light, t_point point, 
     ambient = clamp_color(ambient);  
     if (shadow)
         return clamp_color(ft_multiply_color_scalar(ambient, 1));
-    light_dir = vector_sub(light->position, point);
+    light_dir = vector_sub(light->position, comp->point);
     light_dir_normal = vector_normilze(light_dir);
 
-    light_dot_normal = vector_dot(light_dir_normal, norm_v);
+    light_dot_normal = vector_dot(light_dir_normal, comp->normv);
     if (light_dot_normal < EPSILON)
     {
         diffuse = ft_new_color(0, 0, 0);  
@@ -645,16 +644,14 @@ t_color get_lighting_color(t_material *material, p_light *light, t_point point, 
     else
     {
         diffuse = ft_multiply_color_scalar(eff_color, material->diffuse * light_dot_normal);
-        // diffuse = clamp_color(diffuse);  
-        t_vector reflect_vec = reflect_vector(negate_vector(light_dir_normal), norm_v);
-        reflect_dot_camera = vector_dot(reflect_vec, cam_v);
+        t_vector reflect_vec = reflect_vector(negate_vector(light_dir_normal), comp->normv);
+        reflect_dot_camera = vector_dot(reflect_vec, comp->camv);
         if (reflect_dot_camera <= EPSILON)
             specular = ft_new_color(0, 0, 0); 
         else
         {
             float spec_factor = powf(reflect_dot_camera, material->shininess);
             specular = ft_multiply_color_scalar(light->intensity, material->specular * spec_factor);
-            // specular = clamp_color(specular);
         }
     }
     t_color tmp = ft_add_color(specular, diffuse);
