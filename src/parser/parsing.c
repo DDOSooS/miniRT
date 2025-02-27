@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 20:24:10 by aghergho          #+#    #+#             */
-/*   Updated: 2025/02/26 15:09:28 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/02/27 09:17:24 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,13 +18,26 @@ int ft_is_whitespace(char c)
     return (c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\v');
 }
 
+double get_fractional(char *str, int i)
+{
+    double fractional_part;
+    double divisor ;
+    
+    fractional_part = 0.0;
+    divisor = 10.0;
+    while (str[++i] && (str[i] >= '0' && str[i] <= '9'))
+    {
+        fractional_part += (str[i] - '0') / divisor;
+        divisor *= 10.0;
+    }
+    return fractional_part;
+}
+
 double ft_atod(char *str)
 {
     double result = 0.0;
-    double fractional_part = 0.0;
     int i = 0;
     int sign = 1;
-    double divisor ;
 
     while (ft_is_whitespace(str[i]))
         i++;
@@ -35,23 +48,11 @@ double ft_atod(char *str)
     }
     else if (str[i] == '+') 
         i++;
-    while (str[i] && (str[i] >= '0' && str[i] <= '9'))
-    {
+    i--;
+    while (str[++i] && (str[i] >= '0' && str[i] <= '9'))
         result = result * 10 + (str[i] - '0');
-        i++;
-    }
     if (str[i] == '.')
-    {
-        i++; 
-        divisor = 10.0;
-        while (str[i] && (str[i] >= '0' && str[i] <= '9'))
-        {
-            fractional_part += (str[i] - '0') / divisor;
-            divisor *= 10.0;
-            i++;
-        }
-    }
-    result += fractional_part;
+        result += get_fractional(str, i);
     return result * sign;
 }
 
@@ -68,7 +69,6 @@ int is_empty_line(char *line)
             return 0;
         i++;
     }
-    // printf("end of line check\n");
     return 1;
 }
 
@@ -434,6 +434,7 @@ int is_identifier(char *identifier)
     return 0;
 }
 
+//!norminnete
 int ft_check_map_components(t_map **map)
 {
     map_line    *tmp;

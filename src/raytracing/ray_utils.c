@@ -38,27 +38,38 @@ t_intersection *ray_hit(t_intersection *inters, int count)
     return result;
 }
 
-t_intersection ft_intersect_sphere(t_ray ray, t_sphere *sphere)
+float calculate_discriment(t_ray ray, t_sphere *sphere)
 {
-    t_intersection result;
+    float a, b, c;
     t_vector sphere_to_ray;
-    float a, b, c, discriminant;
-    int t1, t2;
 
     sphere_to_ray = vector_sub(ray.origin, sphere->sphere_coordinates);
     a = vector_dot(ray.direction, ray.direction);
     b = 2 * vector_dot(ray.direction, sphere_to_ray);
     c = vector_dot(sphere_to_ray, sphere_to_ray) - (sphere->sphere_diameter/2.0 * sphere->sphere_diameter/2.0);
-    discriminant = b * b - 4 * a * c;
+    return b * b - 4 * a * c;
+}
+
+
+
+t_intersection ft_intersect_sphere(t_ray ray, t_sphere *sphere)
+{
+    t_intersection result;
+    float  a,b,discriminant;
+    int t1, t2;
+    t_vector sphere_to_ray;;
+
+    sphere_to_ray = vector_sub(ray.origin, sphere->sphere_coordinates);
+    a = vector_dot(ray.direction, ray.direction);
+    b = 2 * vector_dot(ray.direction, sphere_to_ray);
+    discriminant = calculate_discriment(ray, sphere);
+    result.n_sol = 0;
     if (discriminant < 0)
-    {
         result.t1 = -1;
-        result.n_sol = 0;
-    }
     else
     {
-        t1 = (-b - sqrt(discriminant)) / (2 * a);
-        t2 = (-b + sqrt(discriminant)) / (2 * a);
+        t1 = (-b - sqrtf(discriminant)) / (2 * a);
+        t2 = (-b + sqrtf(discriminant)) / (2 * a);
         if (t1 > 0 && t2 > 0 && t1 > t2)
             t1 = t2;
         result.t1 = t1;
@@ -68,6 +79,7 @@ t_intersection ft_intersect_sphere(t_ray ray, t_sphere *sphere)
     }
     return result;
 }
+
 t_intersection  ft_new_intersection(float t, void *object, int type)
 {
     t_intersection intersection;
@@ -159,15 +171,15 @@ t_intersection ft_intersect_plane(t_ray ray, t_plane *plane)
 {
     t_intersection result = {0,  0, NULL, 0};
     
-    // 1. Calculate denominator (dot product of ray direction and plane normal)
+    // Calculate denominator (dot product of ray direction and plane normal)
     float denom = vector_dot(ray.direction, plane->plane_normal);
-    // 2. Check for parallel ray (denominator near zero)
+    // Check for parallel ray (denominator near zero)
     if (fabs(denom) < EPSILON)  
         return result;
-    // 3. Calculate vector from ray origin to a point on the plane
+    // Calculate vector from ray origin to a point on the plane
     t_vector origin_to_plane = vector_sub(ray.origin, plane->plane_cordinates); 
     // Fixed: use plane->point instead of plane->plane_normal
-    // 4. Calculate intersection distance
+    //Calculate intersection distance
     float t = -(vector_dot(origin_to_plane, plane->plane_normal)) / denom;
     if (t < EPSILON)
         return result;  // Intersection is behind ray origin
@@ -232,12 +244,10 @@ float get_min_sol(float *arr, int len)
 int  is_point_inside_cylinder(t_point point, t_cylinder *cylinder)
 {
     float **rotation = create_rotation_matrix_from_vector(cylinder->orientation);
-    
     float **combined = ft_multiply_matrix(cylinder->transform, rotation, 4, 4);
     float **inverse = inverse_matrix(combined, 4);
     if (!inverse)
         inverse = cylinder->transform;
-
     t_vector transformed_point = ft_multiply_matrix_vec(inverse, point);
     float half_height = cylinder->height / 2.0f;
     if (transformed_point.y > half_height || transformed_point.y < -half_height)
@@ -247,6 +257,7 @@ int  is_point_inside_cylinder(t_point point, t_cylinder *cylinder)
     return radial_dist < cylinder->raduis;
 }
 
+// NORMINETTE URGENT TO DO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 t_intersection ft_intersect_cylinder(t_ray ray, t_cylinder *cylinder)
 {
     t_intersection result = {-1, -1, NULL, SHAPE_CYLINDER};
@@ -258,49 +269,35 @@ t_intersection ft_intersect_cylinder(t_ray ray, t_cylinder *cylinder)
 
     //  rotation matrix && orientation vector
     float **rotation = create_rotation_matrix_from_vector(cylinder->orientation);
-    
     // Combine rotation and transformation MX
     float **combined = ft_multiply_matrix(cylinder->transform, rotation, 4, 4);
     float **inverse = inverse_matrix(combined, 4);
     if (!inverse)
         inverse = cylinder->transform;
-
     // Transform ray to object space
-    t_ray transformed_ray =create_ray(ft_multiply_matrix_vec(inverse, ray.origin),
+    t_ray tr_ray = create_ray(ft_multiply_matrix_vec(inverse, ray.origin),
                                         ft_multiply_matrix_vec(inverse, ray.direction));
-    float ox = transformed_ray.origin.x;
-    float oy = transformed_ray.origin.y;
-    float oz = transformed_ray.origin.z;
-    float dx = transformed_ray.direction.x;
-    float dy = transformed_ray.direction.y;
-    float dz = transformed_ray.direction.z;
-
-    float a = dx * dx + dz * dz;
-
-    float b = 2.0f * (ox * dx + oz * dz);
-    float c = ox * ox + oz * oz - cylinder->raduis * cylinder->raduis;
+    float a = tr_ray.direction.x * tr_ray.direction.x + tr_ray.direction.z * tr_ray.direction.z;
+    float b = 2.0f * (tr_ray.origin.x * tr_ray.direction.x + tr_ray.origin.z * tr_ray.direction.z);
+    float c = tr_ray.origin.x * tr_ray.origin.x + tr_ray.origin.z * tr_ray.origin.z - cylinder->raduis * cylinder->raduis;
     float discriminant = b * b - 4.0f * a * c;
-    // printf("%f %f %f -- %f\n", a, b, c,discriminant);
     float disance = INFINITY;
     if (discriminant >= 0)
     {
         float sqrt_disc = sqrtf(discriminant);
         float t1 = (-b - sqrt_disc) / (2.0f * a);
         float t2 = (-b + sqrt_disc) / (2.0f * a);
-        float y1 = transformed_ray.origin.y + t1 * dy;
-        float y2 = transformed_ray.origin.y + t2 * dy;
-        float maximum = half_height;
-        float minimum = -half_height;
-        if (y1 >= minimum && y1 <= maximum)
+        float y1 = tr_ray.origin.y + t1 * tr_ray.direction.y;
+        float y2 = tr_ray.origin.y + t2 * tr_ray.direction.y;
+        if (y1 >= half_height && y1 <= half_height)
             sol[counter++] = t1;
-        if (y2 >= minimum && y2 <= maximum) 
+        if (y2 >= half_height && y2 <= half_height) 
             sol[counter++] = t2;
     }
-
-    captop = check_intersection_caps(transformed_ray, cylinder, half_height);
+    captop = check_intersection_caps(tr_ray, cylinder, half_height);
     if (captop.n_sol > 0)
         sol[counter++] = captop.t1;
-    capbottom = check_intersection_caps(transformed_ray, cylinder, -half_height);
+    capbottom = check_intersection_caps(tr_ray, cylinder, -half_height);
     if (capbottom.n_sol > 0)
         sol[counter++] = capbottom.t1;
     if (counter > 0)
@@ -330,7 +327,6 @@ t_vector normalize_at_cylinder_pos(t_cylinder *cylinder, t_point world_p)
         inv = combined;
         
     t_point local_p = ft_multiply_matrix_point(inv, world_p);
-
     //  normal in object space
     t_vector local_normal;
     if (fabs(local_p.y - cylinder->height/2) < EPSILON)
@@ -339,7 +335,6 @@ t_vector normalize_at_cylinder_pos(t_cylinder *cylinder, t_point world_p)
         local_normal = (t_vector){0, -1, 0};
     else
         local_normal = (t_vector){local_p.x, 0, local_p.z};
-
     // Transform normal back to world space !<= 
     ft_transpose_matrix(&inv, 4, 4);
     t_vector world_normal = ft_multiply_matrix_vec(inv, local_normal);
@@ -416,13 +411,13 @@ t_vector normalize_at_plane_pos(t_plane *plane, t_point w_p)
     return normalized;
 }
 
-t_point point_add(t_point point, t_vector p2)
+t_point point_add(t_point p1, t_vector p2)
 {
     t_point new_point;
 
-    new_point.x = point.x + p2.x;
-    new_point.y = point.y + p2.y;
-    new_point.z = point.z + p2.z;
+    new_point.x = p1.x + p2.x;
+    new_point.y = p1.y + p2.y;
+    new_point.z = p1.z + p2.z;
     new_point.w = 1.0;  
     return new_point;
 }

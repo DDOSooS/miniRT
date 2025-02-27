@@ -486,10 +486,7 @@ float **inverse_matrix(float **m, int n)
     det = determinant(m, n);
     if (det == 0)
         return (NULL);
-        
     inverse = ft_create_matrix(n, n);
-    if (!inverse)
-        return (NULL);
     for (i = 1; i <= n; i++)
     {
         for (j = 1; j <= n; j++)
@@ -617,47 +614,31 @@ t_color clamp_color(t_color color)
 
 t_color get_lighting_color(t_material *material, p_light *light, t_compose *comp, int shadow)
 {
-    t_color eff_color;
-    t_vector light_dir;
     t_vector light_dir_normal;
-    t_color ambient;
-    t_color diffuse;
-    t_color specular;
-    t_color total_color;
-    float light_dot_normal;
-    float reflect_dot_camera;
+    t_color eff_color, ambient,  diffuse, specular;
+    float light_dot_normal, reflect_dot_camera;
 
     eff_color = ft_multiply_color(material->color, light->intensity);
-    ambient = ft_multiply_color_scalar(eff_color, material->ambient);
-    ambient = clamp_color(ambient);  
+    ambient = clamp_color(ft_multiply_color_scalar(eff_color, material->ambient));  
     if (shadow)
-        return clamp_color(ft_multiply_color_scalar(ambient, 1));
-    light_dir = vector_sub(light->position, comp->point);
-    light_dir_normal = vector_normilze(light_dir);
-
+        return ambient;
+    light_dir_normal = vector_normilze(vector_sub(light->position, comp->point));
     light_dot_normal = vector_dot(light_dir_normal, comp->normv);
     if (light_dot_normal < EPSILON)
-    {
-        diffuse = ft_new_color(0, 0, 0);  
-        specular = ft_new_color(0, 0, 0); 
-    }
+        return ambient;
     else
     {
         diffuse = ft_multiply_color_scalar(eff_color, material->diffuse * light_dot_normal);
-        t_vector reflect_vec = reflect_vector(negate_vector(light_dir_normal), comp->normv);
-        reflect_dot_camera = vector_dot(reflect_vec, comp->camv);
+        reflect_dot_camera = vector_dot(reflect_vector(negate_vector(light_dir_normal),
+                                        comp->normv), comp->camv);
         if (reflect_dot_camera <= EPSILON)
             specular = ft_new_color(0, 0, 0); 
         else
-        {
-            float spec_factor = powf(reflect_dot_camera, material->shininess);
-            specular = ft_multiply_color_scalar(light->intensity, material->specular * spec_factor);
-        }
+            specular = ft_multiply_color_scalar(light->intensity,
+                        material->specular * powf(reflect_dot_camera, material->shininess));
     }
     t_color tmp = ft_add_color(specular, diffuse);
-    total_color = ft_add_color(tmp, ambient);
-    total_color = clamp_color(total_color);
-    return ( total_color);
+    return (clamp_color(ft_add_color(tmp, ambient)));
 }
 
 t_material *default_material(void)
@@ -676,6 +657,7 @@ t_material *default_material(void)
 t_vector vector_normilze(t_vector vec)
 {
     t_vector new ;  
+ 
     // if (!vec) 
     //     return (t_vector ){0,0,0};
     float magnitude = vec_lenght(vec);
