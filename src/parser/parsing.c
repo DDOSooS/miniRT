@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 20:24:10 by aghergho          #+#    #+#             */
-/*   Updated: 2025/02/27 09:17:24 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/03/02 12:24:34 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -260,10 +260,10 @@ int ft_check_colors(char *component)
     double color;
     
     colors = split(component,",");
-    if (ft_count_components(colors) != 3)
-        return (ft_free_line_components(colors), 0);
     if (!colors)
         return 0;
+    if (ft_count_components(colors) != 3)
+        return (ft_free_line_components(colors), 0);
     i = -1;
     while (colors[++i])
     {
@@ -273,6 +273,7 @@ int ft_check_colors(char *component)
         if (color < 0 || color > 255)
             return (ft_free_line_components(colors), 0);         
     }
+    ft_free_line_components(colors);
     return (1);
 }
 

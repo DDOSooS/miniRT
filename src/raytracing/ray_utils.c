@@ -20,10 +20,12 @@ t_point position(t_ray ray, float distance)
 }
 
 
-t_intersection *ray_hit(t_intersection *inters, int count)
+t_intersection ray_hit(t_intersection *inters, int count)
 {
     float min_t = INT_MAX;
-    t_intersection *result = &inters[0];
+    t_intersection result;
+    
+    t_intersection *tmp = &inters[0];
     int i = 0;
     
     while (i < count)
@@ -31,10 +33,14 @@ t_intersection *ray_hit(t_intersection *inters, int count)
         if (inters[i].t1 > 0 && inters[i].t1 < min_t)
         {
             min_t = inters[i].t1;
-            result = &inters[i];
+            tmp = &inters[i];
         }
         i++;
     }
+    result.n_sol = tmp->n_sol;
+    result.t1 = tmp->t1;
+    result.object = tmp->object;
+    result.type = tmp->type;
     return result;
 }
 
@@ -203,19 +209,19 @@ int check_cylinder_caps(t_ray *ray, float t, float radius)
 t_intersection check_intersection_caps(t_ray ray, t_cylinder *cylinder, float cap)
 {
     t_intersection result = {-1, -1, NULL, SHAPE_CYLINDER};
+    float xs ;
+    float x ;
+    float z;
     
+    float radius_squared ;
     if (fabs(ray.direction.y) < EPSILON)
-        return result;
-        
-    float xs = (cap - ray.origin.y) / ray.direction.y;
-    
+        return result; 
+    xs= (cap - ray.origin.y) / ray.direction.y;
     if (xs < EPSILON)
         return result;
-        
-    float x = ray.origin.x + xs * ray.direction.x;
-    float z = ray.origin.z + xs * ray.direction.z;
-    
-    float radius_squared = (cylinder->raduis + EPSILON) * (cylinder->raduis + EPSILON);
+    x = ray.origin.x + xs * ray.direction.x;
+    z = ray.origin.z + xs * ray.direction.z;
+    radius_squared = (cylinder->raduis + EPSILON) * (cylinder->raduis + EPSILON);
     if ((x * x + z * z) <= radius_squared)
     {
         result.t1 = xs;
@@ -254,6 +260,9 @@ int  is_point_inside_cylinder(t_point point, t_cylinder *cylinder)
         return 0;
     float radial_dist = sqrtf(transformed_point.x * transformed_point.x + 
                              transformed_point.z * transformed_point.z);
+    ft_free_matrix(rotation, 4);
+    ft_free_matrix(combined, 4);
+    ft_free_matrix(inverse, 4);
     return radial_dist < cylinder->raduis;
 }
 
@@ -289,9 +298,9 @@ t_intersection ft_intersect_cylinder(t_ray ray, t_cylinder *cylinder)
         float t2 = (-b + sqrt_disc) / (2.0f * a);
         float y1 = tr_ray.origin.y + t1 * tr_ray.direction.y;
         float y2 = tr_ray.origin.y + t2 * tr_ray.direction.y;
-        if (y1 >= half_height && y1 <= half_height)
+        if (y1 >= -half_height && y1 <= half_height)
             sol[counter++] = t1;
-        if (y2 >= half_height && y2 <= half_height) 
+        if (y2 >= -half_height && y2 <= half_height) 
             sol[counter++] = t2;
     }
     captop = check_intersection_caps(tr_ray, cylinder, half_height);
@@ -315,6 +324,9 @@ t_intersection ft_intersect_cylinder(t_ray ray, t_cylinder *cylinder)
             result.t1 = min_t;
         }
     }
+    ft_free_matrix(rotation, 4);
+    ft_free_matrix(combined, 4);
+    ft_free_matrix(inverse, 4);
     return result;
 }
 
@@ -323,9 +335,9 @@ t_vector normalize_at_cylinder_pos(t_cylinder *cylinder, t_point world_p)
     float **rotation = create_rotation_matrix_from_vector(cylinder->orientation);
     float **combined = ft_multiply_matrix(cylinder->transform, rotation, 4, 4);
     float **inv = inverse_matrix(combined, 4);
+
     if (!inv)
-        inv = combined;
-        
+        inv = combined;    
     t_point local_p = ft_multiply_matrix_point(inv, world_p);
     //  normal in object space
     t_vector local_normal;
@@ -339,21 +351,25 @@ t_vector normalize_at_cylinder_pos(t_cylinder *cylinder, t_point world_p)
     ft_transpose_matrix(&inv, 4, 4);
     t_vector world_normal = ft_multiply_matrix_vec(inv, local_normal);
     vector_normilze(world_normal);
-
+    ft_free_matrix(rotation, 4);
+    ft_free_matrix(combined, 4);
+    ft_free_matrix(inv, 4);
     return world_normal;
 }
 
-t_intersection *intersect_world(t_world *world, t_ray ray)
+t_intersection intersect_world(t_world *world, t_ray ray)
 {
-    t_intersection *res;
+    t_intersection  res;
+    t_intersection  *inter;
+    t_shape         *current;
     int i;
 
     if (!world->shape)
-        return NULL;
-    t_shape *current = world->shape;
-    t_intersection *inter = malloc(sizeof(t_intersection) * world->n_objects);
+        return (t_intersection) {0,0,NULL,0};
+    current = world->shape;
+    inter = malloc(sizeof(t_intersection) * world->n_objects);
     if (!inter)
-        return NULL;
+        return (t_intersection) {0,0,NULL,0};
     i = 0;
     while (current)
     {
@@ -367,7 +383,7 @@ t_intersection *intersect_world(t_world *world, t_ray ray)
         i++;
     }
     res = ray_hit(inter, world->n_objects);
-    return res;
+    return (free(inter), res);
 }
 
 t_vector normilize_at_sphere_pos(t_sphere *sphere, t_point w_p)
@@ -391,6 +407,10 @@ t_vector normilize_at_sphere_pos(t_sphere *sphere, t_point w_p)
     return vec;
 }
 
+/*
+linear algebraic transformation
+(M^-1)^T * N
+*/
 t_vector normalize_at_plane_pos(t_plane *plane, t_point w_p)
 {
     t_vector world_normal;
@@ -411,32 +431,32 @@ t_vector normalize_at_plane_pos(t_plane *plane, t_point w_p)
     return normalized;
 }
 
-t_point point_add(t_point p1, t_vector p2)
+t_point point_add(t_point point, t_vector p2)
 {
     t_point new_point;
 
-    new_point.x = p1.x + p2.x;
-    new_point.y = p1.y + p2.y;
-    new_point.z = p1.z + p2.z;
+    new_point.x = point.x + p2.x;
+    new_point.y = point.y + p2.y;
+    new_point.z = point.z + p2.z;
     new_point.w = 1.0;  
     return new_point;
 }
 
-t_compose *prepare_computations(t_intersection *inter, t_ray ray)
+t_compose *prepare_computations(t_intersection inter, t_ray ray)
 {
     t_compose *comp = malloc(sizeof(t_compose));
 
-    comp->t = inter->t1;
-    comp->obj = inter->object;
-    comp->obj_type = inter->type;
+    comp->t = inter.t1;
+    comp->obj = inter.object;
+    comp->obj_type = inter.type;
     comp->camv = negate_vector(ray.direction);
     comp->point = position(ray, comp->t);
     if (comp->obj_type == SHAPE_SPHERE)
-        comp->normv = normilize_at_sphere_pos((t_sphere *)(inter->object), comp->point);
+        comp->normv = normilize_at_sphere_pos((t_sphere *)(inter.object), comp->point);
     else if (comp->obj_type == SHAPE_PLANE)
-        comp->normv = normalize_at_plane_pos((t_plane *)(inter->object), comp->point);
+        comp->normv = normalize_at_plane_pos((t_plane *)(inter.object), comp->point);
     else if (comp->obj_type == SHAPE_CYLINDER)
-        comp->normv = normalize_at_cylinder_pos((t_cylinder *)(inter->object), comp->point);
+        comp->normv = normalize_at_cylinder_pos((t_cylinder *)(inter.object), comp->point);
     comp->normv = vector_normilze(comp->normv);
     comp->inside = 0;
     if (vector_dot(comp->normv, comp->camv) < 0.0)
@@ -449,7 +469,12 @@ t_compose *prepare_computations(t_intersection *inter, t_ray ray)
     return comp;
 }
 
-
+/*
+X-axis corresponds to left/right
+Y-axis corresponds to up/down
+Z-axis corresponds to forward/backward (with negative Z being forward)
+*/
+//camera transform matrix that transform from world coordinates to camera system Co
 float **get_view_transform(t_point from_v, t_vector to_v, t_vector up_v)
 {
     float **view_transform;
@@ -457,6 +482,7 @@ float **get_view_transform(t_point from_v, t_vector to_v, t_vector up_v)
     t_vector left_v;
     t_vector up_n;
     float **res;
+    float **traslate_mx;
 
     forward_v = vector_normilze(to_v);
     up_n = vector_normilze(up_v);
@@ -472,19 +498,26 @@ float **get_view_transform(t_point from_v, t_vector to_v, t_vector up_v)
     view_transform[2][0] = -forward_v.x;
     view_transform[2][1] = -forward_v.y;
     view_transform[2][2] = -forward_v.z;
-    res = ft_multiply_matrix(view_transform, ft_translate_matrix(ft_new_point(-from_v.x, -from_v.y, -from_v.z), 1), 4, 4);
+    traslate_mx = ft_translate_matrix(ft_new_point(-from_v.x, -from_v.y, -from_v.z), 1);
+    res = ft_multiply_matrix(view_transform, traslate_mx, 4, 4);
+    ft_free_matrix(view_transform,4);
+    ft_free_matrix(traslate_mx, 4);
     return res;
 }
 
 float **create_rotation_matrix_from_vector(t_vector orientation)
 {
+    float **res;
     t_vector normalized = vector_normilze(orientation);
     double theta_y = atan2(normalized.y, normalized.z);
     double theta_x = atan2(-normalized.x, sqrt(normalized.y * normalized.y + normalized.z * normalized.z));
-    
     float **rot_x = rotate_x(theta_x);
     float **rot_y = rotate_y(theta_y);
-    return ft_multiply_matrix(rot_y, rot_x,4,4);
+    res = ft_multiply_matrix(rot_x, rot_y, 4, 4);
+
+    ft_free_matrix(rot_x, 4);
+    ft_free_matrix(rot_y, 4);
+    return res;
 }
 
 void ft_add_cylinder_shape(t_world *world, t_cylinder *cylinder)
@@ -678,6 +711,7 @@ t_ray get_ray_pixel(s_camera *cam, float x, float y, float edge)
 	pixel_world = ft_multiply_matrix_vec(inv, pixel);
     ray.origin = ft_multiply_matrix_vec(inv, ft_new_point(0, 0, 0));
 	ray.direction = vector_normilze(vector_sub(pixel_world, ray.origin));
+    ft_free_matrix(inv , 4);
     return (ray);
 }
 
@@ -685,13 +719,18 @@ t_ray get_ray_pixel(s_camera *cam, float x, float y, float edge)
 
 int is_shadowed(t_world *world, t_point point)
 {
-    t_vector v = vector_sub(world->light->position, point);
-    t_vector direction = vector_normilze(v);
-    float distance = vec_lenght(v);
-
-    t_ray r = create_ray(point, direction);
-    t_intersection *intersections = intersect_world(world, r);
-    if (intersections && intersections->t1 >=  EPSILON && intersections->t1 < distance)
+    t_vector v;
+    t_vector direction;
+    float distance;
+    t_ray r;
+    t_intersection intersections;
+    
+    v = vector_sub(world->light->position, point);
+    direction = vector_normilze(v);
+    r = create_ray(point, direction);
+    distance = vec_lenght(v);
+    intersections = intersect_world(world, r);
+    if (intersections.n_sol > 0 && intersections.t1 >=  EPSILON && intersections.t1 < distance)
     {
         // free_intersection(intersections);
         return 1;
@@ -717,21 +756,21 @@ t_color shading_hit(t_world *world, t_compose *comp)
     return color;
 }
 
+
 t_color get_color_at(t_world *world, t_ray ray)
 {
-    t_intersection *inter;
+    t_intersection inter;
     t_compose *comp;
     t_color res;
 
     inter = intersect_world(world, ray);
-    if (!inter  || inter->n_sol <= 0)
+    if (inter.n_sol <= 0)
         return ft_new_color(0, 0, 0);
     comp = prepare_computations(inter, ray);
     res = shading_hit(world, comp);
+    free(comp);
     return res;
 }
-
-
 
 int render_image(t_scene *scene, t_world *world, s_camera *cam)
 {

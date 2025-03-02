@@ -1,6 +1,5 @@
 #include "./includes/minirt.h"
 
-
 void var_dump_all(t_map *map, t_scene *scene)
 {
     // ---  t_scene ---
@@ -116,7 +115,6 @@ int	ft_close(t_var *vars)
 int	ft_close_window(t_var *data)
 {
     mlx_destroy_window(data->mlx, data->win);
-
 	exit(EXIT_SUCCESS);
 	return (1);
 }

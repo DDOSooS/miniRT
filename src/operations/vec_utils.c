@@ -471,7 +471,7 @@ float determinant(float **m, int n)
             return (0);
         det += sign * m[0][i] * determinant(minor, n - 1);
         sign = -sign;
-        free(minor);
+        ft_free_matrix(minor, n - 1);
     }
     return (det);
 }
@@ -495,7 +495,7 @@ float **inverse_matrix(float **m, int n)
             if (!minor)
                 return (NULL);
             inverse[j-1][i-1] = pow(-1, i + j) * determinant(minor, n - 1);
-            free(minor);
+            ft_free_matrix(minor, n - 1);
         }
     }
     ft_transpose_matrix(&inverse, n, n);
@@ -611,7 +611,9 @@ t_color clamp_color(t_color color)
     return color;
 }
 
-
+/*
+    Specular=LightIntensity×MaterialSpecular×(cos(θ)) 
+*/
 t_color get_lighting_color(t_material *material, p_light *light, t_compose *comp, int shadow)
 {
     t_vector light_dir_normal;
