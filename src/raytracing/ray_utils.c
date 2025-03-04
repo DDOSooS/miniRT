@@ -249,20 +249,26 @@ float get_min_sol(float *arr, int len)
 
 int  is_point_inside_cylinder(t_point point, t_cylinder *cylinder)
 {
-    float **rotation = create_rotation_matrix_from_vector(cylinder->orientation);
-    float **combined = ft_multiply_matrix(cylinder->transform, rotation, 4, 4);
-    float **inverse = inverse_matrix(combined, 4);
+    float **rotation;
+    float **combined;
+    float **inverse;
+    float half_height, radial_dist;
+    t_vector tr_p;
+    
+    rotation  = create_rotation_matrix_from_vector(cylinder->orientation);
+    combined = ft_multiply_matrix(cylinder->transform, rotation, 4, 4);
+    inverse = inverse_matrix(combined, 4);
     if (!inverse)
         inverse = cylinder->transform;
-    t_vector transformed_point = ft_multiply_matrix_vec(inverse, point);
-    float half_height = cylinder->height / 2.0f;
-    if (transformed_point.y > half_height || transformed_point.y < -half_height)
+    tr_p = ft_multiply_matrix_vec(inverse, point);
+    half_height = cylinder->height / 2.0f;
+    if (tr_p.y > half_height || tr_p.y < -half_height)
         return 0;
-    float radial_dist = sqrtf(transformed_point.x * transformed_point.x + 
-                             transformed_point.z * transformed_point.z);
+    radial_dist = sqrtf(tr_p.x * tr_p.x + tr_p.z * tr_p.z);
     ft_free_matrix(rotation, 4);
     ft_free_matrix(combined, 4);
-    ft_free_matrix(inverse, 4);
+    if (inverse != cylinder->transform)
+        ft_free_matrix(inverse, 4);
     return radial_dist < cylinder->raduis;
 }
 
@@ -326,16 +332,21 @@ t_intersection ft_intersect_cylinder(t_ray ray, t_cylinder *cylinder)
     }
     ft_free_matrix(rotation, 4);
     ft_free_matrix(combined, 4);
-    ft_free_matrix(inverse, 4);
+    if (inverse != cylinder->transform)
+        ft_free_matrix(inverse, 4);
     return result;
 }
 
 t_vector normalize_at_cylinder_pos(t_cylinder *cylinder, t_point world_p)
 {
-    float **rotation = create_rotation_matrix_from_vector(cylinder->orientation);
-    float **combined = ft_multiply_matrix(cylinder->transform, rotation, 4, 4);
-    float **inv = inverse_matrix(combined, 4);
-
+    float **rotation;
+    float **combined;
+    float **inv;
+    t_vector world_normal;
+    
+    rotation = create_rotation_matrix_from_vector(cylinder->orientation);
+    combined = ft_multiply_matrix(cylinder->transform, rotation, 4, 4);
+    inv = inverse_matrix(combined, 4);
     if (!inv)
         inv = combined;    
     t_point local_p = ft_multiply_matrix_point(inv, world_p);
@@ -349,11 +360,12 @@ t_vector normalize_at_cylinder_pos(t_cylinder *cylinder, t_point world_p)
         local_normal = (t_vector){local_p.x, 0, local_p.z};
     // Transform normal back to world space !<= 
     ft_transpose_matrix(&inv, 4, 4);
-    t_vector world_normal = ft_multiply_matrix_vec(inv, local_normal);
+    world_normal = ft_multiply_matrix_vec(inv, local_normal);
     vector_normilze(world_normal);
     ft_free_matrix(rotation, 4);
     ft_free_matrix(combined, 4);
-    ft_free_matrix(inv, 4);
+    if (inv != combined)
+        ft_free_matrix(inv, 4);
     return world_normal;
 }
 
@@ -403,7 +415,8 @@ t_vector normilize_at_sphere_pos(t_sphere *sphere, t_point w_p)
     tmp = ft_multiply_matrix_vec(inv_m, obj_n);
     tmp.w = 0;
     vec = vector_normilze(tmp);
-    ft_free_matrix(inv_m, 4);
+    if (inv_m != sphere->transform)
+        ft_free_matrix(inv_m, 4);
     return vec;
 }
 
@@ -415,9 +428,12 @@ t_vector normalize_at_plane_pos(t_plane *plane, t_point w_p)
 {
     t_vector world_normal;
     float **inv_transpose;
+    t_vector normalized;
+    t_vector obj_normal;
+    
     
     // Start with the plane's normal - no need to normalize yet
-    t_vector obj_normal = plane->plane_normal;
+    obj_normal = plane->plane_normal;
         inv_transpose = inverse_matrix(plane->transform, 4);
     if (!inv_transpose)
         inv_transpose = plane->transform;
@@ -425,7 +441,7 @@ t_vector normalize_at_plane_pos(t_plane *plane, t_point w_p)
     // Transform the normal to world space
     world_normal = ft_multiply_matrix_vec(inv_transpose, obj_normal);
     world_normal.w = 0;  
-    t_vector normalized = vector_normilze(world_normal);    
+    normalized = vector_normilze(world_normal);    
     if (inv_transpose != plane->transform)
         ft_free_matrix(inv_transpose, 4);
     return normalized;
