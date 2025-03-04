@@ -168,8 +168,6 @@ int main(int argc, char **argv)
     float width = 700;
     float height = 400;
     init_scene(scene, width, height);
-    // var_dump_all(map,scene);
-
     t_world *world = default_world(scene);
     render_image(scene, world, scene->camera);
     return 0;

@@ -711,7 +711,8 @@ t_ray get_ray_pixel(s_camera *cam, float x, float y, float edge)
 	pixel_world = ft_multiply_matrix_vec(inv, pixel);
     ray.origin = ft_multiply_matrix_vec(inv, ft_new_point(0, 0, 0));
 	ray.direction = vector_normilze(vector_sub(pixel_world, ray.origin));
-    ft_free_matrix(inv , 4);
+    if (inv  != cam->transform)
+        ft_free_matrix(inv , 4);
     return (ray);
 }
 
