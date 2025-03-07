@@ -58,30 +58,35 @@ float calculate_discriment(t_ray ray, t_sphere *sphere)
 
 
 
-t_intersection ft_intersect_sphere(t_ray ray, t_sphere *sphere)
-{
+t_intersection ft_intersect_sphere(t_ray ray, t_sphere *sphere) {
     t_intersection result;
-    float  a,b,discriminant;
-    int t1, t2;
-    t_vector sphere_to_ray;;
+    float a, b, discriminant;
+    float t1, t2; 
+    t_vector sphere_to_ray;
+    float closest_t;
 
     sphere_to_ray = vector_sub(ray.origin, sphere->sphere_coordinates);
     a = vector_dot(ray.direction, ray.direction);
     b = 2 * vector_dot(ray.direction, sphere_to_ray);
     discriminant = calculate_discriment(ray, sphere);
     result.n_sol = 0;
-    if (discriminant < 0)
-        result.t1 = -1;
-    else
+    result.t1 = -1;
+    if (discriminant >= 0)
     {
         t1 = (-b - sqrtf(discriminant)) / (2 * a);
         t2 = (-b + sqrtf(discriminant)) / (2 * a);
-        if (t1 > 0 && t2 > 0 && t1 > t2)
-            t1 = t2;
-        result.t1 = t1;
-        result.n_sol = 2;
-        result.object = sphere;
-        result.type = SHAPE_SPHERE;
+        closest_t = -1;
+        if (t1 > EPSILON) 
+            closest_t = t1;        
+        if (t2 > EPSILON && (closest_t < 0 || t2 < closest_t))
+            closest_t = t2;
+        if (closest_t > 0)
+        {
+            result.t1 = closest_t;
+            result.n_sol = 2;
+            result.object = sphere;
+            result.type = SHAPE_SPHERE;
+        }
     }
     return result;
 }
@@ -782,7 +787,10 @@ t_color get_color_at(t_world *world, t_ray ray)
 
     inter = intersect_world(world, ray);
     if (inter.n_sol <= 0)
+    {
+        printf("no intersection\n");
         return ft_new_color(0, 0, 0);
+    }
     comp = prepare_computations(inter, ray);
     res = shading_hit(world, comp);
     free(comp);
