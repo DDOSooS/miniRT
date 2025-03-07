@@ -27,6 +27,7 @@
 // # define    WIN_HEIGHT  720
 # define    EPSILON     1e-4f
 # define    PI          3.14159265359
+# define    ESC_KEY     65307
 
 typedef struct    s_vector
 {

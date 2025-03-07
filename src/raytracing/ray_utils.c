@@ -799,6 +799,15 @@ t_color get_color_at(t_world *world, t_ray ray)
     return res;
 }
 
+int key_hook(int keycode, t_var *data)
+{
+    if (keycode == ESC_KEY) {
+        ft_close_window(data);
+        exit(0);
+    }
+    return (0);
+}
+
 int render_image(t_scene *scene, t_world *world, s_camera *cam)
 {
     float x, y;
@@ -823,6 +832,7 @@ int render_image(t_scene *scene, t_world *world, s_camera *cam)
     mlx_put_image_to_window(scene->data->mlx, scene->data->win,
                             scene->data->img.img_ptr, 0, 0);
     mlx_hook(scene->data->win, 17, 0, &ft_close_window, scene->data);
+    mlx_key_hook(scene->data->win, &key_hook, scene->data);
     mlx_loop(scene->data->mlx);
     return 0;
 }

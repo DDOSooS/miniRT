@@ -551,8 +551,16 @@ map_line *ft_gen_scen_map(char *file_name)
     while (line)
     {
         if (line && !is_empty_line(line))
+        {
+            if (line && line[0] == '#')
+            {
+                free(line);
+                line = get_next_line(fd);
+                continue;
+            }
             if (!ft_add_line(&map, line))
                 return (free(line), close(fd),NULL);
+        }
         free(line);
         line = get_next_line(fd);
     }
