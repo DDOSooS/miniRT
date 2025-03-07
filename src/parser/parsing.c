@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 20:24:10 by aghergho          #+#    #+#             */
-/*   Updated: 2025/03/02 12:24:34 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/03/04 16:00:19 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -614,8 +614,8 @@ int ft_add_camera(t_scene **scene, char **components)
     if (!camera)
         return 0;
     camera->fov  = fov;
-    camera->h_size = 400;
-    camera->w_size = 700;
+    camera->w_size = 1500;
+    camera->h_size = 700;
     camera->direction = dir;
     camera->origin = position;
     ft_set_camera(&camera);

@@ -605,9 +605,9 @@ float clamp(float value, float min, float max)
 
 t_color clamp_color(t_color color)
 {
-    color.r = clamp(color.r, 0.0f, 1.0f);
-    color.g = clamp(color.g, 0.0f, 1.0f);
-    color.b = clamp(color.b, 0.0f, 1.0f);
+    color.r = clamp(color.r, 0.0f, 1.00000f);
+    color.g = clamp(color.g, 0.0f, 1.00000f);
+    color.b = clamp(color.b, 0.0f, 1.00000f);
     return color;
 }
 
@@ -623,13 +623,17 @@ t_color get_lighting_color(t_material *material, p_light *light, t_compose *comp
     eff_color = ft_multiply_color(material->color, light->intensity);
     ambient = clamp_color(ft_multiply_color_scalar(eff_color, material->ambient));  
     if (shadow)
+    {
+        printf("IS SHADOWED 1\n");
         return ambient;
+    }
     light_dir_normal = vector_normilze(vector_sub(light->position, comp->point));
     light_dot_normal = vector_dot(light_dir_normal, comp->normv);
-    if (light_dot_normal < EPSILON)
+    if (light_dot_normal < EPSILON && !comp->inside)
         return ambient;
     else
     {
+        printf("yes\n");
         diffuse = ft_multiply_color_scalar(eff_color, material->diffuse * light_dot_normal);
         reflect_dot_camera = vector_dot(reflect_vector(negate_vector(light_dir_normal),
                                         comp->normv), comp->camv);
@@ -640,6 +644,7 @@ t_color get_lighting_color(t_material *material, p_light *light, t_compose *comp
                         material->specular * powf(reflect_dot_camera, material->shininess));
     }
     t_color tmp = ft_add_color(specular, diffuse);
+    printf("yes");
     return (clamp_color(ft_add_color(tmp, ambient)));
 }
 

@@ -165,8 +165,8 @@ int main(int argc, char **argv)
     if (!map->lines || !ft_check_map_components(&map))
         return (free(map), ft_putstr_fd("map is empty\n", 2), 1);
     scene = ft_generate_scene(map->lines);
-    float width = 700;
-    float height = 400;
+    float width = 1500;
+    float height = 700;
     init_scene(scene, width, height);
     t_world *world = default_world(scene);
     render_image(scene, world, scene->camera);
