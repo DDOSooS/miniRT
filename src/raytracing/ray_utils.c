@@ -78,11 +78,6 @@ t_intersection ft_intersect_sphere(t_ray ray, t_sphere *sphere)
         t2 = (-b + sqrtf(discriminant)) / (2 * a);
         if (t1 > 0 && t2 > 0 && t1 > t2)
             t1 = t2;
-        else if ((t1 < 0 && t2 > 0) || (t1 > 0 && t2 < 0))
-        {
-            if (t1 < 0)
-                t1 =  t2;
-        }
         result.t1 = t1;
         result.n_sol = 2;
         result.object = sphere;
@@ -482,7 +477,6 @@ t_compose *prepare_computations(t_intersection inter, t_ray ray)
     comp->inside = 0;
     if (vector_dot(comp->normv, comp->camv) < 0.0)
     {
-        printf("is inside\n");
         comp->inside = 1;
         comp->normv = negate_vector(comp->normv);
     }
@@ -733,7 +727,7 @@ t_ray get_ray_pixel(s_camera *cam, float x, float y, float edge)
 	pixel_world = ft_multiply_matrix_vec(inv, pixel);
     ray.origin = ft_multiply_matrix_vec(inv, ft_new_point(0, 0, 0));
 	ray.direction = vector_normilze(vector_sub(pixel_world, ray.origin));
-    if (inv != cam->transform)
+    if (inv  != cam->transform)
         ft_free_matrix(inv , 4);
     return (ray);
 }
@@ -788,13 +782,9 @@ t_color get_color_at(t_world *world, t_ray ray)
 
     inter = intersect_world(world, ray);
     if (inter.n_sol <= 0)
-    {
-        printf("no intersection\n");
         return ft_new_color(0, 0, 0);
-    }
     comp = prepare_computations(inter, ray);
     res = shading_hit(world, comp);
-    // printf("color %f %f %f \n", res.r, res.g, res.b);
     free(comp);
     return res;
 }
@@ -828,7 +818,7 @@ int render_image(t_scene *scene, t_world *world, s_camera *cam)
             my_pixel_put(&scene->data->img, x, y, pixel_color);
         }
     }
-    printf("end of render\n");
+    printf("end scene\n");
     mlx_put_image_to_window(scene->data->mlx, scene->data->win,
                             scene->data->img.img_ptr, 0, 0);
     mlx_hook(scene->data->win, 17, 0, &ft_close_window, scene->data);
