@@ -778,7 +778,69 @@ void get_spherical_coordinates(t_vector hit_point, t_sphere *sphere, float *u, f
 
     *u = (theta + M_PI) / (2 * M_PI);
     *v = phi / M_PI;
+    printf("UV coordinates: u = %f, v = %f\n", *u, *v);
 }
+t_color int_to_color(int color)
+{
+    t_color result;
+    result.r = (color >> 16) & 0xFF; // Extract red component
+    result.g = (color >> 8) & 0xFF;  // Extract green component
+    result.b = color & 0xFF;         // Extract blue component
+    return result;
+}
+
+t_color sample_texture(t_texture *texture, float u, float v)
+{
+    u = fmod(u, 1.0f);
+    v = fmod(v, 1.0f);
+    if (u < 0) u += 1.0f;
+    if (v < 0) v += 1.0f;
+    int x = (int)(u * texture->width);
+    int y = (int)(v * texture->height);
+    x = x % texture->width;
+    y = y % texture->height;
+    int pixel_index = y * texture->size_line + x * (texture->bpp / 8);
+    int color = *(int *)(texture->img_data + pixel_index);
+
+    t_color result = int_to_color(color);
+    printf("Sampled color: r = %f, g = %f, b = %f\n", result.r, result.g, result.b);
+    return result;
+}
+t_color get_textured_lighting_color(t_color texture_color, t_material *material, p_light *light, t_compose *comp, int shadow)
+{
+    t_vector light_dir_normal;
+    t_color eff_color, ambient, diffuse, specular;
+    float light_dot_normal, reflect_dot_camera;
+
+    printf("Texture color: r = %f, g = %f, b = %f\n", texture_color.r, texture_color.g, texture_color.b);
+    eff_color = ft_multiply_color(texture_color, light->intensity);
+    ambient = clamp_color(ft_multiply_color_scalar(eff_color, material->ambient));  
+    printf("Ambient color: r = %f, g = %f, b = %f\n", ambient.r, ambient.g, ambient.b);
+    if (shadow)
+        return ambient;
+    light_dir_normal = vector_normilze(vector_sub(light->position, comp->point));
+    light_dot_normal = vector_dot(light_dir_normal, comp->normv);
+    if (light_dot_normal < EPSILON)
+        return ambient;
+    else
+    {
+        diffuse = ft_multiply_color_scalar(eff_color, material->diffuse * light_dot_normal);
+        reflect_dot_camera = vector_dot(reflect_vector(negate_vector(light_dir_normal),
+                                        comp->normv), comp->camv);
+        if (reflect_dot_camera <= EPSILON)
+            specular = ft_new_color(0, 0, 0); 
+        else
+            specular = ft_multiply_color_scalar(light->intensity,
+                        material->specular * powf(reflect_dot_camera, material->shininess));
+    }
+    printf("Diffuse color: r = %f, g = %f, b = %f\n", diffuse.r, diffuse.g, diffuse.b);
+    printf("Specular color: r = %f, g = %f, b = %f\n", specular.r, specular.g, specular.b);
+    t_color tmp = ft_add_color(specular, diffuse);
+    t_color final_color = clamp_color(ft_add_color(tmp, ambient));
+    printf("Final color: r = %f, g = %f, b = %f\n", final_color.r, final_color.g, final_color.b);
+    return final_color;
+}
+
 
 t_color shading_hit(t_world *world, t_compose *comp)
 {
@@ -796,6 +858,18 @@ t_color shading_hit(t_world *world, t_compose *comp)
             color = get_checkered_color((t_sphere *)comp->obj, u, v);
             material->color = color;
         }
+        if (((t_sphere *)comp->obj)->has_texture)
+        {
+            float u, v;
+            get_spherical_coordinates(comp->over_point, (t_sphere *)comp->obj, &u, &v);
+            color = sample_texture(((t_sphere *)comp->obj)->texture, u, v);
+            color.r /= 255.0f;
+            color.g /= 255.0f;
+            color.b /= 255.0f;
+
+            shadowed = is_shadowed(world, comp->over_point);
+            return get_textured_lighting_color(color, material, world->light, comp, shadowed);
+        }
     }
     else if (comp->obj_type == SHAPE_PLANE)
         material = ((t_plane *)comp->obj)->material;
@@ -803,7 +877,7 @@ t_color shading_hit(t_world *world, t_compose *comp)
         material = ((t_cylinder *)comp->obj)->material;
     shadowed = is_shadowed(world, comp->over_point);
     color = get_lighting_color(material, world->light, comp, shadowed);
-
+    printf("color: r = %f, g = %f, b = %f\n", color.r, color.g, color.b);
     return color;
 }
 
@@ -844,10 +918,12 @@ int render_image(t_scene *scene, t_world *world, s_camera *cam)
         { 
             ray = get_ray_pixel(cam, x, y, 0.5);
             color = get_color_at(world, ray);
+            printf("Final color: r = %f, g = %f, b = %f\n", color.r, color.g, color.b);
             pixel_color = (255 << 24) |
                 (int)clamp((float)(255.999 * color.r), 0, 255) << 16 |
                 (int)clamp((float)(255.999 * color.g), 0, 255) << 8 |
                 (int)clamp((float)(255.999 * color.b), 0, 255);
+            printf("puting this color: %d\n", pixel_color);
             my_pixel_put(&scene->data->img, x, y, pixel_color);
         }
     }
