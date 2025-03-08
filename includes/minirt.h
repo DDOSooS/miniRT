@@ -133,8 +133,10 @@ typedef struct sphere
     float          sphere_diameter;
     t_vector        sphere_coordinates;
     t_color         sphere_color;
+    t_color        checkered_color;
     float           **transform;
     t_material       *material;
+    int has_checkered;
     struct sphere   *next;
 }   t_sphere;
 
