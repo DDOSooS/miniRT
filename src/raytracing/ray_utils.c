@@ -761,23 +761,56 @@ int is_shadowed(t_world *world, t_point point)
     return 0;
 }
 
+t_color get_checkered_color(t_sphere *sphere, float u, float v)
+{
+    int scale = 20;
+    int u_scaled = (int)(u * scale);
+    int v_scaled = (int)(v * scale);
+
+    if ((u_scaled + v_scaled) % 2 == 0)
+        return sphere->sphere_color;
+    else
+        return sphere->checkered_color;
+}
+
+void get_spherical_coordinates(t_vector hit_point, t_sphere *sphere, float *u, float *v)
+{
+    t_vector local_point = vector_sub(hit_point, sphere->sphere_coordinates);
+    local_point = vector_normilze(local_point);
+
+    float theta = atan2(local_point.z, local_point.x);
+    float phi = acos(local_point.y);
+
+    *u = (theta + M_PI) / (2 * M_PI);
+    *v = phi / M_PI;
+}
+
 t_color shading_hit(t_world *world, t_compose *comp)
 {
     t_color color;
     t_material *material;
-    int shadowed ;
+    int shadowed;
 
     if (comp->obj_type == SHAPE_SPHERE)
+    {
         material = ((t_sphere *)comp->obj)->material;
+        if (((t_sphere *)comp->obj)->has_checkered)
+        {
+            float u, v;
+            get_spherical_coordinates(comp->over_point, (t_sphere *)comp->obj, &u, &v);
+            color = get_checkered_color((t_sphere *)comp->obj, u, v);
+            material->color = color;
+        }
+    }
     else if (comp->obj_type == SHAPE_PLANE)
         material = ((t_plane *)comp->obj)->material;
     else if (comp->obj_type == SHAPE_CYLINDER)
         material = ((t_cylinder *)comp->obj)->material;
     shadowed = is_shadowed(world, comp->over_point);
-    color = get_lighting_color(material, world->light,comp, shadowed);
+    color = get_lighting_color(material, world->light, comp, shadowed);
+
     return color;
 }
-
 
 t_color get_color_at(t_world *world, t_ray ray)
 {
@@ -795,6 +828,15 @@ t_color get_color_at(t_world *world, t_ray ray)
     res = shading_hit(world, comp);
     free(comp);
     return res;
+}
+
+int key_hook(int keycode, t_var *data)
+{
+    if (keycode == ESC_KEY) {
+        ft_close_window(data);
+        exit(0);
+    }
+    return (0);
 }
 
 int render_image(t_scene *scene, t_world *world, s_camera *cam)
@@ -821,6 +863,7 @@ int render_image(t_scene *scene, t_world *world, s_camera *cam)
     mlx_put_image_to_window(scene->data->mlx, scene->data->win,
                             scene->data->img.img_ptr, 0, 0);
     mlx_hook(scene->data->win, 17, 0, &ft_close_window, scene->data);
+    mlx_key_hook(scene->data->win, &key_hook, scene->data);
     mlx_loop(scene->data->mlx);
     return 0;
 }

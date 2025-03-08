@@ -27,6 +27,7 @@
 // # define    WIN_HEIGHT  720
 # define    EPSILON     1e-4f
 # define    PI          3.14159265359
+# define    ESC_KEY     65307
 
 typedef struct    s_vector
 {
@@ -132,8 +133,10 @@ typedef struct sphere
     float          sphere_diameter;
     t_vector        sphere_coordinates;
     t_color         sphere_color;
+    t_color        checkered_color;
     float           **transform;
     t_material       *material;
+    int has_checkered;
     struct sphere   *next;
 }   t_sphere;
 

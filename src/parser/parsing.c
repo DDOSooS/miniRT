@@ -357,7 +357,7 @@ int ft_check_light_component(char **components, int *counter)
 
 int ft_check_sphere_component(char **components)
 {
-    if (ft_count_components(components) != 4)
+    if (ft_count_components(components) != 4 && ft_count_components(components) != 6)
         return 0;
     if (!ft_check_elements(components[1]))
         return 0;
@@ -365,7 +365,13 @@ int ft_check_sphere_component(char **components)
         return 0;
     if (!ft_check_colors(components[3]))
         return 0;
-    // printf("sphere components are valid\n");
+    if (ft_count_components(components) == 6)
+    {
+        if (ft_strcmp(components[4], "ch") != 0)
+            return 0;
+        if (!ft_check_colors(components[5]))
+            return 0;
+    }
     return 1;
 }
 
@@ -551,8 +557,16 @@ map_line *ft_gen_scen_map(char *file_name)
     while (line)
     {
         if (line && !is_empty_line(line))
+        {
+            if (line && line[0] == '#')
+            {
+                free(line);
+                line = get_next_line(fd);
+                continue;
+            }
             if (!ft_add_line(&map, line))
                 return (free(line), close(fd),NULL);
+        }
         free(line);
         line = get_next_line(fd);
     }
@@ -651,6 +665,13 @@ t_sphere *ft_new_sphere(char **components)
     sphere->material = default_material();
     ft_gen_colors(&sphere->material->color, components[3]);
     sphere->next = NULL;
+    if (ft_count_components(components) == 6)
+    {
+        sphere->has_checkered = 1;
+        ft_gen_colors(&sphere->checkered_color, components[5]);
+    }
+    else
+        sphere->has_checkered = 0;
     return sphere;
 }
 
