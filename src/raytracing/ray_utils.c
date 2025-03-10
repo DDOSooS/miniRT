@@ -22,7 +22,7 @@ t_point position(t_ray ray, float distance)
 
 t_intersection ray_hit(t_intersection *inters, int count)
 {
-    float min_t = INT_MAX;
+    float min_t = (float)INT_MAX;
     t_intersection result;
     
     t_intersection *tmp = &inters[0];
@@ -978,7 +978,7 @@ t_color get_color_at(t_world *world, t_ray ray)
     inter = intersect_world(world, ray);
     if (inter.n_sol <= 0)
     {
-        printf("no intersection\n");
+        // printf("no intersection\n");
         return ft_new_color(0, 0, 0);
     }
     comp = prepare_computations(inter, ray);
@@ -987,9 +987,10 @@ t_color get_color_at(t_world *world, t_ray ray)
     return res;
 }
 
-int key_hook(int keycode, t_var *data)
+int key_hook(int keycode, t_scene *data)
 {
-    if (keycode == ESC_KEY) {
+    if (keycode == ESC_KEY)
+    {
         ft_close_window(data);
         exit(0);
     }
@@ -1021,8 +1022,8 @@ int render_image(t_scene *scene, t_world *world, s_camera *cam)
     printf("end scene\n");
     mlx_put_image_to_window(scene->data->mlx, scene->data->win,
                             scene->data->img.img_ptr, 0, 0);
-    mlx_hook(scene->data->win, 17, 0, &ft_close_window, scene->data);
-    mlx_key_hook(scene->data->win, &key_hook, scene->data);
+    mlx_hook(scene->data->win, 17, 0, &ft_close_window, scene);
+    mlx_key_hook(scene->data->win, &key_hook, scene);
     mlx_loop(scene->data->mlx);
     return 0;
 }

@@ -97,7 +97,6 @@ void    ft_free_map(map_line **map_lines)
         free(*map_lines);
         (*map_lines) = tmp;
     }
-    free(map_lines);
     map_lines = NULL;    
 }
 
@@ -479,17 +478,11 @@ int ft_check_map_components(t_map **map)
 {
     map_line    *tmp;
     int         identifier_id;
-
     int i;
+
     i = 0;
     tmp = (*map)->lines;
-    int count = 0;
     map_line *line =(*map)->lines;
-    while (line)
-    {
-        count++;
-        line = line->next;
-    }
     while (tmp)
     {        
         identifier_id = is_identifier(tmp->line_component[0]);
@@ -497,12 +490,12 @@ int ft_check_map_components(t_map **map)
         {
             printf("line %d: \n", i);
             printf("identifier is not a valid identifier (%s)\n", tmp->line_component[0]);
-            return (0);
+            return (ft_free_map(&(*map)->lines),0);
         }
         if (!ft_check_components(identifier_id, tmp->line_component, ((*map)->scen_elements)))
         {
             printf("Error at map checking line component \n");
-            return (0);
+            return (ft_free_map(&(*map)->lines),0);
         }
         tmp = tmp->next;
         i++;
@@ -511,7 +504,7 @@ int ft_check_map_components(t_map **map)
         || (*map)->scen_elements[2] > 1)
     {
         printf("duplicated of elements that must be declared just Once\n");
-        return 0;
+        return (ft_free_map(&(*map)->lines),0);
     }
     return (1);
 }
@@ -603,6 +596,7 @@ map_line *ft_gen_scen_map(char *file_name)
         free(line);
         line = get_next_line(fd);
     }
+    free(line);
     close(fd);
     return (map);
 }
@@ -661,8 +655,8 @@ int ft_add_camera(t_scene **scene, char **components)
     if (!camera)
         return 0;
     camera->fov  = fov;
-    camera->h_size = 400;
-    camera->w_size = 900;
+    camera->h_size = SCREEN_HEIGHT;
+    camera->w_size = SCREEN_WIDTH;
     camera->direction = dir;
     camera->origin = position;
     ft_set_camera(&camera);

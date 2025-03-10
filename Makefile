@@ -10,7 +10,8 @@ name = scen
 src = main.c ./src/parser/parsing.c \
 	./includes/get_next_line/get_next_line.c \
 	./includes/get_next_line/get_next_line_utils.c \
-	./src/operations/vec_utils.c ./src/raytracing/ray_utils.c
+	./src/operations/vec_utils.c ./src/raytracing/ray_utils.c \
+	./src/freieer.c
 
 obj = $(src:.c=.o)
 
