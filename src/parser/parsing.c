@@ -355,9 +355,21 @@ int ft_check_light_component(char **components, int *counter)
     return (1);
 }
 
+int check_xpm_file(char *file)
+{
+    char *extention;
+
+    extention = ft_strrchr(file, '.');
+    if (extention && ft_strcmp(extention, ".xpm") == 0)
+        return 1;
+    printf("invalid xpm file\n");
+    return 0;
+}
+
 int ft_check_sphere_component(char **components)
 {
-    if (ft_count_components(components) != 4 && ft_count_components(components) != 6)
+    int cout = ft_count_components(components);
+    if (cout != 4 && cout != 6 && cout != 5)
         return 0;
     if (!ft_check_elements(components[1]))
         return 0;
@@ -365,7 +377,9 @@ int ft_check_sphere_component(char **components)
         return 0;
     if (!ft_check_colors(components[3]))
         return 0;
-    if (ft_count_components(components) == 6)
+    if (cout == 5)
+        return check_xpm_file(components[4]);
+    if (cout == 6)
     {
         if (ft_strcmp(components[4], "ch") != 0)
             return 0;
@@ -405,6 +419,21 @@ int ft_check_cylinder_component(char **components)
     return 1;
 }
 
+int ft_check_cone_component(char **components) {
+    if (ft_count_components(components) != 6)
+        return 0;
+    if (!ft_check_elements(components[1]))
+        return 0;
+    if (!ft_check_elements(components[2]))
+        return 0;
+    if (!ft_check_non_negative(components[3]) || !ft_check_non_negative(components[4]))
+        return 0;
+    if (!ft_check_colors(components[5]))
+        return 0;
+    // printf("cone components are valid\n");
+    return 1;
+}
+
 int ft_check_components(int identifier_id, char **components, int *counter)
 {
     if (identifier_id == 1)
@@ -419,6 +448,8 @@ int ft_check_components(int identifier_id, char **components, int *counter)
         return (ft_check_plane_component(components));
     if (identifier_id == 6)
         return (ft_check_cylinder_component(components));
+    if (identifier_id == 7)
+        return (ft_check_cone_component(components));
     return 1;
 }
                                                                               
@@ -438,6 +469,8 @@ int is_identifier(char *identifier)
         return 5;
     if (identifier && !ft_strcmp(identifier, "cy"))
         return 6;
+    if (identifier && !ft_strcmp(identifier, "co"))
+        return 7;
     return 0;
 }
 
@@ -629,7 +662,7 @@ int ft_add_camera(t_scene **scene, char **components)
         return 0;
     camera->fov  = fov;
     camera->h_size = 400;
-    camera->w_size = 700;
+    camera->w_size = 900;
     camera->direction = dir;
     camera->origin = position;
     ft_set_camera(&camera);
@@ -650,8 +683,63 @@ int ft_add_light(t_scene **scene, char **components)
     (*scene)->light = light;
     return 1;
 }
-  
-t_sphere *ft_new_sphere(char **components)
+
+// t_color int_to_color(int color)
+// {
+//     t_color result;
+//     result.r = (color >> 16) & 0xFF;
+//     result.g = (color >> 8) & 0xFF;
+//     result.b = color & 0xFF;
+//     return result;
+// }
+void get_texture(t_sphere *sphere, char *texture_name, t_scene **scene)
+{
+    int fd = open(texture_name, O_RDONLY);
+    if (fd < 0)
+    {
+        perror("Error: Failed to open texture file");
+        return;
+    }
+    close(fd);
+
+    sphere->texture = malloc(sizeof(t_texture));
+    if (!sphere->texture)
+    {
+        perror("Error: Failed to allocate memory for texture");
+        return;
+    }
+
+    sphere->texture->img_ptr = mlx_xpm_file_to_image(
+        (*scene)->data->mlx,
+        texture_name,
+        &sphere->texture->width,
+        &sphere->texture->height
+    );
+    if (!sphere->texture->img_ptr)
+    {
+        perror("Error: Failed to load XPM image");
+        free(sphere->texture);
+        sphere->texture = NULL;
+        return;
+    }
+    sphere->texture->img_data = mlx_get_data_addr(
+        sphere->texture->img_ptr,
+        &sphere->texture->bpp,
+        &sphere->texture->size_line,
+        &sphere->texture->endian
+    );
+    printf("print infos: %d %d %d %d\n", sphere->texture->bpp, sphere->texture->size_line, sphere->texture->width, sphere->texture->height);
+    if (!sphere->texture->img_data)
+    {
+        perror("Error: Failed to get image data");
+        mlx_destroy_image(NULL, sphere->texture->img_ptr);
+        free(sphere->texture);
+        sphere->texture = NULL;
+        return;
+    }
+}
+
+t_sphere *ft_new_sphere(char **components, t_scene **scene)
 {
     t_sphere *sphere;
     
@@ -668,10 +756,21 @@ t_sphere *ft_new_sphere(char **components)
     if (ft_count_components(components) == 6)
     {
         sphere->has_checkered = 1;
+        sphere->has_texture = 0;
         ft_gen_colors(&sphere->checkered_color, components[5]);
     }
-    else
+    else if (ft_count_components(components) == 5)
+    {
+        printf("texture name %s\n", components[4]);
         sphere->has_checkered = 0;
+        sphere->has_texture = 1;
+        get_texture(sphere, components[4], scene);
+    }
+    else
+    {
+        sphere->has_texture = 0;
+        sphere->has_checkered = 0;
+    }
     return sphere;
 }
 
@@ -680,7 +779,7 @@ int ft_add_sphere(t_scene **scene, char **components)
     t_sphere *sphere;
     t_sphere *tmp;
     
-    sphere = ft_new_sphere(components);
+    sphere = ft_new_sphere(components, scene);
     if (!sphere)
             return 0;
     tmp = (*scene)->sphere;
@@ -770,6 +869,47 @@ int ft_add_cylinder(t_scene **scene, char **components)
     return 1;
 }
 
+t_cone *ft_new_cone(char **components)
+{
+    t_cone *cone = malloc(sizeof(t_cone));
+    if (!cone)
+        return NULL;
+
+    ft_gen_elements(&cone->apex, components[1]);
+    ft_gen_elements(&cone->axis, components[2]);
+    cone->height = ft_atod(components[3]);
+    cone->radius = ft_atod(components[4]);
+    ft_gen_colors(&cone->color, components[5]);
+    cone->material = default_material();
+    cone->transform = identity_matrix(4);
+    cone->transform[0][3] = cone->apex.x;
+    cone->transform[1][3] = cone->apex.y;
+    cone->transform[2][3] = cone->apex.z;
+    cone->next = NULL;
+    cone->material->color = cone->color;
+
+    return cone;
+}
+
+int ft_add_cone(t_scene **scene, char **components)
+{
+    t_cone *cone = ft_new_cone(components);
+    if (!cone)
+        return 0;
+
+    t_cone *tmp = (*scene)->cone;
+    if (!tmp)
+        (*scene)->cone = cone;
+    else
+    {
+        while (tmp->next)
+            tmp = tmp->next;
+        tmp->next = cone;
+    }
+
+    return 1;
+}
+
 int ft_add_component(t_scene **scene, int identifier, char **components)
 {
     if (identifier == 1)
@@ -784,30 +924,21 @@ int ft_add_component(t_scene **scene, int identifier, char **components)
         return (ft_add_plane(scene, components));
     if (identifier == 6)
         return (ft_add_cylinder(scene, components));
+    if (identifier == 7)
+        return (ft_add_cone(scene, components));
     return (1);
 }
  
-t_scene *ft_generate_scene(map_line *compoenent)
+int ft_generate_scene(map_line *compoenent, t_scene **scene)
 {
-    t_scene *new;
     int     identifier_id;
 
-    new = malloc(sizeof(t_scene));
-    if (!new)
-        return (NULL);
-    new->ambient = NULL;
-    new->camera = NULL;
-    new->light = NULL;
-    new->sphere = NULL;
-    new->plane = NULL;
-    new->cylinder = NULL;
-    new->data = NULL;
     while (compoenent)
     {
         identifier_id = is_identifier(compoenent->line_component[0]);
         if (identifier_id)
-            ft_add_component(&new, identifier_id, compoenent->line_component);
+            ft_add_component(scene, identifier_id, compoenent->line_component);
         compoenent = compoenent->next;
     }
-    return (new);
+    return 1;
 }

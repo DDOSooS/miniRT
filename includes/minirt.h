@@ -25,6 +25,10 @@
 
 // # define    WIN_WIDTH   1280
 // # define    WIN_HEIGHT  720
+
+#define SCREEN_WIDTH 1800.f
+#define SCREEN_HEIGHT 1200.f
+
 # define    EPSILON     1e-4f
 # define    PI          3.14159265359
 # define    ESC_KEY     65307
@@ -48,7 +52,8 @@ typedef enum e_shape_type
 {
     SHAPE_SPHERE,
     SHAPE_PLANE,
-    SHAPE_CYLINDER
+    SHAPE_CYLINDER, 
+    SHAPE_CONE
 } t_shape_type;
 
 
@@ -128,6 +133,18 @@ typedef struct map
     int scen_elements[3];
 } t_map;
 
+typedef struct s_texture
+{
+	t_color *colors;
+	char *img_data;
+	void *img_ptr;
+	int width;
+	int height;
+	int size_line;
+	int bpp;
+	int endian;
+}	t_texture;
+
 typedef struct sphere
 {
     float          sphere_diameter;
@@ -136,6 +153,8 @@ typedef struct sphere
     t_color        checkered_color;
     float           **transform;
     t_material       *material;
+    t_texture       *texture;
+    int has_texture;
     int has_checkered;
     struct sphere   *next;
 }   t_sphere;
@@ -162,6 +181,18 @@ typedef struct cylinder
     t_material       *material;
     struct cylinder *next;
 } t_cylinder;
+
+typedef struct cone
+{
+    t_vector apex;          // Apex of the cone (tip)
+    t_vector axis;          // Axis of the cone (direction)
+    float height;           // Height of the cone
+    float radius;           // Base radius of the cone
+    t_color color;          // Color of the cone
+    t_material *material;   // Material properties
+    float **transform;      // Transformation matrix
+    struct cone *next;      // Pointer to the next cone in the scene
+} t_cone;
 
 typedef struct camera
 {
@@ -209,6 +240,7 @@ typedef struct s_scene
     t_plane     *plane;
     t_cylinder  *cylinder;
     t_var       *data;
+    t_cone    *cone;
 }   t_scene;
 
 typedef struct s_compose
@@ -232,6 +264,7 @@ typedef struct s_shape
         t_sphere *sphere;
         t_plane *plane;
         t_cylinder *cylinder;
+        t_cone *cone;
     } objects;
     struct s_shape *next;
 } t_shape;
@@ -248,7 +281,8 @@ int	ft_close_window(t_var *data);
 void my_pixel_put(t_img *img, int x, int y, int color);
 map_line    *ft_gen_scen_map(char *file_name);
 int render_image(t_scene *scene ,t_world *t_world, s_camera *cam);
-t_scene     *ft_generate_scene(map_line *compoenent);
+// t_scene     *ft_generate_scene(map_line *compoenent, t_scene *scene);
+int ft_generate_scene(map_line *compoenent, t_scene **scene);
 void        var_dump_lines(map_line *map);
 int         ft_check_map_components(t_map **map);
 float       ft_vec_lenght(t_vector*v);
@@ -267,7 +301,8 @@ t_ray       create_ray(t_vector origin, t_vector direction);
 int         gen_ray(t_scene *scene,float x, float y, t_ray cam_r);
 void ft_set_camera(s_camera **camera);
 t_vector    vector_copy(t_vector src);
-t_sphere *ft_new_sphere(char **components);
+// t_sphere *ft_new_sphere(char **components);
+t_sphere *ft_new_sphere(char **components, t_scene **scene);
 
 /* colors operations*/
 t_color ft_new_color(float r, float g, float b);

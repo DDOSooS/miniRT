@@ -136,7 +136,6 @@ void init_scene(t_scene *scene, float width, float height)
 {
     scene->camera->w_size = width;
     scene->camera->h_size = height; 
-    scene->data = malloc(sizeof(t_var));
     scene->data->mlx = mlx_init();
     scene->data->win = mlx_new_window(scene->data->mlx, 
                                      scene->camera->w_size, 
@@ -149,6 +148,32 @@ void init_scene(t_scene *scene, float width, float height)
                                              &scene->data->img.bits_per_pixel,
                                              &scene->data->img.line_length,
                                              &scene->data->img.endian);
+}
+
+t_scene *allocate_scene(void)
+{
+    t_scene *scene;
+
+    scene = malloc(sizeof(t_scene));
+    if (!scene)
+        return NULL;
+    scene->camera = malloc(sizeof(s_camera));
+    if (!scene->camera)
+        return NULL;
+    scene->ambient = malloc(sizeof(t_ambient));
+    if (!scene->ambient)
+        return NULL;
+    scene->light = malloc(sizeof(t_light));
+    if (!scene->light)
+        return NULL;
+    scene->data = malloc(sizeof(t_var));
+    if (!scene->data)
+        return NULL;
+    scene->sphere = NULL;
+    scene->plane = NULL;
+    scene->cylinder = NULL;
+    scene->cone = NULL;
+    return scene;
 }
 
 int main(int argc, char **argv)
@@ -164,10 +189,12 @@ int main(int argc, char **argv)
     map->lines = ft_gen_scen_map(argv[1]);
     if (!map->lines || !ft_check_map_components(&map))
         return (free(map), ft_putstr_fd("map is empty\n", 2), 1);
-    scene = ft_generate_scene(map->lines);
-    float width = 1500;
-    float height = 700;
+    scene = allocate_scene();
+    float width = 900;
+    float height = 400;
     init_scene(scene, width, height);
+    if (!ft_generate_scene(map->lines, &scene))
+        return (100);
     t_world *world = default_world(scene);
     render_image(scene, world, scene->camera);
     return 0;
