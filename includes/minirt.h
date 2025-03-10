@@ -25,6 +25,10 @@
 
 // # define    WIN_WIDTH   1280
 // # define    WIN_HEIGHT  720
+
+#define SCREEN_WIDTH 1800.f
+#define SCREEN_HEIGHT 1200.f
+
 # define    EPSILON     1e-4f
 # define    PI          3.14159265359
 # define    ESC_KEY     65307
@@ -48,7 +52,8 @@ typedef enum e_shape_type
 {
     SHAPE_SPHERE,
     SHAPE_PLANE,
-    SHAPE_CYLINDER
+    SHAPE_CYLINDER, 
+    SHAPE_CONE
 } t_shape_type;
 
 
@@ -177,6 +182,18 @@ typedef struct cylinder
     struct cylinder *next;
 } t_cylinder;
 
+typedef struct cone
+{
+    t_vector apex;          // Apex of the cone (tip)
+    t_vector axis;          // Axis of the cone (direction)
+    float height;           // Height of the cone
+    float radius;           // Base radius of the cone
+    t_color color;          // Color of the cone
+    t_material *material;   // Material properties
+    float **transform;      // Transformation matrix
+    struct cone *next;      // Pointer to the next cone in the scene
+} t_cone;
+
 typedef struct camera
 {
     int             camera_fov;
@@ -223,6 +240,7 @@ typedef struct s_scene
     t_plane     *plane;
     t_cylinder  *cylinder;
     t_var       *data;
+    t_cone    *cone;
 }   t_scene;
 
 typedef struct s_compose
@@ -246,6 +264,7 @@ typedef struct s_shape
         t_sphere *sphere;
         t_plane *plane;
         t_cylinder *cylinder;
+        t_cone *cone;
     } objects;
     struct s_shape *next;
 } t_shape;

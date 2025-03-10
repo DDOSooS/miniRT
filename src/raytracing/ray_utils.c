@@ -147,6 +147,11 @@ t_shape *ft_new_shape(void *shape_obj, int shape_type)
         new_shape->objects.plane = (t_plane *)shape_obj;
     else if (shape_type == SHAPE_CYLINDER)
         new_shape->objects.cylinder = (t_cylinder *)shape_obj;
+    else if (shape_type == SHAPE_CONE)
+    {
+        printf("cone is being created\n");
+        new_shape->objects.cone = (t_cone *)shape_obj;
+    }
     else
     {
         free(new_shape);
@@ -272,6 +277,45 @@ int  is_point_inside_cylinder(t_point point, t_cylinder *cylinder)
     return radial_dist < cylinder->raduis;
 }
 
+t_intersection ft_intersect_cone(t_ray ray, t_cone *cone)
+{
+    t_intersection inter = {0, 0, NULL, 0};
+    float t1, t2;
+
+    t_vector oc = vector_sub(ray.origin, cone->apex);
+    float k = cone->radius / cone->height;
+    float k2 = k * k;
+
+    float A = ray.direction.x * ray.direction.x + ray.direction.z * ray.direction.z - k2 * ray.direction.y * ray.direction.y;
+    float B = 2 * (ray.direction.x * oc.x + ray.direction.z * oc.z - k2 * ray.direction.y * oc.y);
+    float C = oc.x * oc.x + oc.z * oc.z - k2 * oc.y * oc.y;
+
+    float discriminant = B * B - 4 * A * C;
+
+    if (discriminant < 0)
+        return inter;
+
+    discriminant = sqrt(discriminant);
+    t1 = (-B - discriminant) / (2 * A);
+    t2 = (-B + discriminant) / (2 * A);
+    float y1 = ray.origin.y + t1 * ray.direction.y;
+    float y2 = ray.origin.y + t2 * ray.direction.y;
+
+    if (y1 < 0 || y1 > cone->height)
+        t1 = -1;
+    if (y2 < 0 || y2 > cone->height)
+        t2 = -1;
+    if (t1 >= 0 || t2 >= 0)
+    {
+        inter.n_sol = 2;
+        inter.t1 = t1;
+        inter.object = cone;
+        inter.type = SHAPE_CONE;
+    }
+
+    return inter;
+}
+
 // NORMINETTE URGENT TO DO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 t_intersection ft_intersect_cylinder(t_ray ray, t_cylinder *cylinder)
 {
@@ -337,6 +381,24 @@ t_intersection ft_intersect_cylinder(t_ray ray, t_cylinder *cylinder)
     return result;
 }
 
+t_vector vector_mult_scalar(t_vector v, float scalar)
+{
+    t_vector result;
+    result.x = v.x * scalar;
+    result.y = v.y * scalar;
+    result.z = v.z * scalar;
+    result.w = v.w * scalar;
+    return result;
+}
+
+t_vector normalize_at_cone_pos(t_cone *cone, t_vector point)
+{
+    t_vector apex_to_point = vector_sub(point, cone->apex);
+    float height_component = vector_dot(apex_to_point, cone->axis);
+    t_vector normal = vector_sub(apex_to_point, vector_mult_scalar(cone->axis, height_component));
+    return vector_normilze(normal);
+}
+
 t_vector normalize_at_cylinder_pos(t_cylinder *cylinder, t_point world_p)
 {
     float **rotation;
@@ -391,6 +453,8 @@ t_intersection intersect_world(t_world *world, t_ray ray)
             inter[i] = ft_intersect_plane(ray, current->objects.plane);
         else if (current->type == SHAPE_CYLINDER)
             inter[i] = ft_intersect_cylinder(ray, current->objects.cylinder);  
+        else if (current->type == SHAPE_CONE)
+            inter[i] = ft_intersect_cone(ray, current->objects.cone);
         current = current->next;
         i++;
     }
@@ -473,6 +537,9 @@ t_compose *prepare_computations(t_intersection inter, t_ray ray)
         comp->normv = normalize_at_plane_pos((t_plane *)(inter.object), comp->point);
     else if (comp->obj_type == SHAPE_CYLINDER)
         comp->normv = normalize_at_cylinder_pos((t_cylinder *)(inter.object), comp->point);
+    else if (comp->obj_type == SHAPE_CONE)
+        comp->normv = normalize_at_cone_pos((t_cone *)(inter.object), comp->point);
+        // comp->normv = normalize_at_cone_pos((t_cylinder *)(inter.object), comp->point);
     comp->normv = vector_normilze(comp->normv);
     comp->inside = 0;
     if (vector_dot(comp->normv, comp->camv) < 0.0)
@@ -573,6 +640,18 @@ void ft_add_sphere_shape(t_world *world, t_sphere *sphere)
     }
 }
 
+void ft_add_cone_shape(t_world *world, t_cone *cone)
+{
+    t_cone *tmp;
+
+    tmp = cone;
+    while (tmp)
+    {
+        ft_add_shape(&world, tmp, SHAPE_CONE);
+        tmp = tmp->next;
+    }
+}
+
 void ft_add_plight(t_world *world, t_light *light)
 {
     world->light = malloc(sizeof(p_light));
@@ -593,6 +672,8 @@ t_world *default_world(t_scene *scene)
         ft_add_plane_shape(world, scene->plane);
     if (scene->sphere)
         ft_add_sphere_shape(world, scene->sphere);
+    if (scene->cone)
+        ft_add_cone_shape(world, scene->cone);
     ft_add_plight(world, scene->light);
     /*
     while (world->shape->objects.cylinder)
@@ -778,7 +859,7 @@ void get_spherical_coordinates(t_vector hit_point, t_sphere *sphere, float *u, f
 
     *u = (theta + M_PI) / (2 * M_PI);
     *v = phi / M_PI;
-    printf("UV coordinates: u = %f, v = %f\n", *u, *v);
+    // printf("UV coordinates: u = %f, v = %f\n", *u, *v);
 }
 t_color int_to_color(int color)
 {
@@ -803,7 +884,7 @@ t_color sample_texture(t_texture *texture, float u, float v)
     int color = *(int *)(texture->img_data + pixel_index);
 
     t_color result = int_to_color(color);
-    printf("Sampled color: r = %f, g = %f, b = %f\n", result.r, result.g, result.b);
+    // printf("Sampled color: r = %f, g = %f, b = %f\n", result.r, result.g, result.b);
     return result;
 }
 t_color get_textured_lighting_color(t_color texture_color, t_material *material, p_light *light, t_compose *comp, int shadow)
@@ -812,10 +893,10 @@ t_color get_textured_lighting_color(t_color texture_color, t_material *material,
     t_color eff_color, ambient, diffuse, specular;
     float light_dot_normal, reflect_dot_camera;
 
-    printf("Texture color: r = %f, g = %f, b = %f\n", texture_color.r, texture_color.g, texture_color.b);
+    // printf("Texture color: r = %f, g = %f, b = %f\n", texture_color.r, texture_color.g, texture_color.b);
     eff_color = ft_multiply_color(texture_color, light->intensity);
     ambient = clamp_color(ft_multiply_color_scalar(eff_color, material->ambient));  
-    printf("Ambient color: r = %f, g = %f, b = %f\n", ambient.r, ambient.g, ambient.b);
+    // printf("Ambient color: r = %f, g = %f, b = %f\n", ambient.r, ambient.g, ambient.b);
     if (shadow)
         return ambient;
     light_dir_normal = vector_normilze(vector_sub(light->position, comp->point));
@@ -833,11 +914,11 @@ t_color get_textured_lighting_color(t_color texture_color, t_material *material,
             specular = ft_multiply_color_scalar(light->intensity,
                         material->specular * powf(reflect_dot_camera, material->shininess));
     }
-    printf("Diffuse color: r = %f, g = %f, b = %f\n", diffuse.r, diffuse.g, diffuse.b);
-    printf("Specular color: r = %f, g = %f, b = %f\n", specular.r, specular.g, specular.b);
+    // printf("Diffuse color: r = %f, g = %f, b = %f\n", diffuse.r, diffuse.g, diffuse.b);
+    // printf("Specular color: r = %f, g = %f, b = %f\n", specular.r, specular.g, specular.b);
     t_color tmp = ft_add_color(specular, diffuse);
     t_color final_color = clamp_color(ft_add_color(tmp, ambient));
-    printf("Final color: r = %f, g = %f, b = %f\n", final_color.r, final_color.g, final_color.b);
+    // printf("Final color: r = %f, g = %f, b = %f\n", final_color.r, final_color.g, final_color.b);
     return final_color;
 }
 
@@ -875,9 +956,11 @@ t_color shading_hit(t_world *world, t_compose *comp)
         material = ((t_plane *)comp->obj)->material;
     else if (comp->obj_type == SHAPE_CYLINDER)
         material = ((t_cylinder *)comp->obj)->material;
+    else if (comp->obj_type == SHAPE_CONE)
+        material = ((t_cone *)comp->obj)->material;
     shadowed = is_shadowed(world, comp->over_point);
     color = get_lighting_color(material, world->light, comp, shadowed);
-    printf("color: r = %f, g = %f, b = %f\n", color.r, color.g, color.b);
+    // printf("color: r = %f, g = %f, b = %f\n", color.r, color.g, color.b);
     return color;
 }
 
@@ -918,12 +1001,12 @@ int render_image(t_scene *scene, t_world *world, s_camera *cam)
         { 
             ray = get_ray_pixel(cam, x, y, 0.5);
             color = get_color_at(world, ray);
-            printf("Final color: r = %f, g = %f, b = %f\n", color.r, color.g, color.b);
+            // printf("Final color: r = %f, g = %f, b = %f\n", color.r, color.g, color.b);
             pixel_color = (255 << 24) |
                 (int)clamp((float)(255.999 * color.r), 0, 255) << 16 |
                 (int)clamp((float)(255.999 * color.g), 0, 255) << 8 |
                 (int)clamp((float)(255.999 * color.b), 0, 255);
-            printf("puting this color: %d\n", pixel_color);
+            // printf("puting this color: %d\n", pixel_color);
             my_pixel_put(&scene->data->img, x, y, pixel_color);
         }
     }

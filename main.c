@@ -172,6 +172,7 @@ t_scene *allocate_scene(void)
     scene->sphere = NULL;
     scene->plane = NULL;
     scene->cylinder = NULL;
+    scene->cone = NULL;
     return scene;
 }
 
@@ -189,8 +190,8 @@ int main(int argc, char **argv)
     if (!map->lines || !ft_check_map_components(&map))
         return (free(map), ft_putstr_fd("map is empty\n", 2), 1);
     scene = allocate_scene();
-    float width = 1500;
-    float height = 700;
+    float width = 900;
+    float height = 400;
     init_scene(scene, width, height);
     if (!ft_generate_scene(map->lines, &scene))
         return (100);

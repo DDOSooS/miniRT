@@ -419,6 +419,21 @@ int ft_check_cylinder_component(char **components)
     return 1;
 }
 
+int ft_check_cone_component(char **components) {
+    if (ft_count_components(components) != 6)
+        return 0;
+    if (!ft_check_elements(components[1]))
+        return 0;
+    if (!ft_check_elements(components[2]))
+        return 0;
+    if (!ft_check_non_negative(components[3]) || !ft_check_non_negative(components[4]))
+        return 0;
+    if (!ft_check_colors(components[5]))
+        return 0;
+    // printf("cone components are valid\n");
+    return 1;
+}
+
 int ft_check_components(int identifier_id, char **components, int *counter)
 {
     if (identifier_id == 1)
@@ -433,6 +448,8 @@ int ft_check_components(int identifier_id, char **components, int *counter)
         return (ft_check_plane_component(components));
     if (identifier_id == 6)
         return (ft_check_cylinder_component(components));
+    if (identifier_id == 7)
+        return (ft_check_cone_component(components));
     return 1;
 }
                                                                               
@@ -452,6 +469,8 @@ int is_identifier(char *identifier)
         return 5;
     if (identifier && !ft_strcmp(identifier, "cy"))
         return 6;
+    if (identifier && !ft_strcmp(identifier, "co"))
+        return 7;
     return 0;
 }
 
@@ -642,8 +661,8 @@ int ft_add_camera(t_scene **scene, char **components)
     if (!camera)
         return 0;
     camera->fov  = fov;
-    camera->h_size = 700;
-    camera->w_size = 1500;
+    camera->h_size = 400;
+    camera->w_size = 900;
     camera->direction = dir;
     camera->origin = position;
     ft_set_camera(&camera);
@@ -850,6 +869,47 @@ int ft_add_cylinder(t_scene **scene, char **components)
     return 1;
 }
 
+t_cone *ft_new_cone(char **components)
+{
+    t_cone *cone = malloc(sizeof(t_cone));
+    if (!cone)
+        return NULL;
+
+    ft_gen_elements(&cone->apex, components[1]);
+    ft_gen_elements(&cone->axis, components[2]);
+    cone->height = ft_atod(components[3]);
+    cone->radius = ft_atod(components[4]);
+    ft_gen_colors(&cone->color, components[5]);
+    cone->material = default_material();
+    cone->transform = identity_matrix(4);
+    cone->transform[0][3] = cone->apex.x;
+    cone->transform[1][3] = cone->apex.y;
+    cone->transform[2][3] = cone->apex.z;
+    cone->next = NULL;
+    cone->material->color = cone->color;
+
+    return cone;
+}
+
+int ft_add_cone(t_scene **scene, char **components)
+{
+    t_cone *cone = ft_new_cone(components);
+    if (!cone)
+        return 0;
+
+    t_cone *tmp = (*scene)->cone;
+    if (!tmp)
+        (*scene)->cone = cone;
+    else
+    {
+        while (tmp->next)
+            tmp = tmp->next;
+        tmp->next = cone;
+    }
+
+    return 1;
+}
+
 int ft_add_component(t_scene **scene, int identifier, char **components)
 {
     if (identifier == 1)
@@ -864,6 +924,8 @@ int ft_add_component(t_scene **scene, int identifier, char **components)
         return (ft_add_plane(scene, components));
     if (identifier == 6)
         return (ft_add_cylinder(scene, components));
+    if (identifier == 7)
+        return (ft_add_cone(scene, components));
     return (1);
 }
  
