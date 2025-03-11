@@ -661,8 +661,8 @@ int ft_add_camera(t_scene **scene, char **components)
     if (!camera)
         return 0;
     camera->fov  = fov;
-    camera->h_size = 400;
-    camera->w_size = 900;
+    camera->h_size = SCREEN_HEIGHT;
+    camera->w_size = SCREEN_WIDTH;
     camera->direction = dir;
     camera->origin = position;
     ft_set_camera(&camera);

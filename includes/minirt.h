@@ -26,8 +26,12 @@
 // # define    WIN_WIDTH   1280
 // # define    WIN_HEIGHT  720
 
-#define SCREEN_WIDTH 1800.f
-#define SCREEN_HEIGHT 1200.f
+// #define SCREEN_WIDTH 1800.f
+// #define SCREEN_HEIGHT 1200.f
+
+
+#define SCREEN_WIDTH 80.f
+#define SCREEN_HEIGHT 20.f
 
 # define    EPSILON     1e-4f
 # define    PI          3.14159265359
@@ -296,7 +300,7 @@ t_vector    vector_sub(t_vector v1, t_vector v2);
 t_vector    vector_add(t_vector v1, t_vector v2);
 // t_vector    *ft_new_vector(float x, float y, float z);
 void        var_dump_vector(t_vector vec);
-void init_scene(t_scene *scene, float width, float height);
+void init_scene(t_scene *scene);
 t_ray       create_ray(t_vector origin, t_vector direction);
 int         gen_ray(t_scene *scene,float x, float y, t_ray cam_r);
 void ft_set_camera(s_camera **camera);

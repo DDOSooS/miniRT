@@ -472,15 +472,38 @@ t_vector normilize_at_sphere_pos(t_sphere *sphere, t_point w_p)
 
     inv_m = inverse_matrix(sphere->transform, 4);
     if (!inv_m)
+    {
+        // printf("Error: inverse matrix is null\n");
         inv_m = sphere->transform;
+    }
+    // for (int i = 0; i < 4; i++)
+    // {
+    //     for (int j = 0; j < 4; j++)
+    //         printf("%f ", inv_m[i][j]);
+    //     printf("\n");
+    // }
+
     obj_p = ft_multiply_matrix_vec(inv_m, w_p);
     obj_n = vector_sub(w_p, sphere->sphere_coordinates);
     ft_transpose_matrix(&inv_m, 4,4);
+    // printf("after transposing ============================================\n");
+    // for (int i = 0; i < 4; i++)
+    // {
+    //     for (int j = 0; j < 4; j++)
+    //         printf("%f ", inv_m[i][j]);
+    //     printf("\n");
+    // }
     tmp = ft_multiply_matrix_vec(inv_m, obj_n);
     tmp.w = 0;
     vec = vector_normilze(tmp);
+    // printf("vector normalise =================================================\n");
+    // printf("x: %f y: %f z: %f\n", vec.x, vec.y, vec.z);
+    // printf("====================================================================\n");
     if (inv_m != sphere->transform)
+    {
+        // printf("freeing inverse matrix\n");
         ft_free_matrix(inv_m, 4);
+    }
     return vec;
 }
 
@@ -527,19 +550,33 @@ t_compose *prepare_computations(t_intersection inter, t_ray ray)
     t_compose *comp = malloc(sizeof(t_compose));
 
     comp->t = inter.t1;
+    // printf("(1)=> Intersection t1: %f\n", inter.t1);
     comp->obj = inter.object;
     comp->obj_type = inter.type;
     comp->camv = negate_vector(ray.direction);
     comp->point = position(ray, comp->t);
+
+    // printf("(2)=> comp->point: x=%f y=%f z=%f\n", comp->point.x, comp->point.y, comp->point.z);
     if (comp->obj_type == SHAPE_SPHERE)
+    {
         comp->normv = normilize_at_sphere_pos((t_sphere *)(inter.object), comp->point);
+        // printf("(sphere)=> Normal vector: x=%f y=%f z=%f\n", comp->normv.x, comp->normv.y, comp->normv.z);
+    }
     else if (comp->obj_type == SHAPE_PLANE)
+    {
         comp->normv = normalize_at_plane_pos((t_plane *)(inter.object), comp->point);
+        // printf("(plane)=> Normal vector: x=%f y=%f z=%f\n",comp->normv.x, comp->normv.y, comp->normv.z);
+    }
     else if (comp->obj_type == SHAPE_CYLINDER)
+    {
         comp->normv = normalize_at_cylinder_pos((t_cylinder *)(inter.object), comp->point);
+        // printf("(cylinder)=> Normal vector: x=%f y=%f z=%f\n", comp->normv.x, comp->normv.y, comp->normv.z);
+    }
     else if (comp->obj_type == SHAPE_CONE)
+    {
         comp->normv = normalize_at_cone_pos((t_cone *)(inter.object), comp->point);
-        // comp->normv = normalize_at_cone_pos((t_cylinder *)(inter.object), comp->point);
+        // printf("(cone)=> Normal vector: x=%f y=%f z=%f\n", comp->normv.x, comp->normv.y, comp->normv.z);
+    }
     comp->normv = vector_normilze(comp->normv);
     comp->inside = 0;
     if (vector_dot(comp->normv, comp->camv) < 0.0)
@@ -549,6 +586,7 @@ t_compose *prepare_computations(t_intersection inter, t_ray ray)
     }
     t_point offset = ft_scale_point(comp->normv, EPSILON);
     comp->over_point = point_add(comp->point, offset);
+    // printf("(4)=> over point x: %f y: %f z: %f\n", comp->over_point.x, comp->over_point.y, comp->over_point.z);
     return comp;
 }
 
@@ -854,6 +892,7 @@ void get_spherical_coordinates(t_vector hit_point, t_sphere *sphere, float *u, f
     t_vector local_point = vector_sub(hit_point, sphere->sphere_coordinates);
     local_point = vector_normilze(local_point);
 
+    // printf("local_point: x = %f, y = %f, z = %f\n", local_point.x, local_point.y, local_point.z);
     float theta = atan2(local_point.z, local_point.x);
     float phi = acos(local_point.y);
 
@@ -908,6 +947,10 @@ t_color get_textured_lighting_color(t_color texture_color, t_material *material,
         diffuse = ft_multiply_color_scalar(eff_color, material->diffuse * light_dot_normal);
         reflect_dot_camera = vector_dot(reflect_vector(negate_vector(light_dir_normal),
                                         comp->normv), comp->camv);
+        // printf("reflect_dot_camera: %f\n", reflect_dot_camera);
+        // fflush(stdout);
+        // printf("material->shininess: %f\n", material->shininess);
+        // fflush(stdout);
         if (reflect_dot_camera <= EPSILON)
             specular = ft_new_color(0, 0, 0); 
         else
@@ -925,23 +968,27 @@ t_color get_textured_lighting_color(t_color texture_color, t_material *material,
 
 t_color shading_hit(t_world *world, t_compose *comp)
 {
-    t_color color;
-    t_material *material;
-    int shadowed;
+    t_color color = ft_new_color(0, 0, 0);
+    t_material *material = NULL;
+    int shadowed = 0;
 
     if (comp->obj_type == SHAPE_SPHERE)
     {
         material = ((t_sphere *)comp->obj)->material;
         if (((t_sphere *)comp->obj)->has_checkered)
         {
-            float u, v;
+            float u = 0, v = 0;
+            // printf("over_point: x = %f, y = %f, z = %f\n", comp->over_point.x, comp->over_point.y, comp->over_point.z);
+            // printf("sphere coordinates: x = %f, y = %f, z = %f\n", ((t_sphere *)comp->obj)->sphere_coordinates.x, ((t_sphere *)comp->obj)->sphere_coordinates.y, ((t_sphere *)comp->obj)->sphere_coordinates.z);
             get_spherical_coordinates(comp->over_point, (t_sphere *)comp->obj, &u, &v);
             color = get_checkered_color((t_sphere *)comp->obj, u, v);
             material->color = color;
         }
         if (((t_sphere *)comp->obj)->has_texture)
         {
-            float u, v;
+            float u = 0, v = 0;
+            // printf("over_point: x = %f, y = %f, z = %f\n", comp->over_point.x, comp->over_point.y, comp->over_point.z);
+            // printf("sphere coordinates: x = %f, y = %f, z = %f\n", ((t_sphere *)comp->obj)->sphere_coordinates.x, ((t_sphere *)comp->obj)->sphere_coordinates.y, ((t_sphere *)comp->obj)->sphere_coordinates.z);
             get_spherical_coordinates(comp->over_point, (t_sphere *)comp->obj, &u, &v);
             color = sample_texture(((t_sphere *)comp->obj)->texture, u, v);
             color.r /= 255.0f;
@@ -988,33 +1035,104 @@ int key_hook(int keycode, t_var *data)
     return (0);
 }
 
+char *int_to_str(int num)
+{
+    int len = 0;
+    int temp = num;
+    char *str;
+
+    if (temp == 0)
+        len = 1;
+    else
+    {
+        while (temp != 0)
+        {
+            temp /= 10;
+            len++;
+        }
+    }
+    str = malloc(len + 1);
+    if (!str)
+        return NULL;
+    str[len] = '\0';
+    for (int i = len - 1; i >= 0; i--)
+    {
+        str[i] = (num % 10) + '0';
+        num /= 10;
+    }
+    return str;
+}
+
+void ft_strcpy(char *dest, const char *src)
+{
+    while (*src)
+        *dest++ = *src++;
+    *dest = '\0';
+}
+
+void ft_strcat(char *dest, const char *src)
+{
+    while (*dest)
+        dest++;
+    while (*src)
+        *dest++ = *src++;
+    *dest = '\0';
+}
+
+
 int render_image(t_scene *scene, t_world *world, s_camera *cam)
 {
     float x, y;
     t_color color;
     t_ray ray;
     int pixel_color;
+    int total_pixels = cam->w_size * cam->h_size;
+    int current_pixel = 0;
+
+    mlx_clear_window(scene->data->mlx, scene->data->win);
 
     for (y = 0; y < cam->h_size; y++)
     {
         for (x = 0; x < cam->w_size; x++)
-        { 
+        {
             ray = get_ray_pixel(cam, x, y, 0.5);
+            printf("ray origin: x = %f, y = %f, z = %f\n", ray.origin.x, ray.origin.y, ray.origin.z);
+            printf("ray direction: x = %f, y = %f, z = %f\n", ray.direction.x, ray.direction.y, ray.direction.z);
             color = get_color_at(world, ray);
-            // printf("Final color: r = %f, g = %f, b = %f\n", color.r, color.g, color.b);
             pixel_color = (255 << 24) |
                 (int)clamp((float)(255.999 * color.r), 0, 255) << 16 |
                 (int)clamp((float)(255.999 * color.g), 0, 255) << 8 |
                 (int)clamp((float)(255.999 * color.b), 0, 255);
-            // printf("puting this color: %d\n", pixel_color);
             my_pixel_put(&scene->data->img, x, y, pixel_color);
+
+            current_pixel++;
         }
+
+        int progress = (int)((float)current_pixel / total_pixels * 100);
+        char *progress_str = malloc(20);
+        if (!progress_str)
+            continue; 
+        char *progress_num = int_to_str(progress);
+        if (!progress_num)
+        {
+            free(progress_str);
+            continue;
+        }
+        ft_strcpy(progress_str, "Loading... ");
+        ft_strcat(progress_str, progress_num);
+        ft_strcat(progress_str, "%");
+        mlx_clear_window(scene->data->mlx, scene->data->win);
+        mlx_string_put(scene->data->mlx, scene->data->win, 
+                       cam->w_size / 2 - 50, cam->h_size / 2, 0xFFFFFF, progress_str);
+        free(progress_str);
+        free(progress_num);
     }
-    printf("end scene\n");
+    mlx_clear_window(scene->data->mlx, scene->data->win);
     mlx_put_image_to_window(scene->data->mlx, scene->data->win,
                             scene->data->img.img_ptr, 0, 0);
     mlx_hook(scene->data->win, 17, 0, &ft_close_window, scene->data);
     mlx_key_hook(scene->data->win, &key_hook, scene->data);
     mlx_loop(scene->data->mlx);
+
     return 0;
 }

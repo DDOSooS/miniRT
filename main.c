@@ -114,8 +114,19 @@ int	ft_close(t_var *vars)
 
 int	ft_close_window(t_var *data)
 {
-    mlx_destroy_window(data->mlx, data->win);
-	exit(EXIT_SUCCESS);
+    if (data->img.img_ptr)
+        mlx_destroy_image(data->mlx, data->img.img_ptr);
+    if (data->win)
+        mlx_destroy_window(data->mlx, data->win);
+    if (data->mlx)
+    {
+        mlx_destroy_display(data->mlx);
+        mlx_loop_end(data->mlx);
+        free(data->mlx);
+    }
+
+    free(data);
+	// exit(EXIT_SUCCESS);
 	return (1);
 }
 
@@ -132,18 +143,11 @@ void my_pixel_put(t_img *img, int x, int y, int color)
     *((unsigned int *)(img->addr + offset)) = color;
 }
 
-void init_scene(t_scene *scene, float width, float height)
+void init_scene(t_scene *scene)
 {
-    scene->camera->w_size = width;
-    scene->camera->h_size = height; 
     scene->data->mlx = mlx_init();
-    scene->data->win = mlx_new_window(scene->data->mlx, 
-                                     scene->camera->w_size, 
-                                     scene->camera->h_size, 
-                                     "MiniRT");
-    scene->data->img.img_ptr = mlx_new_image(scene->data->mlx, 
-                                            scene->camera->w_size, 
-                                            scene->camera->h_size);
+    scene->data->win = mlx_new_window(scene->data->mlx, SCREEN_WIDTH, SCREEN_HEIGHT, "MiniRT");
+    scene->data->img.img_ptr = mlx_new_image(scene->data->mlx, SCREEN_WIDTH, SCREEN_HEIGHT);
     scene->data->img.addr = mlx_get_data_addr(scene->data->img.img_ptr,
                                              &scene->data->img.bits_per_pixel,
                                              &scene->data->img.line_length,
@@ -156,15 +160,6 @@ t_scene *allocate_scene(void)
 
     scene = malloc(sizeof(t_scene));
     if (!scene)
-        return NULL;
-    scene->camera = malloc(sizeof(s_camera));
-    if (!scene->camera)
-        return NULL;
-    scene->ambient = malloc(sizeof(t_ambient));
-    if (!scene->ambient)
-        return NULL;
-    scene->light = malloc(sizeof(t_light));
-    if (!scene->light)
         return NULL;
     scene->data = malloc(sizeof(t_var));
     if (!scene->data)
@@ -190,9 +185,7 @@ int main(int argc, char **argv)
     if (!map->lines || !ft_check_map_components(&map))
         return (free(map), ft_putstr_fd("map is empty\n", 2), 1);
     scene = allocate_scene();
-    float width = 900;
-    float height = 400;
-    init_scene(scene, width, height);
+    init_scene(scene);
     if (!ft_generate_scene(map->lines, &scene))
         return (100);
     t_world *world = default_world(scene);
