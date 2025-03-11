@@ -26,12 +26,8 @@
 // # define    WIN_WIDTH   1280
 // # define    WIN_HEIGHT  720
 
-// #define SCREEN_WIDTH 1800.f
-// #define SCREEN_HEIGHT 1200.f
-
-
-#define SCREEN_WIDTH 80.f
-#define SCREEN_HEIGHT 20.f
+#define SCREEN_WIDTH 200.f
+#define SCREEN_HEIGHT 200.f
 
 # define    EPSILON     1e-4f
 # define    PI          3.14159265359
@@ -224,6 +220,7 @@ typedef struct light
     t_point         light_coordinate;
     double          light_ration;
     t_color         light_color;
+    struct light    *next;
 } t_light;
 
 
@@ -243,8 +240,9 @@ typedef struct s_scene
     t_sphere    *sphere;
     t_plane     *plane;
     t_cylinder  *cylinder;
+    t_cone      *cone;
     t_var       *data;
-    t_cone    *cone;
+    // t_map       *map;
 }   t_scene;
 
 typedef struct s_compose
@@ -281,7 +279,7 @@ typedef struct s_world
 } t_world;
 
 
-int	ft_close_window(t_var *data);
+int	ft_close_window(t_scene *scen);
 void my_pixel_put(t_img *img, int x, int y, int color);
 map_line    *ft_gen_scen_map(char *file_name);
 int render_image(t_scene *scene ,t_world *t_world, s_camera *cam);
@@ -384,4 +382,9 @@ t_vector ft_scale_vector(t_vector vector, float scale);
 t_point ft_multiply_matrix_point(float **m, t_point v);
 float **create_rotation_matrix_from_vector(t_vector orientation);
 t_point ft_scale_point(t_point vector, float scale);
+
+// destroy scen functions
+void ft_destroy_scene(t_scene *scen);
+void    ft_free_map(map_line **map_lines);
+void     ft_free_map_line(t_map *map);
 #endif
