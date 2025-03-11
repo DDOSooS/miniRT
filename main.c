@@ -117,7 +117,9 @@ int	ft_close(t_var *vars)
 int	ft_close_window(t_scene *scen)
 {
     ft_destroy_scene(scen);
-    // ft_free_map_line(scen->map);   
+    // ft_free_map_line(scen->map); 
+    ft_free_map(&scen->map->lines);
+    free(scen->map);  
     mlx_destroy_image(scen->data->mlx, scen->data->img.img_ptr);
     mlx_destroy_window(scen->data->mlx, scen->data->win);
     mlx_destroy_display(scen->data->mlx);
@@ -202,13 +204,16 @@ int main(int argc, char **argv)
     map->lines = ft_gen_scen_map(argv[1]);
     if (!map->lines || !ft_check_map_components(&map))
         return (free(map),ft_putstr_fd("map is empty\n", 2), 1);
-    scene = allocate_scene();
+    // exit(0);
+    // ft_free_map(&map->lines);
+    // free(map);
+        scene = allocate_scene();
     init_scene(scene);
     if (!ft_generate_scene(map->lines, &scene))
         return (100);
-    // scene->map = map;
-    t_world *world = default_world(scene);
-    render_image(scene, world, scene->camera);
+    scene->map = map;
+    scene->world = default_world(scene);
+    render_image(scene, scene->world, scene->camera);
     return 0;
 }
 

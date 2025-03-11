@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2025/03/01 10:59:54 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/03/11 12:37:58 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -232,19 +232,6 @@ typedef struct objects
     struct objects*  next;
 } t_object;
 
-typedef struct s_scene
-{
-    s_camera    *camera;
-    t_ambient   *ambient;
-    t_light     *light;
-    t_sphere    *sphere;
-    t_plane     *plane;
-    t_cylinder  *cylinder;
-    t_cone      *cone;
-    t_var       *data;
-    // t_map       *map;
-}   t_scene;
-
 typedef struct s_compose
 {
     t_intersection  intersection;
@@ -278,6 +265,20 @@ typedef struct s_world
     p_light *light;
 } t_world;
 
+
+typedef struct s_scene
+{
+    s_camera    *camera;
+    t_ambient   *ambient;
+    t_light     *light;
+    t_sphere    *sphere;
+    t_plane     *plane;
+    t_cylinder  *cylinder;
+    t_cone      *cone;
+    t_var       *data;
+    t_map       *map;
+    t_world     *world;
+}   t_scene;
 
 int	ft_close_window(t_scene *scen);
 void my_pixel_put(t_img *img, int x, int y, int color);

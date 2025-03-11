@@ -70,9 +70,20 @@ void ft_free_cone(t_cone *cone)
     }
 }
 
+void ft_free_shapes(t_shape *shape)
+{
+    t_shape *tmp;
+
+    while(shape)
+    {
+        tmp = shape->next;
+        free(shape);
+        shape = tmp;
+    }
+}
+
 void ft_destroy_scene(t_scene *scen)
 {
-    // ft_free_map_line(scen->map);
     free(scen->ambient);
     ft_free_light(scen->light); 
     ft_free_camera(&scen->camera);
@@ -80,4 +91,9 @@ void ft_destroy_scene(t_scene *scen)
     ft_free_sphere(scen->sphere);
     ft_free_cylinder(scen->cylinder);
     ft_free_cone(scen->cone);
+    ft_free_shapes(scen->world->shape);
+    free(scen->world->light);
+    free(scen->world);
+
+
 }

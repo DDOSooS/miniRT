@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 20:24:10 by aghergho          #+#    #+#             */
-/*   Updated: 2025/03/07 13:46:17 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/03/11 12:30:59 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -551,7 +551,6 @@ int    ft_add_line(map_line **map, char *line)
     map_line    *new;
     map_line    *last;
 
-
     new = (map_line *)malloc(sizeof(map_line));
     if (!new)
         return 0;
@@ -610,9 +609,9 @@ int ft_gen_colors(t_color *color,char *components)
     tmp_colors = split(components, ",");
     if (!tmp_colors) 
         return 0;
-    (color)->r= clamp (ft_atod(tmp_colors[0])  / 255.0f,0,1);
-    (color)->g= clamp(ft_atod(tmp_colors[1])  / 255.0f,0,1);
-    (color)->b= clamp(ft_atod(tmp_colors[2])  / 255.0f,0,1);
+    (color)->r = clamp (ft_atod(tmp_colors[0])  / 255.0f,0,1);
+    (color)->g = clamp(ft_atod(tmp_colors[1])  / 255.0f,0,1);
+    (color)->b = clamp(ft_atod(tmp_colors[2])  / 255.0f,0,1);
     ft_free_line_components(tmp_colors);
     return (1); 
 }
@@ -633,7 +632,6 @@ int ft_add_ambient(t_scene **scene, char **components)
 {
     t_ambient  *tmp;
 
-    // tmp = (*scene)->ambient;
     tmp = malloc(sizeof(t_ambient));
     tmp->ambient_ration = ft_atod(components[1]);
     ft_gen_colors(&tmp->ambient_color, components[2]);
@@ -900,7 +898,6 @@ int ft_add_cone(t_scene **scene, char **components)
             tmp = tmp->next;
         tmp->next = cone;
     }
-
     return 1;
 }
 
