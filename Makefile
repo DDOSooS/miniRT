@@ -6,7 +6,7 @@ LIBX = minilibx-linux/libmlx_Linux.a
 LIBFT = ./includes/libft/libft.a
 MLX = ./minilibx-linux/libmlx.a
 
-name = scen	
+name = miniRT
 src = main.c ./src/parser/parsing.c \
 	./includes/get_next_line/get_next_line.c \
 	./includes/get_next_line/get_next_line_utils.c \
