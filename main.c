@@ -188,7 +188,6 @@ void     ft_free_map_line(t_map *map)
         free(map->lines);
         map->lines = tmp;
     }
-
 }
 
 int main(int argc, char **argv)
@@ -204,10 +203,7 @@ int main(int argc, char **argv)
     map->lines = ft_gen_scen_map(argv[1]);
     if (!map->lines || !ft_check_map_components(&map))
         return (free(map),ft_putstr_fd("map is empty\n", 2), 1);
-    // exit(0);
-    // ft_free_map(&map->lines);
-    // free(map);
-        scene = allocate_scene();
+    scene = allocate_scene();
     init_scene(scene);
     if (!ft_generate_scene(map->lines, &scene))
         return (100);
@@ -216,5 +212,4 @@ int main(int argc, char **argv)
     render_image(scene, scene->world, scene->camera);
     return 0;
 }
-
 

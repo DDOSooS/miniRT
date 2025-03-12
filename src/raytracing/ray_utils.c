@@ -197,8 +197,13 @@ t_intersection ft_intersect_plane(t_ray ray, t_plane *plane)
     // Fixed: use plane->point instead of plane->plane_normal
     //Calculate intersection distance
     float t = -(vector_dot(origin_to_plane, plane->plane_normal)) / denom;
+
     if (t < EPSILON)
+    {
+
         return result;  // Intersection is behind ray origin
+    }
+    printf("INTERSECTION IS BEING FOUND\n");              
     result.n_sol =1;
     result.t1 = t;
     result.object = plane;
@@ -631,20 +636,24 @@ float **get_view_transform(t_point from_v, t_vector to_v, t_vector up_v)
     return res;
 }
 
+//y rotation than x rotation~~~~~~
 float **create_rotation_matrix_from_vector(t_vector orientation)
 {
     float **res;
-    t_vector normalized = vector_normilze(orientation);
-    double theta_y = atan2(normalized.y, normalized.z);
-    double theta_x = atan2(-normalized.x, sqrt(normalized.y * normalized.y + normalized.z * normalized.z));
-    float **rot_x = rotate_x(theta_x);
-    float **rot_y = rotate_y(theta_y);
-    res = ft_multiply_matrix(rot_x, rot_y, 4, 4);
-
-    ft_free_matrix(rot_x, 4);
+    float sd_ax;
+    t_vector normalized;
+    float **rot_y;
+    float **rot_x;
+    
+    normalized = vector_normilze(orientation);
+    rot_y = rotate_y(atan2(normalized.x, normalized.z));
+    rot_x = rotate_x(asin(-normalized.y));
+    res = ft_multiply_matrix(rot_y, rot_x, 4, 4);
     ft_free_matrix(rot_y, 4);
+    ft_free_matrix(rot_x, 4);
     return res;
 }
+
 
 void ft_add_cylinder_shape(t_world *world, t_cylinder *cylinder)
 {
@@ -653,7 +662,8 @@ void ft_add_cylinder_shape(t_world *world, t_cylinder *cylinder)
     tmp = cylinder;
     while (tmp)
     {
-        ft_add_shape(&world,tmp, SHAPE_CYLINDER);
+        if (tmp->orientation.x != 0 ||  tmp->orientation.y != 0 || tmp->orientation.z != 0)
+            ft_add_shape(&world,tmp, SHAPE_CYLINDER);
         tmp = tmp->next;
     }
 }
@@ -1105,8 +1115,8 @@ int render_image(t_scene *scene, t_world *world, s_camera *cam)
         for (x = 0; x < cam->w_size; x++)
         {
             ray = get_ray_pixel(cam, x, y, 0.5);
-            printf("ray origin: x = %f, y = %f, z = %f\n", ray.origin.x, ray.origin.y, ray.origin.z);
-            printf("ray direction: x = %f, y = %f, z = %f\n", ray.direction.x, ray.direction.y, ray.direction.z);
+            // printf("ray origin: x = %f, y = %f, z = %f\n", ray.origin.x, ray.origin.y, ray.origin.z);
+            // printf("ray direction: x = %f, y = %f, z = %f\n", ray.direction.x, ray.direction.y, ray.direction.z);
             color = get_color_at(world, ray);
             pixel_color = (255 << 24) |
                 (int)clamp((float)(255.999 * color.r), 0, 255) << 16 |

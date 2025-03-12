@@ -26,8 +26,8 @@
 // # define    WIN_WIDTH   1280
 // # define    WIN_HEIGHT  720
 
-#define SCREEN_WIDTH 200.f
-#define SCREEN_HEIGHT 200.f
+#define SCREEN_WIDTH 1200.f
+#define SCREEN_HEIGHT 600.f
 
 # define    EPSILON     1e-4f
 # define    PI          3.14159265359
