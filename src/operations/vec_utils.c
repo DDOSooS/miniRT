@@ -578,7 +578,7 @@ p_light  *ft_new_plight(t_color color, t_point point)
     light = (p_light *)malloc(sizeof(p_light));
     if (!light)
         return NULL;
-    light->intensity = ft_new_color(color.r, color.g, color.b);
+    light->color = ft_new_color(color.r, color.g, color.b);
     light->position = ft_new_point(point.x, point.y, point.z);
     return light;
 }
@@ -612,19 +612,19 @@ t_color clamp_color(t_color color)
 }
 
 /*
-    Specular=LightIntensity×MaterialSpecular×(cos(θ)) 
+    Specular=Lightcolor×MaterialSpecular×(cos(θ)) 
 */
-t_color get_lighting_color(t_material *material, p_light *light, t_compose *comp, int shadow)
+t_color get_lighting_color(t_material *material, t_light *light, t_compose *comp, int shadow)
 {
     t_vector light_dir_normal;
     t_color eff_color, ambient,  diffuse, specular;
     float light_dot_normal, reflect_dot_camera;
 
-    eff_color = ft_multiply_color(material->color, light->intensity);
+    eff_color = ft_multiply_color(material->color, light->color);
     ambient = clamp_color(ft_multiply_color_scalar(eff_color, material->ambient));  
     if (shadow)
         return ambient;
-    light_dir_normal = vector_normilze(vector_sub(light->position, comp->point));
+    light_dir_normal = vector_normilze(vector_sub(light->coordinate, comp->point));
     light_dot_normal = vector_dot(light_dir_normal, comp->normv);
     if (light_dot_normal < EPSILON)
         return ambient;
@@ -636,7 +636,7 @@ t_color get_lighting_color(t_material *material, p_light *light, t_compose *comp
         if (reflect_dot_camera <= EPSILON)
             specular = ft_new_color(0, 0, 0); 
         else
-            specular = ft_multiply_color_scalar(light->intensity,
+            specular = ft_multiply_color_scalar(light->color,
                         material->specular * powf(reflect_dot_camera, material->shininess));
     }
     t_color tmp = ft_add_color(specular, diffuse);
@@ -658,10 +658,8 @@ t_material *default_material(void)
 
 t_vector vector_normilze(t_vector vec)
 {
-    t_vector new ;  
- 
-    // if (!vec) 
-    //     return (t_vector ){0,0,0};
+    t_vector new ;
+
     float magnitude = vec_lenght(vec);
     if (magnitude == 0) 
         return ft_new_vector(0, 0, 0);

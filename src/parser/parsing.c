@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 20:24:10 by aghergho          #+#    #+#             */
-/*   Updated: 2025/03/11 12:30:59 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/03/12 17:43:08 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -500,8 +500,7 @@ int ft_check_map_components(t_map **map)
         tmp = tmp->next;
         i++;
     }
-    if ((*map)->scen_elements[0] > 1 || (*map)->scen_elements[1] > 1
-        || (*map)->scen_elements[2] > 1)
+    if ((*map)->scen_elements[0] > 1 || (*map)->scen_elements[1] > 1)
     {
         printf("duplicated of elements that must be declared just Once\n");
         return (ft_free_map(&(*map)->lines),0);
@@ -665,14 +664,23 @@ int ft_add_camera(t_scene **scene, char **components)
 int ft_add_light(t_scene **scene, char **components)
 {
     t_light *light;
-
+    t_light *tmp;
     // light = (*scene)->light;
     light = malloc(sizeof(t_light));
-    ft_gen_elements(&light->light_coordinate, components[1]);
-    light->light_ration = ft_atod(components[2]);
-    ft_gen_colors(&light->light_color, components[3]);
-    light->light_coordinate.w = 1;
-    (*scene)->light = light;
+    ft_gen_elements(&light->coordinate, components[1]);
+    light->ration = ft_atod(components[2]);
+    ft_gen_colors(&light->color, components[3]);
+    light->coordinate.w = 1;
+    light->next = NULL;
+    if (!(*scene)->light)
+        (*scene)->light = light;
+    else
+    {
+        tmp = (*scene)->light;
+        while(tmp->next)
+            tmp = tmp->next;
+        tmp->next = light; 
+    }
     return 1;
 }
 

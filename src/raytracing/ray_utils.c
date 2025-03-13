@@ -134,7 +134,7 @@ p_light *default_light()
     if (!light)
         return (NULL);
     light->position = ft_new_point(-10, 10, -10);
-    light->intensity = ft_new_color(1, 1, 1);
+    light->color = ft_new_color(1, 1, 1);
     return light;
 }
 
@@ -203,7 +203,7 @@ t_intersection ft_intersect_plane(t_ray ray, t_plane *plane)
 
         return result;  // Intersection is behind ray origin
     }
-    printf("INTERSECTION IS BEING FOUND\n");              
+    // printf("INTERSECTION IS BEING FOUND\n");              
     result.n_sol =1;
     result.t1 = t;
     result.object = plane;
@@ -227,8 +227,9 @@ t_intersection check_intersection_caps(t_ray ray, t_cylinder *cylinder, float ca
     float xs ;
     float x ;
     float z;
-    
     float radius_squared ;
+
+    //unitialided values
     if (fabs(ray.direction.y) < EPSILON)
         return result; 
     xs= (cap - ray.origin.y) / ray.direction.y;
@@ -433,12 +434,12 @@ t_vector normalize_at_cylinder_pos(t_cylinder *cylinder, t_point world_p)
     // Transform normal back to world space !<= 
     ft_transpose_matrix(&inv, 4, 4);
     world_normal = ft_multiply_matrix_vec(inv, local_normal);
-    vector_normilze(world_normal);
+    ;
     ft_free_matrix(rotation, 4);
     ft_free_matrix(combined, 4);
     if (inv != combined)
         ft_free_matrix(inv, 4);
-    return world_normal;
+    return vector_normilze(world_normal);
 }
 
 t_intersection intersect_world(t_world *world, t_ray ray)
@@ -482,38 +483,15 @@ t_vector normilize_at_sphere_pos(t_sphere *sphere, t_point w_p)
 
     inv_m = inverse_matrix(sphere->transform, 4);
     if (!inv_m)
-    {
-        // printf("Error: inverse matrix is null\n");
         inv_m = sphere->transform;
-    }
-    // for (int i = 0; i < 4; i++)
-    // {
-    //     for (int j = 0; j < 4; j++)
-    //         printf("%f ", inv_m[i][j]);
-    //     printf("\n");
-    // }
-
     obj_p = ft_multiply_matrix_vec(inv_m, w_p);
     obj_n = vector_sub(w_p, sphere->sphere_coordinates);
     ft_transpose_matrix(&inv_m, 4,4);
-    // printf("after transposing ============================================\n");
-    // for (int i = 0; i < 4; i++)
-    // {
-    //     for (int j = 0; j < 4; j++)
-    //         printf("%f ", inv_m[i][j]);
-    //     printf("\n");
-    // }
     tmp = ft_multiply_matrix_vec(inv_m, obj_n);
     tmp.w = 0;
     vec = vector_normilze(tmp);
-    // printf("vector normalise =================================================\n");
-    // printf("x: %f y: %f z: %f\n", vec.x, vec.y, vec.z);
-    // printf("====================================================================\n");
     if (inv_m != sphere->transform)
-    {
-        // printf("freeing inverse matrix\n");
         ft_free_matrix(inv_m, 4);
-    }
     return vec;
 }
 
@@ -527,7 +505,6 @@ t_vector normalize_at_plane_pos(t_plane *plane, t_point w_p)
     float **inv_transpose;
     t_vector normalized;
     t_vector obj_normal;
-    
     
     // Start with the plane's normal - no need to normalize yet
     obj_normal = plane->plane_normal;
@@ -587,6 +564,8 @@ t_compose *prepare_computations(t_intersection inter, t_ray ray)
         comp->normv = normalize_at_cone_pos((t_cone *)(inter.object), comp->point);
         // printf("(cone)=> Normal vector: x=%f y=%f z=%f\n", comp->normv.x, comp->normv.y, comp->normv.z);
     }
+    else
+        comp->normv = ft_new_vector(0, 0, 0);  
     comp->normv = vector_normilze(comp->normv);
     comp->inside = 0;
     if (vector_dot(comp->normv, comp->camv) < 0.0)
@@ -601,19 +580,20 @@ t_compose *prepare_computations(t_intersection inter, t_ray ray)
 }
 
 /*
-X-axis corresponds to left/right
-Y-axis corresponds to up/down
-Z-axis corresponds to forward/backward (with negative Z being forward)
+    X-axis corresponds to left/right
+    Y-axis corresponds to up/down
+    Z-axis corresponds to forward/backward (with negative Z being forward)
 */
+
 //camera transform matrix that transform from world coordinates to camera system Co
 float **get_view_transform(t_point from_v, t_vector to_v, t_vector up_v)
 {
-    float **view_transform;
-    t_vector forward_v;
-    t_vector left_v;
-    t_vector up_n;
-    float **res;
-    float **traslate_mx;
+    t_vector    forward_v;
+    t_vector    left_v;
+    t_vector    up_n;
+    float       **view_transform;
+    float       **res;
+    float       **traslate_mx;
 
     forward_v = vector_normilze(to_v);
     up_n = vector_normilze(up_v);
@@ -654,7 +634,6 @@ float **create_rotation_matrix_from_vector(t_vector orientation)
     return res;
 }
 
-
 void ft_add_cylinder_shape(t_world *world, t_cylinder *cylinder)
 {
     t_cylinder *tmp;
@@ -667,7 +646,6 @@ void ft_add_cylinder_shape(t_world *world, t_cylinder *cylinder)
         tmp = tmp->next;
     }
 }
-
 
 void ft_add_plane_shape(t_world *world, t_plane *plane)
 {
@@ -707,9 +685,15 @@ void ft_add_cone_shape(t_world *world, t_cone *cone)
 
 void ft_add_plight(t_world *world, t_light *light)
 {
-    world->light = malloc(sizeof(p_light));
-    world->light->position = ft_new_point(light->light_coordinate.x, light->light_coordinate.y, light->light_coordinate.z);
-    world->light->intensity = ft_new_color(light->light_color.r, light->light_color.g, light->light_color.b);
+    t_light *tmp;
+    
+    world->light = light;
+    tmp = light;
+    while(tmp)
+    {
+        tmp->color = ft_scale_color(tmp->color, tmp->ration);
+        tmp = tmp->next;
+    }
 }
 
 t_world *default_world(t_scene *scene)
@@ -728,94 +712,6 @@ t_world *default_world(t_scene *scene)
     if (scene->cone)
         ft_add_cone_shape(world, scene->cone);
     ft_add_plight(world, scene->light);
-    /*
-    while (world->shape->objects.cylinder)
-    {
-        printf("cylinder shape \n");
-        world->shape->objects.cylinder = world->shape->objects.cylinder->next;
-    }
-    while (world->shape->objects.sphere)
-    {
-        printf("sphere shape \n");
-        world->shape->objects.sphere = world->shape->objects.sphere->next;
-    }
-    while (world->shape->objects.plane)
-    {
-        printf("plane shape \n");
-        world->shape->objects.plane = world->shape->objects.plane->next;
-    }
-    t_world *world = malloc(sizeof(t_world));
-    if (!world)
-        return NULL;
-    world->n_objects = 0;
-    world->shape = NULL;
-
-    t_sphere *sphere1 = default_sphere();
-    sphere1->sphere_diameter = 50; 
-    sphere1->sphere_coordinates = ft_new_point(0, 10, -140);
-    sphere1->material->color = ft_new_color(0.9, 0.5, 0.2);
-
-
-    t_sphere *sphere2 = default_sphere();
-    sphere2->sphere_diameter = 20; 
-    sphere2->sphere_coordinates = ft_new_point(-50, 0, -140);
-    sphere2->material->color = ft_new_color(1, 0, 0.2);
-    sphere2->transform = identity_matrix(4);
-
-    // t_sphere *sphere3 = default_sphere();
-    // sphere3->sphere_diameter = 60; 
-    // sphere3->sphere_coordinates = ft_new_point(0, , -20);
-    // sphere3->material->color = ft_new_color(0.9, 0.5, 0.2);
-    
-    t_plane *plane2 = malloc(sizeof(t_plane));
-    plane2->plane_normal = ft_new_vector(0, 0, -1);
-    plane2->plane_cordinates = ft_new_point(0,1, 100);
-    plane2->plane_color = ft_new_color(0.8, 0.8, 0.8);
-    plane2->transform = identity_matrix(4);
-    plane2->material = default_material();
-    plane2->material->color = ft_new_color(1, 1, 1);
-    plane2->material->diffuse = 0.7;
-    plane2->material->specular = 0.3;
-
-    t_plane *plane = malloc(sizeof(t_plane));
-    plane->plane_normal = ft_new_vector(0, -1, 0);
-    plane->plane_cordinates = ft_new_point(0,-60, 0);
-    plane->plane_color = ft_new_color(0.8, 0.8, 0.8);
-    plane->transform = identity_matrix(4);
-    plane->material = default_material();
-    plane->material->color = ft_new_color(1, 0, 0);
-    // plane->material->diffuse = 0.7;
-    // plane->material->specular = 0.3;
-
-    t_cylinder *cylinder1 = malloc(sizeof(t_cylinder));
-    cylinder1->raduis = 40;
-    cylinder1->height = 50;
-    cylinder1->material = default_material();
-    cylinder1->material->color = ft_new_color(1, 0, -150);
-    cylinder1->orientation = ft_new_vector(0,0,0);
-    // cylinder1->transform = create_rotation_matrix_from_vector(cylinder1->orientation);
-    cylinder1->coordinates = ft_new_point(0,0,0);
-    cylinder1->transform = identity_matrix(4);
-    cylinder1->transform[0][3] = cylinder1->coordinates.x;
-    cylinder1->transform[1][3] = cylinder1->coordinates.y;
-    cylinder1->transform[2][3] = cylinder1->coordinates.z;
-    cylinder1->next = NULL;
- 
-    // Light 
-    world->light = ft_new_plight
-    (
-        ft_new_color(1, 1, 1),
-        ft_new_point(0, 10, -200)
-    );
-    // ft_add_shape(&world, sphere1, SHAPE_SPHERE);
-    ft_add_shape(&world, plane, SHAPE_PLANE);
-    ft_add_shape(&world, plane2, SHAPE_PLANE);
-    ft_add_shape(&world, cylinder1, SHAPE_CYLINDER);
-    // if (world->shape->objects.cylinder)
-    // printf("cylinder is  being created. height:%d==\n", world->shape->objects.cylinder->height);
-    // ft_add_shape(&world, sphere1, SHAPE_SPHERE);
-    // ft_add_shape(&world, sphere2, SHAPE_SPHERE);
-    */
     return world;
 }
 
@@ -826,7 +722,6 @@ void ft_set_camera(s_camera **camera)
     float aspect;
     float half_view;
    
-
     aspect = (*camera)->w_size / (*camera)->h_size;
     half_view = tan((*camera)->fov / 2.0f);
     if (aspect >= 1.0f)
@@ -867,26 +762,23 @@ t_ray get_ray_pixel(s_camera *cam, float x, float y, float edge)
 }
 
 //shadow
-
-int is_shadowed(t_world *world, t_point point)
+//to do
+// iterate to each light source while i find just once source intersection i need to break;
+int is_shadowed(t_world *world, t_light *light, t_point point)
 {
     t_vector v;
     t_vector direction;
     float distance;
     t_ray r;
     t_intersection intersections;
-    
-    v = vector_sub(world->light->position, point);
+
+    v = vector_sub(light->coordinate, point);
     direction = vector_normilze(v);
     r = create_ray(point, direction);
     distance = vec_lenght(v);
     intersections = intersect_world(world, r);
     if (intersections.n_sol > 0 && intersections.t1 >=  EPSILON && intersections.t1 < distance)
-    {
-        // free_intersection(intersections);
         return 1;
-    }
-    // free_intersection(intersections);
     return 0;
 }
 
@@ -941,19 +833,20 @@ t_color sample_texture(t_texture *texture, float u, float v)
     // printf("Sampled color: r = %f, g = %f, b = %f\n", result.r, result.g, result.b);
     return result;
 }
-t_color get_textured_lighting_color(t_color texture_color, t_material *material, p_light *light, t_compose *comp, int shadow)
+
+t_color get_textured_lighting_color(t_color texture_color, t_material *material, t_light *light, t_compose *comp, int shadow)
 {
     t_vector light_dir_normal;
     t_color eff_color, ambient, diffuse, specular;
     float light_dot_normal, reflect_dot_camera;
 
     // printf("Texture color: r = %f, g = %f, b = %f\n", texture_color.r, texture_color.g, texture_color.b);
-    eff_color = ft_multiply_color(texture_color, light->intensity);
+    eff_color = ft_multiply_color(texture_color, light->color);
     ambient = clamp_color(ft_multiply_color_scalar(eff_color, material->ambient));  
     // printf("Ambient color: r = %f, g = %f, b = %f\n", ambient.r, ambient.g, ambient.b);
     if (shadow)
         return ambient;
-    light_dir_normal = vector_normilze(vector_sub(light->position, comp->point));
+    light_dir_normal = vector_normilze(vector_sub(light->coordinate, comp->point));
     light_dot_normal = vector_dot(light_dir_normal, comp->normv);
     if (light_dot_normal < EPSILON)
         return ambient;
@@ -969,7 +862,7 @@ t_color get_textured_lighting_color(t_color texture_color, t_material *material,
         if (reflect_dot_camera <= EPSILON)
             specular = ft_new_color(0, 0, 0); 
         else
-            specular = ft_multiply_color_scalar(light->intensity,
+            specular = ft_multiply_color_scalar(light->color,
                         material->specular * powf(reflect_dot_camera, material->shininess));
     }
     // printf("Diffuse color: r = %f, g = %f, b = %f\n", diffuse.r, diffuse.g, diffuse.b);
@@ -986,44 +879,51 @@ t_color shading_hit(t_world *world, t_compose *comp)
     t_color color = ft_new_color(0, 0, 0);
     t_material *material = NULL;
     int shadowed = 0;
+    t_light *tmp_light;
+    int i;
 
-    if (comp->obj_type == SHAPE_SPHERE)
+    i = -1;
+    tmp_light = world->light;
+    while (tmp_light)
     {
-        material = ((t_sphere *)comp->obj)->material;
-        if (((t_sphere *)comp->obj)->has_checkered)
+        // printf("==== Color :: %f-%f-%f==((%d))===\n", tmp_light->color.r, tmp_light->color.g, tmp_light->color.b, ++i);
+        if (comp->obj_type == SHAPE_SPHERE)
         {
-            float u = 0, v = 0;
-            // printf("over_point: x = %f, y = %f, z = %f\n", comp->over_point.x, comp->over_point.y, comp->over_point.z);
-            // printf("sphere coordinates: x = %f, y = %f, z = %f\n", ((t_sphere *)comp->obj)->sphere_coordinates.x, ((t_sphere *)comp->obj)->sphere_coordinates.y, ((t_sphere *)comp->obj)->sphere_coordinates.z);
-            get_spherical_coordinates(comp->over_point, (t_sphere *)comp->obj, &u, &v);
-            color = get_checkered_color((t_sphere *)comp->obj, u, v);
-            material->color = color;
+            material = ((t_sphere *)comp->obj)->material;
+            if (((t_sphere *)comp->obj)->has_checkered)
+            {
+                float u = 0, v = 0;
+                // printf("over_point: x = %f, y = %f, z = %f\n", comp->over_point.x, comp->over_point.y, comp->over_point.z);
+                // printf("sphere coordinates: x = %f, y = %f, z = %f\n", ((t_sphere *)comp->obj)->sphere_coordinates.x, ((t_sphere *)comp->obj)->sphere_coordinates.y, ((t_sphere *)comp->obj)->sphere_coordinates.z);
+                get_spherical_coordinates(comp->over_point, (t_sphere *)comp->obj, &u, &v);
+                color = get_checkered_color((t_sphere *)comp->obj, u, v);
+                material->color = color;
+            }
+            if (((t_sphere *)comp->obj)->has_texture)
+            {
+                float u = 0, v = 0;
+                // printf("over_point: x = %f, y = %f, z = %f\n", comp->over_point.x, comp->over_point.y, comp->over_point.z);
+                // printf("sphere coordinates: x = %f, y = %f, z = %f\n", ((t_sphere *)comp->obj)->sphere_coordinates.x, ((t_sphere *)comp->obj)->sphere_coordinates.y, ((t_sphere *)comp->obj)->sphere_coordinates.z);
+                get_spherical_coordinates(comp->over_point, (t_sphere *)comp->obj, &u, &v);
+                color = sample_texture(((t_sphere *)comp->obj)->texture, u, v);
+                color.r /= 255.0f;
+                color.g /= 255.0f;
+                color.b /= 255.0f;
+                shadowed = is_shadowed(world,tmp_light, comp->over_point);
+                return get_textured_lighting_color(color, material, tmp_light, comp, shadowed);
+            }
         }
-        if (((t_sphere *)comp->obj)->has_texture)
-        {
-            float u = 0, v = 0;
-            // printf("over_point: x = %f, y = %f, z = %f\n", comp->over_point.x, comp->over_point.y, comp->over_point.z);
-            // printf("sphere coordinates: x = %f, y = %f, z = %f\n", ((t_sphere *)comp->obj)->sphere_coordinates.x, ((t_sphere *)comp->obj)->sphere_coordinates.y, ((t_sphere *)comp->obj)->sphere_coordinates.z);
-            get_spherical_coordinates(comp->over_point, (t_sphere *)comp->obj, &u, &v);
-            color = sample_texture(((t_sphere *)comp->obj)->texture, u, v);
-            color.r /= 255.0f;
-            color.g /= 255.0f;
-            color.b /= 255.0f;
-
-            shadowed = is_shadowed(world, comp->over_point);
-            return get_textured_lighting_color(color, material, world->light, comp, shadowed);
-        }
-    }
-    else if (comp->obj_type == SHAPE_PLANE)
-        material = ((t_plane *)comp->obj)->material;
-    else if (comp->obj_type == SHAPE_CYLINDER)
-        material = ((t_cylinder *)comp->obj)->material;
-    else if (comp->obj_type == SHAPE_CONE)
-        material = ((t_cone *)comp->obj)->material;
-    shadowed = is_shadowed(world, comp->over_point);
-    color = get_lighting_color(material, world->light, comp, shadowed);
-    // printf("color: r = %f, g = %f, b = %f\n", color.r, color.g, color.b);
-    return color;
+        else if (comp->obj_type == SHAPE_PLANE)
+            material = ((t_plane *)comp->obj)->material;
+        else if (comp->obj_type == SHAPE_CYLINDER)
+            material = ((t_cylinder *)comp->obj)->material;
+        else if (comp->obj_type == SHAPE_CONE)
+            material = ((t_cone *)comp->obj)->material;
+        shadowed = is_shadowed(world, tmp_light, comp->over_point);
+        color = ft_add_color (color, get_lighting_color(material, tmp_light, comp, shadowed));
+        tmp_light = tmp_light->next;
+    } 
+    return clamp_color (color);
 }
 
 t_color get_color_at(t_world *world, t_ray ray)
@@ -1054,7 +954,7 @@ int key_hook(int keycode, t_scene *data)
     return (0);
 }
 
-char *int_to_str(int num)
+char *int_to_str(int num) 
 {
     int len = 0;
     int temp = num;
@@ -1123,7 +1023,6 @@ int render_image(t_scene *scene, t_world *world, s_camera *cam)
                 (int)clamp((float)(255.999 * color.g), 0, 255) << 8 |
                 (int)clamp((float)(255.999 * color.b), 0, 255);
             my_pixel_put(&scene->data->img, x, y, pixel_color);
-
             current_pixel++;
         }
 
@@ -1152,6 +1051,5 @@ int render_image(t_scene *scene, t_world *world, s_camera *cam)
     mlx_hook(scene->data->win, 17, 0, &ft_close_window, scene);
     mlx_key_hook(scene->data->win, &key_hook, scene);
     mlx_loop(scene->data->mlx);
-
     return 0;
 }

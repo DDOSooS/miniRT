@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2025/03/11 12:37:58 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/03/13 15:26:20 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,8 @@
 // # define    WIN_WIDTH   1280
 // # define    WIN_HEIGHT  720
 
-#define SCREEN_WIDTH 1200.f
-#define SCREEN_HEIGHT 600.f
+#define SCREEN_WIDTH 150.f
+#define SCREEN_HEIGHT 150.f
 
 # define    EPSILON     1e-4f
 # define    PI          3.14159265359
@@ -96,7 +96,7 @@ typedef struct s_material
 
 typedef struct light_s
 {
-    t_color intensity;
+    t_color color;
     t_point position;
 } p_light;
 
@@ -217,9 +217,9 @@ typedef struct ambient
 
 typedef struct light
 {
-    t_point         light_coordinate;
-    double          light_ration;
-    t_color         light_color;
+    t_point         coordinate;
+    double          ration;
+    t_color         color;
     struct light    *next;
 } t_light;
 
@@ -262,7 +262,7 @@ typedef struct s_world
 {
     int n_objects;
     t_shape *shape;
-    p_light *light;
+    t_light *light;
 } t_world;
 
 
@@ -363,7 +363,7 @@ t_intersection ray_hit(t_intersection *inters, int count);
 t_ray transform(t_ray ray, float **m);
 t_ray transform(t_ray ray, float **m);
 t_point position(t_ray ray, float distance);
-t_color get_lighting_color(t_material *material, p_light *light, t_compose *comp, int);
+t_color get_lighting_color(t_material *material, t_light *light, t_compose *comp, int);
 t_vector normilize_at_sphere_pos(t_sphere *sphere, t_point w_p);
 /* end of ray manipulation functions*/
 
@@ -377,7 +377,7 @@ float **get_view_transform(t_point from_v, t_point to_v, t_vector up_v);
 t_ray get_ray_pixel(s_camera *cam, float x, float y, float edge);
 t_color clamp_color(t_color color);
 
-int is_shadowed(t_world *world, t_point point);
+int is_shadowed(t_world *world,t_light *light, t_point point);
 float clamp(float value, float min, float max); 
 t_vector ft_scale_vector(t_vector vector, float scale);
 t_point ft_multiply_matrix_point(float **m, t_point v);

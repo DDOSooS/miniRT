@@ -168,13 +168,13 @@ int get_pixel_color(t_vector *dir, t_scene *scene)
         t_vector *light_dir = vector_sub(scene->light->light_coordinate, intersection_point);
         t_vector *light_dir_normalized = vector_normilze(light_dir);
         
-        //  light intensity (
-        double light_intensity = fmax(vector_dot(normal, light_dir_normalized), 0.0);
+        //  light color (
+        double light_color = fmax(vector_dot(normal, light_dir_normalized), 0.0);
         
-        //  sphere color => light intensity and light ratio
-        int r = (int)fmin(scene->sphere->sphere_color->r * light_intensity * scene->light->light_ration, 255);
-        int g = (int)fmin(scene->sphere->sphere_color->g * light_intensity * scene->light->light_ration, 255);
-        int b = (int)fmin(scene->sphere->sphere_color->b * light_intensity * scene->light->light_ration, 255);
+        //  sphere color => light color and light ratio
+        int r = (int)fmin(scene->sphere->sphere_color->r * light_color * scene->light->light_ration, 255);
+        int g = (int)fmin(scene->sphere->sphere_color->g * light_color * scene->light->light_ration, 255);
+        int b = (int)fmin(scene->sphere->sphere_color->b * light_color * scene->light->light_ration, 255);
         
         // Blend with light color
         r = (r * scene->light->light_color->r) / 255;
@@ -357,7 +357,7 @@ void var_dump_light(p_light *light)
 {
     printf("Light Details:\n");
     printf("  Position: (%.2f, %.2f, %.2f)\n", light->position->x, light->position->y, light->position->z);
-    printf("  Intensity: %.2f\n", light->intensity);
+    printf("  color: %.2f\n", light->color);
 }
 
 void var_dump_world(t_world *world)
@@ -703,13 +703,13 @@ t_color *white = ft_new_color(1000000.0, 1.0, 1.0);
 
     // Test specific to your lighting scenario
     t_material *m = default_material();
-    t_color *light_intensity = ft_new_color(1.0, 1.0, 1.0);
+    t_color *light_color = ft_new_color(1.0, 1.0, 1.0);
     
     printf("\nTesting lighting components:\n");
     printf("Material color: %f %f %f\n", m->color->r, m->color->g, m->color->b);
-    printf("Light intensity: %f %f %f\n", light_intensity->r, light_intensity->g, light_intensity->b);
+    printf("Light color: %f %f %f\n", light_color->r, light_color->g, light_color->b);
     
-    t_color *eff_color = ft_multiply_color(m->color, light_intensity);
+    t_color *eff_color = ft_multiply_color(m->color, light_color);
     printf("Effective color: %f %f %f\n", eff_color->r, eff_color->g, eff_color->b);
     
     t_color *ambient = ft_multiply_color_scalar(eff_color, m->ambient);
@@ -722,7 +722,7 @@ t_color *white = ft_new_color(1000000.0, 1.0, 1.0);
     free(mult);
     free(scalar_mult);
     free(sum);
-    free(light_intensity);
+    free(light_color);
     free(eff_color);
     free(ambient);
     free(m->color);
@@ -778,7 +778,7 @@ t_color *white = ft_new_color(1000000.0, 1.0, 1.0);
 
     printf("pixel color %f %f %f\n", pixel_color->r, pixel_color->g, pixel_color->b);
     printf("pixel color inner %f %f %f\n", sphere_inner->material->color->r, sphere_inner->material->color->g, sphere_inner->material->color->b);
-    printf("world->light ntensity->f %f=  %f= %f\n", world->light->intensity->r, world->light->intensity->g, world->light->intensity->b);
+    printf("world->light ntensity->f %f=  %f= %f\n", world->light->color->r, world->light->color->g, world->light->color->b);
     return 0;
     printf("inside world %d\n", compose->inside);
 */

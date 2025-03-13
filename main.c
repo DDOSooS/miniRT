@@ -30,9 +30,13 @@ void var_dump_all(t_map *map, t_scene *scene)
         //  light
         printf("\n--- Light ---\n");
         if (scene->light) {
-            printf("Light Coordinates: [%f, %f, %f]\n", scene->light->light_coordinate.x, scene->light->light_coordinate.y, scene->light->light_coordinate.z);
-            printf("Light Ratio: %f\n", scene->light->light_ration);
-            printf("Light Color: [%f, %f, %f]\n", scene->light->light_color.r, scene->light->light_color.g, scene->light->light_color.b);
+            while(scene->light)
+            {
+                printf("Light Coordinates: [%f, %f, %f]\n", scene->light->coordinate.x, scene->light->coordinate.y, scene->light->coordinate.z);
+                printf("Light Ratio: %f\n", scene->light->ration);
+                printf("Light Color: [%f, %f, %f]\n", scene->light->color.r, scene->light->color.g, scene->light->color.b);
+                scene->light = scene->light->next;
+            }
         } else {
             printf("Light is NULL\n");
         }
@@ -168,6 +172,7 @@ t_scene *allocate_scene(void)
     scene->plane = NULL;
     scene->cylinder = NULL;
     scene->cone = NULL;
+    scene->light = NULL;
     return scene;
 }
 

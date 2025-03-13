@@ -12,9 +12,10 @@ void ft_free_sphere(t_sphere *sphere)
     
     while(sphere)
     {
-        tmp =  sphere->next;
+        tmp = sphere->next;
         ft_free_matrix(sphere->transform,4);
-        free(sphere->texture);
+        if (sphere->has_texture)
+            free(sphere->texture);
         free(sphere->material);
         free(sphere);
         sphere = tmp;
@@ -52,7 +53,14 @@ void ft_free_plane(t_plane *pl)
 //to be adjusted with multiple spot lights
 void ft_free_light(t_light *light)
 {
-    free(light);
+    t_light *tmp;
+
+    while(light)
+    {
+        tmp = light->next;
+        free(light);
+        light = tmp;
+    }
 }
 
 
@@ -92,8 +100,5 @@ void ft_destroy_scene(t_scene *scen)
     ft_free_cylinder(scen->cylinder);
     ft_free_cone(scen->cone);
     ft_free_shapes(scen->world->shape);
-    free(scen->world->light);
     free(scen->world);
-
-
 }
