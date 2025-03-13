@@ -26,8 +26,11 @@
 // # define    WIN_WIDTH   1280
 // # define    WIN_HEIGHT  720
 
-#define SCREEN_WIDTH 150.f
-#define SCREEN_HEIGHT 150.f
+// #define SCREEN_WIDTH 150.f
+// #define SCREEN_HEIGHT 150.f
+
+#define SCREEN_WIDTH 1280.f
+#define SCREEN_HEIGHT 720.f
 
 # define    EPSILON     1e-4f
 # define    PI          3.14159265359
@@ -363,7 +366,8 @@ t_intersection ray_hit(t_intersection *inters, int count);
 t_ray transform(t_ray ray, float **m);
 t_ray transform(t_ray ray, float **m);
 t_point position(t_ray ray, float distance);
-t_color get_lighting_color(t_material *material, t_light *light, t_compose *comp, int);
+// t_color get_lighting_color(t_material *material, t_light *light, t_compose *comp, int);
+t_color get_lighting_color(t_material *material, t_light *light, t_compose *comp, int shadow, t_color base_color);
 t_vector normilize_at_sphere_pos(t_sphere *sphere, t_point w_p);
 /* end of ray manipulation functions*/
 

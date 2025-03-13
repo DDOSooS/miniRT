@@ -887,7 +887,11 @@ t_cone *ft_new_cone(char **components)
     cone->transform[2][3] = cone->apex.z;
     cone->next = NULL;
     cone->material->color = cone->color;
-
+    if (vec_lenght(cone->axis) == 0) {
+        printf("Error: axis of cone is at origin\n");
+        free(cone);
+        return NULL;
+    }
     return cone;
 }
 

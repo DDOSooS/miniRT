@@ -614,16 +614,18 @@ t_color clamp_color(t_color color)
 /*
     Specular=Lightcolor×MaterialSpecular×(cos(θ)) 
 */
-t_color get_lighting_color(t_material *material, t_light *light, t_compose *comp, int shadow)
+
+t_color get_lighting_color(t_material *material, t_light *light, t_compose *comp, int shadow, t_color base_color)
 {
     t_vector light_dir_normal;
-    t_color eff_color, ambient,  diffuse, specular;
+    t_color eff_color, ambient, diffuse, specular;
     float light_dot_normal, reflect_dot_camera;
 
-    eff_color = ft_multiply_color(material->color, light->color);
-    ambient = clamp_color(ft_multiply_color_scalar(eff_color, material->ambient));  
+    eff_color = ft_multiply_color(base_color, light->color); // Use base_color instead of material->color
+    ambient = clamp_color(ft_multiply_color_scalar(eff_color, material->ambient));
     if (shadow)
         return ambient;
+
     light_dir_normal = vector_normilze(vector_sub(light->coordinate, comp->point));
     light_dot_normal = vector_dot(light_dir_normal, comp->normv);
     if (light_dot_normal < EPSILON)
@@ -634,7 +636,7 @@ t_color get_lighting_color(t_material *material, t_light *light, t_compose *comp
         reflect_dot_camera = vector_dot(reflect_vector(negate_vector(light_dir_normal),
                                         comp->normv), comp->camv);
         if (reflect_dot_camera <= EPSILON)
-            specular = ft_new_color(0, 0, 0); 
+            specular = ft_new_color(0, 0, 0);
         else
             specular = ft_multiply_color_scalar(light->color,
                         material->specular * powf(reflect_dot_camera, material->shininess));
