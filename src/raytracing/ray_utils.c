@@ -13,12 +13,13 @@ t_point position(t_ray ray, float distance)
 {
     t_point new;
 
+    // Initialize all components including 'w'
     new.x = ray.origin.x + ray.direction.x * distance;
     new.y = ray.origin.y + ray.direction.y * distance;
     new.z = ray.origin.z + ray.direction.z * distance;
+    new.w = 1.0;  // Points typically have w=1 in homogeneous coordinates
     return (new);
 }
-
 
 t_intersection ray_hit(t_intersection *inters, int count)
 {
@@ -124,18 +125,6 @@ t_sphere *default_sphere()
     sphere->material = default_material();
     sphere->next = NULL;
     return sphere;
-}
-
-p_light *default_light()
-{
-    p_light *light;
-
-    light = malloc(sizeof(p_light));
-    if (!light)
-        return (NULL);
-    light->position = ft_new_point(-10, 10, -10);
-    light->color = ft_new_color(1, 1, 1);
-    return light;
 }
 
 t_shape *ft_new_shape(void *shape_obj, int shape_type)
@@ -278,13 +267,13 @@ int  is_point_inside_cylinder(t_point point, t_cylinder *cylinder)
         inverse = cylinder->transform;
     tr_p = ft_multiply_matrix_vec(inverse, point);
     half_height = cylinder->height / 2.0f;
-    if (tr_p.y > half_height || tr_p.y < -half_height)
-        return 0;
-    radial_dist = sqrtf(tr_p.x * tr_p.x + tr_p.z * tr_p.z);
     ft_free_matrix(rotation, 4);
     ft_free_matrix(combined, 4);
     if (inverse != cylinder->transform)
         ft_free_matrix(inverse, 4);
+    if (tr_p.y > half_height || tr_p.y < -half_height)
+        return 0;
+    radial_dist = sqrtf(tr_p.x * tr_p.x + tr_p.z * tr_p.z);
     return radial_dist < cylinder->raduis;
 }
 
@@ -376,7 +365,8 @@ t_intersection ft_intersect_cylinder(t_ray ray, t_cylinder *cylinder)
         t_point p;
         p.x = ray.origin.x * min_t + ray.direction.x; 
         p.y = ray.origin.y * min_t + ray.direction.y; 
-        p.z = ray.origin.z * min_t + ray.direction.z; 
+        p.z = ray.origin.z * min_t + ray.direction.z;
+        p.w = ray.origin.w * min_t * ray.direction.w; 
         is_inside = is_point_inside_cylinder(p, cylinder);
         if (min_t > EPSILON || is_inside)
         {
@@ -790,8 +780,7 @@ t_color get_checkered_color(t_sphere *sphere, float u, float v)
 
     if ((u_scaled + v_scaled) % 2 == 0)
         return sphere->sphere_color;
-    else
-        return sphere->checkered_color;
+    return sphere->checkered_color;
 }
 
 void get_spherical_coordinates(t_vector hit_point, t_sphere *sphere, float *u, float *v)
@@ -897,6 +886,7 @@ t_color shading_hit(t_world *world, t_compose *comp)
                 // printf("sphere coordinates: x = %f, y = %f, z = %f\n", ((t_sphere *)comp->obj)->sphere_coordinates.x, ((t_sphere *)comp->obj)->sphere_coordinates.y, ((t_sphere *)comp->obj)->sphere_coordinates.z);
                 get_spherical_coordinates(comp->over_point, (t_sphere *)comp->obj, &u, &v);
                 color = get_checkered_color((t_sphere *)comp->obj, u, v);
+                color = get_checkered_color((t_sphere *)comp->obj, u, v);
                 material->color = color;
             }
             if (((t_sphere *)comp->obj)->has_texture)
@@ -910,7 +900,7 @@ t_color shading_hit(t_world *world, t_compose *comp)
                 color.g /= 255.0f;
                 color.b /= 255.0f;
                 shadowed = is_shadowed(world,tmp_light, comp->over_point);
-                return get_textured_lighting_color(color, material, tmp_light, comp, shadowed);
+                color = ft_add_color(color, get_textured_lighting_color(color, material, tmp_light, comp, shadowed));
             }
         }
         else if (comp->obj_type == SHAPE_PLANE)

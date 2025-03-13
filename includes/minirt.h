@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2025/03/13 15:26:20 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/03/13 19:42:16 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,8 @@
 // # define    WIN_WIDTH   1280
 // # define    WIN_HEIGHT  720
 
-#define SCREEN_WIDTH 150.f
-#define SCREEN_HEIGHT 150.f
+#define SCREEN_WIDTH 40.f
+#define SCREEN_HEIGHT 40.f
 
 # define    EPSILON     1e-4f
 # define    PI          3.14159265359
@@ -69,7 +69,6 @@ typedef struct s_intersection
 {
     int     n_sol;
     float   t1;
-    // float   t2;
     void    *object;
     int     type;
 } t_intersection;
