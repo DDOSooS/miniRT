@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2025/03/13 15:26:20 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/03/13 19:42:16 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,6 @@ typedef struct s_intersection
 {
     int     n_sol;
     float   t1;
-    // float   t2;
     void    *object;
     int     type;
 } t_intersection;
