@@ -217,4 +217,3 @@ int main(int argc, char **argv)
     render_image(scene, scene->world, scene->camera);
     return 0;
 }
-

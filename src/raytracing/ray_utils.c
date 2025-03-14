@@ -277,34 +277,257 @@ int  is_point_inside_cylinder(t_point point, t_cylinder *cylinder)
     return radial_dist < cylinder->raduis;
 }
 
+void create_rotation_matrix(t_vector axis, float angle, float rotation_matrix[4][4])
+{
+    float cos_theta = cos(angle);
+    float sin_theta = sin(angle);
+    float one_minus_cos = 1.0f - cos_theta;
+
+    // Normalize the axis
+    float length = sqrt(axis.x * axis.x + axis.y * axis.y + axis.z * axis.z);
+    axis.x /= length;
+    axis.y /= length;
+    axis.z /= length;
+
+    // Create the rotation matrix
+    rotation_matrix[0][0] = cos_theta + axis.x * axis.x * one_minus_cos;
+    rotation_matrix[0][1] = axis.x * axis.y * one_minus_cos - axis.z * sin_theta;
+    rotation_matrix[0][2] = axis.x * axis.z * one_minus_cos + axis.y * sin_theta;
+    rotation_matrix[0][3] = 0.0f;
+
+    rotation_matrix[1][0] = axis.y * axis.x * one_minus_cos + axis.z * sin_theta;
+    rotation_matrix[1][1] = cos_theta + axis.y * axis.y * one_minus_cos;
+    rotation_matrix[1][2] = axis.y * axis.z * one_minus_cos - axis.x * sin_theta;
+    rotation_matrix[1][3] = 0.0f;
+
+    rotation_matrix[2][0] = axis.z * axis.x * one_minus_cos - axis.y * sin_theta;
+    rotation_matrix[2][1] = axis.z * axis.y * one_minus_cos + axis.x * sin_theta;
+    rotation_matrix[2][2] = cos_theta + axis.z * axis.z * one_minus_cos;
+    rotation_matrix[2][3] = 0.0f;
+
+    rotation_matrix[3][0] = 0.0f;
+    rotation_matrix[3][1] = 0.0f;
+    rotation_matrix[3][2] = 0.0f;
+    rotation_matrix[3][3] = 1.0f;
+}
+
+float **convert_to_pointer_array(float matrix[4][4])
+{
+    float **result = (float **)malloc(4 * sizeof(float *));
+    for (int i = 0; i < 4; i++) {
+        result[i] = (float *)malloc(4 * sizeof(float));
+        for (int j = 0; j < 4; j++) {
+            result[i][j] = matrix[i][j];
+        }
+    }
+    return result;
+}
+
+float **create_matrix(int rows, int cols)
+{
+    float **m = malloc(sizeof(float *) * rows);
+    for (int i = 0; i < rows; i++)
+        m[i] = malloc(sizeof(float) * cols);
+    return m;
+}
+float **create_identity_matrix(int size)
+{
+    float **m = create_matrix(size, size);
+    for (int i = 0; i < size; i++)
+    {
+        for (int j = 0; j < size; j++)
+            m[i][j] = (i == j) ? 1 : 0;
+    }
+    return m;
+}
+
+float **matrix_multiply(float **a, float **b)
+{
+    float **result = create_matrix(4, 4);
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            result[i][j] = 0;
+            for (int k = 0; k < 4; k++)
+                result[i][j] += a[i][k] * b[k][j];
+        }
+    }
+    return result;
+}
+
+void free_matrix(float **m)
+{
+    for (int i = 0; i < 4; i++)
+        free(m[i]);
+    free(m);
+}
+
+t_vector matrix_multiply_vector(float **m, t_vector v)
+{
+    t_vector result;
+    result.x = m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z + m[0][3] * v.w;
+    result.y = m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z + m[1][3] * v.w;
+    result.z = m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z + m[2][3] * v.w;
+    result.w = m[3][0] * v.x + m[3][1] * v.y + m[3][2] * v.z + m[3][3] * v.w;
+    return result;
+}
+
+float **rotation_matrix(t_vector axis, float angle)
+{
+    float **m = create_matrix(4, 4);
+    float c = cos(angle);
+    float s = sin(angle);
+    float t = 1 - c;
+
+    axis = vector_normilze(axis);
+
+    m[0][0] = c + axis.x * axis.x * t;
+    m[0][1] = axis.x * axis.y * t - axis.z * s;
+    m[0][2] = axis.x * axis.z * t + axis.y * s;
+    m[0][3] = 0;
+
+    m[1][0] = axis.y * axis.x * t + axis.z * s;
+    m[1][1] = c + axis.y * axis.y * t;
+    m[1][2] = axis.y * axis.z * t - axis.x * s;
+    m[1][3] = 0;
+
+    m[2][0] = axis.z * axis.x * t - axis.y * s;
+    m[2][1] = axis.z * axis.y * t + axis.x * s;
+    m[2][2] = c + axis.z * axis.z * t;
+    m[2][3] = 0;
+
+    m[3][0] = 0;
+    m[3][1] = 0;
+    m[3][2] = 0;
+    m[3][3] = 1;
+
+    return m;
+}
+
+float **translation_matrix(float x, float y, float z)
+{
+    float **m = create_matrix(4, 4);
+    m[0][0] = 1; m[0][1] = 0; m[0][2] = 0; m[0][3] = x;
+    m[1][0] = 0; m[1][1] = 1; m[1][2] = 0; m[1][3] = y;
+    m[2][0] = 0; m[2][1] = 0; m[2][2] = 1; m[2][3] = z;
+    m[3][0] = 0; m[3][1] = 0; m[3][2] = 0; m[3][3] = 1;
+    return m;
+}
+
+float **matrix_inverse(float **m)
+{
+    return create_identity_matrix(4);
+}
+
+void print_matrix_v2(float **m)
+{
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+            printf("%f ", m[i][j]);
+        printf("\n");
+    }
+}
+
+float **create_cone_transform(t_cone *cone)
+{
+    float **transform = create_identity_matrix(4);
+
+    transform[0][3] = -cone->apex.x;
+    transform[1][3] = -cone->apex.y;
+    transform[2][3] = -cone->apex.z;
+
+    t_vector axis = cone->axis;
+    t_vector up = {0, 1, 0, 0};
+
+    t_vector cross = vector_cross(axis, up);
+    float dot = vector_dot(axis, up);
+    float angle = acos(dot);
+
+    if (fabs(angle) > 0.0001)
+    {
+        float rotation_matrix[4][4];
+        create_rotation_matrix(cross, angle, rotation_matrix);
+
+        float **rotation_matrix_ptr = convert_to_pointer_array(rotation_matrix);
+        float **result = matrix_multiply(transform, rotation_matrix_ptr);
+
+        for (int i = 0; i < 4; i++) {
+            free(rotation_matrix_ptr[i]);
+        }
+        free(rotation_matrix_ptr);
+        free_matrix(transform);
+        transform = result;
+    }
+
+    return transform;
+}
+
+
+t_ray transform_ray(t_ray ray, float **transform)
+{
+    t_ray transformed_ray;
+    ray.origin.w = 1;
+    transformed_ray.origin = matrix_multiply_vector(transform, ray.origin);
+
+    ray.direction.w = 0;
+    transformed_ray.direction = matrix_multiply_vector(transform, ray.direction);
+
+    transformed_ray.direction.w = 0;
+
+    return transformed_ray;
+}
 t_intersection ft_intersect_cone(t_ray ray, t_cone *cone)
 {
     t_intersection inter = {0, 0, NULL, 0};
     float t1, t2;
 
-    t_vector oc = vector_sub(ray.origin, cone->apex);
+    // Transform the ray into the cone's local coordinate system
+    float **transform = create_cone_transform(cone);
+
+    // Print transformation matrix for debugging
+    // printf("Transformation Matrix:\n");
+    // for (int i = 0; i < 4; i++) {
+    //     for (int j = 0; j < 4; j++) {
+    //         printf("%f ", transform[i][j]);
+    //     }
+    //     printf("\n");
+    // }
+
+    t_ray local_ray = transform_ray(ray, transform);
+
+    // Print transformed ray for debugging
+
+    t_vector oc = vector_sub(local_ray.origin, (t_vector){0, 0, 0, 0}); // Apex is now at the origin
     float k = cone->radius / cone->height;
     float k2 = k * k;
 
-    float A = ray.direction.x * ray.direction.x + ray.direction.z * ray.direction.z - k2 * ray.direction.y * ray.direction.y;
-    float B = 2 * (ray.direction.x * oc.x + ray.direction.z * oc.z - k2 * ray.direction.y * oc.y);
+    float A = local_ray.direction.x * local_ray.direction.x + local_ray.direction.z * local_ray.direction.z - k2 * local_ray.direction.y * local_ray.direction.y;
+    float B = 2 * (local_ray.direction.x * oc.x + local_ray.direction.z * oc.z - k2 * local_ray.direction.y * oc.y);
     float C = oc.x * oc.x + oc.z * oc.z - k2 * oc.y * oc.y;
 
     float discriminant = B * B - 4 * A * C;
 
     if (discriminant < 0)
+    {
+        free_matrix(transform);
+        // printf("No intersection (discriminant < 0)\n");
         return inter;
+    }
 
     discriminant = sqrt(discriminant);
     t1 = (-B - discriminant) / (2 * A);
     t2 = (-B + discriminant) / (2 * A);
-    float y1 = ray.origin.y + t1 * ray.direction.y;
-    float y2 = ray.origin.y + t2 * ray.direction.y;
+
+    float y1 = local_ray.origin.y + t1 * local_ray.direction.y;
+    float y2 = local_ray.origin.y + t2 * local_ray.direction.y;
 
     if (y1 < 0 || y1 > cone->height)
         t1 = -1;
     if (y2 < 0 || y2 > cone->height)
         t2 = -1;
+
     if (t1 >= 0 || t2 >= 0)
     {
         inter.n_sol = 2;
@@ -313,6 +536,7 @@ t_intersection ft_intersect_cone(t_ray ray, t_cone *cone)
         inter.type = SHAPE_CONE;
     }
 
+    free_matrix(transform);
     return inter;
 }
 
@@ -394,10 +618,22 @@ t_vector vector_mult_scalar(t_vector v, float scalar)
 
 t_vector normalize_at_cone_pos(t_cone *cone, t_vector point)
 {
-    t_vector apex_to_point = vector_sub(point, cone->apex);
-    float height_component = vector_dot(apex_to_point, cone->axis);
-    t_vector normal = vector_sub(apex_to_point, vector_mult_scalar(cone->axis, height_component));
-    return vector_normilze(normal);
+    // Transform the point into the cone's local coordinate system
+    float **transform = create_cone_transform(cone);
+    t_vector local_point = matrix_multiply_vector(transform, point);
+
+    t_vector apex_to_point = vector_sub(local_point, (t_vector){0, 0, 0, 0}); // Apex is at the origin
+    float height_component = vector_dot(apex_to_point, (t_vector){0, 1, 0, 0}); // Axis is now y-axis
+    t_vector normal = vector_sub(apex_to_point, vector_mult_scalar((t_vector){0, 1, 0, 0}, height_component));
+
+    // Transform the normal back to world coordinates
+    float **inverse_transform = matrix_inverse(transform);
+    t_vector world_normal = matrix_multiply_vector(inverse_transform, normal);
+
+    free_matrix(transform);
+    free_matrix(inverse_transform);
+
+    return vector_normilze(world_normal);
 }
 
 t_vector normalize_at_cylinder_pos(t_cylinder *cylinder, t_point world_p)
@@ -668,6 +904,8 @@ void ft_add_cone_shape(t_world *world, t_cone *cone)
     tmp = cone;
     while (tmp)
     {
+        // if (tmp->axis.x =! 0 || tmp->axis.z != 0 || tmp->axis.y != 0)
+            // ft_add_shape(&world, tmp, SHAPE_CONE);
         ft_add_shape(&world, tmp, SHAPE_CONE);
         tmp = tmp->next;
     }
