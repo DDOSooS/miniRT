@@ -1128,6 +1128,7 @@ t_color get_textured_lighting_color(t_color texture_color, t_material *material,
     // printf("Final color: r = %f, g = %f, b = %f\n", final_color.r, final_color.g, final_color.b);
     return final_color;
 }
+/*TODO:trying to fix the shawoding and multicolor on textured sphere*/
 
 t_color shading_hit(t_world *world, t_compose *comp)
 {
@@ -1151,21 +1152,24 @@ t_color shading_hit(t_world *world, t_compose *comp)
                 float u = 0, v = 0;
                 get_spherical_coordinates(comp->over_point, (t_sphere *)comp->obj, &u, &v);
                 base_color = get_checkered_color((t_sphere *)comp->obj, u, v); // Use checkered color as base
+                shadowed = is_shadowed(world, tmp_light, comp->over_point);
+                color = ft_add_color(color, get_lighting_color(material, tmp_light, comp, shadowed, base_color));
+                tmp_light = tmp_light->next;
+                continue; // Skip the rest of the loop for checkered spheres
             }
             else if (((t_sphere *)comp->obj)->has_texture)
             {
                 float u = 0, v = 0;
                 get_spherical_coordinates(comp->over_point, (t_sphere *)comp->obj, &u, &v);
-                color = sample_texture(((t_sphere *)comp->obj)->texture, u, v);
-                color.r /= 255.0f;
-                color.g /= 255.0f;
-                color.b /= 255.0f;
-                shadowed = is_shadowed(world,tmp_light, comp->over_point);
-                color = ft_add_color(color, get_textured_lighting_color(color, material, tmp_light, comp, shadowed));
+                base_color = sample_texture(((t_sphere *)comp->obj)->texture, u, v);
+                base_color.g /= 255.0f;
+                base_color.b /= 255.0f;
+                base_color.r /= 255.0f;
+                shadowed = is_shadowed(world, tmp_light, comp->over_point);
+                color = ft_add_color(color, get_textured_lighting_color(base_color, material, tmp_light, comp, shadowed));
+                tmp_light = tmp_light->next;
+                continue; // Skip the rest of the loop for textured spheres
             }
-
-            shadowed = is_shadowed(world, tmp_light, comp->over_point);
-            color = ft_add_color(color, get_lighting_color(material, tmp_light, comp, shadowed, base_color));
         }
         else if (comp->obj_type == SHAPE_PLANE) {
             material = ((t_plane *)comp->obj)->material;
