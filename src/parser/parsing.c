@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 20:24:10 by aghergho          #+#    #+#             */
-/*   Updated: 2025/03/12 17:43:08 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/03/14 18:09:37 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -313,6 +313,36 @@ int ft_check_fov(char *component)
     return 1;
 }
 
+int ft_check_norm_range(char *comp)
+{
+    double tmp ;
+
+    tmp = ft_atod(comp);
+    if (tmp  < -1 || tmp > 1)
+        return 0;
+    return 1;
+}
+
+int ft_check_norm(char *component)
+{
+    char **norm;
+    int i;
+
+    i = -1;
+    norm = split(component, ",");
+    while (++i < 3)
+    {
+        if (!ft_check_norm_range(norm[i]))
+        {
+            ft_free_line_components(norm);
+            return 0;
+        }
+    }
+    ft_free_line_components(norm);
+    return  1;
+}
+
+
 int ft_check_ambient_component(char **components, int *counter)
 {
     if (ft_count_components(components) != 3)
@@ -392,9 +422,9 @@ int ft_check_plane_component(char **components)
 {
     if (ft_count_components(components) != 4)
         return 0;
-    if (!ft_check_elements(components[1]))
+    if (!ft_check_elements(components[1]) )
         return 0;
-    if (!ft_check_elements(components[2]))
+    if (!ft_check_elements(components[2]) || !ft_check_norm(components[2]))
         return 0;
     if (!ft_check_colors(components[3]))
         return 0;
@@ -408,7 +438,7 @@ int ft_check_cylinder_component(char **components)
         return 0;
     if (!ft_check_elements(components[1]))
         return 0;
-    if (!ft_check_elements(components[2]))
+    if (!ft_check_elements(components[2]) || !ft_check_norm(components[2]))
         return 0;
     if (!ft_check_non_negative(components[3]) || !ft_check_non_negative(components[4]))
         return 0;
