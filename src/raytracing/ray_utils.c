@@ -430,6 +430,8 @@ void print_matrix_v2(float **m)
     }
 }
 
+/* trying to to fix the -1 given to y*/
+
 float **create_cone_transform(t_cone *cone)
 {
     float **transform = create_identity_matrix(4);
@@ -441,14 +443,18 @@ float **create_cone_transform(t_cone *cone)
     t_vector axis = cone->axis;
     t_vector up = {0, 1, 0, 0};
 
-    t_vector cross = vector_cross(axis, up);
-    float dot = vector_dot(axis, up);
-    float angle = acos(dot);
+    float length = sqrt(axis.x * axis.x + axis.y * axis.y + axis.z * axis.z);
+    axis.x /= length;
+    axis.y /= length;
+    axis.z /= length;
 
-    if (fabs(angle) > 0.0001)
-    {
-        float rotation_matrix[4][4];
-        create_rotation_matrix(cross, angle, rotation_matrix);
+    if (fabs(axis.x) < 0.0001 && fabs(axis.y + 1) < 0.0001 && fabs(axis.z) < 0.0001) {
+        float rotation_matrix[4][4] = {
+            {1, 0, 0, 0},
+            {0, -1, 0, 0},
+            {0, 0, -1, 0},
+            {0, 0, 0, 1}
+        };
 
         float **rotation_matrix_ptr = convert_to_pointer_array(rotation_matrix);
         float **result = matrix_multiply(transform, rotation_matrix_ptr);
@@ -458,7 +464,30 @@ float **create_cone_transform(t_cone *cone)
         }
         free(rotation_matrix_ptr);
         free_matrix(transform);
+
         transform = result;
+    }
+    else {
+        float dot = vector_dot(axis, up);
+        float angle = acos(dot);
+        t_vector cross = vector_cross(axis, up);
+
+        if (fabs(angle) > 0.0001)
+        {
+            float rotation_matrix[4][4];
+            create_rotation_matrix(cross, angle, rotation_matrix);
+            float **rotation_matrix_ptr = convert_to_pointer_array(rotation_matrix);
+            float **result = matrix_multiply(transform, rotation_matrix_ptr);
+
+            for (int i = 0; i < 4; i++) {
+                free(rotation_matrix_ptr[i]);
+            }
+            free(rotation_matrix_ptr);
+
+            free_matrix(transform);
+
+            transform = result;
+        }
     }
 
     return transform;
