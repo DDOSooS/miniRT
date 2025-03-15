@@ -1,10 +1,10 @@
-s_camera *new_camera(float h_size, float w_size, float fov, t_point p, t_vector dir)
+t_scamera *new_camera(float h_size, float w_size, float fov, t_point p, t_vector dir)
 {
-    s_camera *camera;
+    t_scamera *camera;
     float aspect;
     float half_view;
    
-    camera = malloc(sizeof(s_camera));
+    camera = malloc(sizeof(t_scamera));
     if (!camera)
         return NULL;
     camera->origin = p;

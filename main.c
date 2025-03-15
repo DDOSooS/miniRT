@@ -93,19 +93,19 @@ void var_dump_all(t_map *map, t_scene *scene)
     }
 }
 
-t_map *ft_init_map()
+t_map   *ft_init_map()
 {
-    t_map *new;
+    t_map   *new;
     int i;
 
     i = -1;
     new = (t_map *)malloc(sizeof(t_map));
     if (!new)
-        return NULL;
+        return (NULL);
     new->lines = NULL;
     while (++i < 3)
         new->scen_elements[i] = 0;    
-    return new;
+    return (new);
 }
 
 int	ft_close(t_var *vars)
@@ -173,12 +173,12 @@ t_scene *allocate_scene(void)
     scene->cylinder = NULL;
     scene->cone = NULL;
     scene->light = NULL;
-    return scene;
+    return (scene);
 }
 
 void     ft_free_map_line(t_map *map)
 {
-    map_line *tmp;
+    t_map_line *tmp;
     int  i;
 
     while(map->lines)
@@ -211,9 +211,9 @@ int main(int argc, char **argv)
     scene = allocate_scene();
     init_scene(scene);
     if (!ft_generate_scene(map->lines, &scene))
-        return (100);
+        return (0);
     scene->map = map;
     scene->world = default_world(scene);
     render_image(scene, scene->world, scene->camera);
-    return 0;
+    return (0);
 }

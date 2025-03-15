@@ -18,10 +18,10 @@ int ft_is_whitespace(char c)
     return (c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\v');
 }
 
-double get_fractional(char *str, int i)
+double  get_fractional(char *str, int i)
 {
-    double fractional_part;
-    double divisor ;
+    double  fractional_part;
+    double  divisor ;
     
     fractional_part = 0.0;
     divisor = 10.0;
@@ -30,10 +30,10 @@ double get_fractional(char *str, int i)
         fractional_part += (str[i] - '0') / divisor;
         divisor *= 10.0;
     }
-    return fractional_part;
+    return (fractional_part);
 }
 
-double ft_atod(char *str)
+double  ft_atod(char *str)
 {
     double result = 0.0;
     int i = 0;
@@ -53,7 +53,7 @@ double ft_atod(char *str)
         result = result * 10 + (str[i] - '0');
     if (str[i] == '.')
         result += get_fractional(str, i);
-    return result * sign;
+    return (result * sign);
 }
 
 int is_empty_line(char *line)
@@ -61,8 +61,7 @@ int is_empty_line(char *line)
     int i = 0;
     
     if (!line || line[0] == '\n')
-        return 1;
-
+        return (1);
     while (line[i])
     {
         if (!ft_is_whitespace(line[i]))
@@ -86,9 +85,9 @@ void ft_free_line_components(char **components)
     free(components);
 }
 
-void    ft_free_map(map_line **map_lines)
+void    ft_free_map(t_map_line **map_lines)
 {
-    map_line *tmp;
+    t_map_line *tmp;
 
     while (*map_lines)
     {
@@ -506,13 +505,13 @@ int is_identifier(char *identifier)
 //!norminnete
 int ft_check_map_components(t_map **map)
 {
-    map_line    *tmp;
+    t_map_line    *tmp;
     int         identifier_id;
     int i;
 
     i = 0;
     tmp = (*map)->lines;
-    map_line *line =(*map)->lines;
+    t_map_line *line =(*map)->lines;
     while (tmp)
     {        
         identifier_id = is_identifier(tmp->line_component[0]);
@@ -540,7 +539,7 @@ int ft_check_map_components(t_map **map)
 
 //================================================================
 
-void    var_dump_lines(map_line *map)
+void    var_dump_lines(t_map_line *map)
 {
     if (!map)
     {
@@ -563,9 +562,9 @@ void    var_dump_lines(map_line *map)
 }
 
 
-map_line    *ft_get_last_line(map_line **map)
+t_map_line    *ft_get_last_line(t_map_line **map)
 {
-    map_line    *tmp;
+    t_map_line    *tmp;
 
     tmp = *map;
     if (!tmp)
@@ -575,12 +574,12 @@ map_line    *ft_get_last_line(map_line **map)
     return (tmp);
 }
 
-int    ft_add_line(map_line **map, char *line)
+int    ft_add_line(t_map_line **map, char *line)
 {
-    map_line    *new;
-    map_line    *last;
+    t_map_line    *new;
+    t_map_line    *last;
 
-    new = (map_line *)malloc(sizeof(map_line));
+    new = (t_map_line *)malloc(sizeof(t_map_line));
     if (!new)
         return 0;
     new->line_component = split(line, " \t\n\r\v");
@@ -595,9 +594,9 @@ int    ft_add_line(map_line **map, char *line)
 
 
 
-map_line *ft_gen_scen_map(char *file_name)
+t_map_line *ft_gen_scen_map(char *file_name)
 {
-    map_line *map;
+    t_map_line *map;
     char *line;
     int fd;
 
@@ -670,7 +669,7 @@ int ft_add_ambient(t_scene **scene, char **components)
 
 int ft_add_camera(t_scene **scene, char **components)
 {
-    s_camera *camera;
+    t_scamera *camera;
     t_point position;
     t_vector dir;
     float     fov;
@@ -678,7 +677,7 @@ int ft_add_camera(t_scene **scene, char **components)
     ft_gen_elements(&position, components[1]);
     ft_gen_elements(&dir, components[2]);
     fov = ft_atod(components[3]);
-    camera = malloc(sizeof(s_camera));
+    camera = malloc(sizeof(t_scamera));
     if (!camera)
         return 0;
     camera->fov  = fov;
@@ -722,13 +721,13 @@ int ft_add_light(t_scene **scene, char **components)
 //     result.b = color & 0xFF;
 //     return result;
 // }
-void get_texture(t_sphere *sphere, char *texture_name, t_scene **scene)
+int get_texture(t_sphere *sphere, char *texture_name, t_scene **scene)
 {
     int fd = open(texture_name, O_RDONLY);
     if (fd < 0)
     {
         perror("Error: Failed to open texture file");
-        return;
+        return (0);
     }
     close(fd);
 
@@ -736,7 +735,7 @@ void get_texture(t_sphere *sphere, char *texture_name, t_scene **scene)
     if (!sphere->texture)
     {
         perror("Error: Failed to allocate memory for texture");
-        return;
+        return (0);
     }
 
     sphere->texture->img_ptr = mlx_xpm_file_to_image(
@@ -750,7 +749,7 @@ void get_texture(t_sphere *sphere, char *texture_name, t_scene **scene)
         perror("Error: Failed to load XPM image");
         free(sphere->texture);
         sphere->texture = NULL;
-        return;
+        return (0);
     }
     sphere->texture->img_data = mlx_get_data_addr(
         sphere->texture->img_ptr,
@@ -758,15 +757,15 @@ void get_texture(t_sphere *sphere, char *texture_name, t_scene **scene)
         &sphere->texture->size_line,
         &sphere->texture->endian
     );
-    printf("print infos: %d %d %d %d\n", sphere->texture->bpp, sphere->texture->size_line, sphere->texture->width, sphere->texture->height);
     if (!sphere->texture->img_data)
     {
         perror("Error: Failed to get image data");
         mlx_destroy_image(NULL, sphere->texture->img_ptr);
         free(sphere->texture);
         sphere->texture = NULL;
-        return;
+        return(0);
     }
+    return (1);
 }
 
 t_sphere *ft_new_sphere(char **components, t_scene **scene)
@@ -791,10 +790,15 @@ t_sphere *ft_new_sphere(char **components, t_scene **scene)
     }
     else if (ft_count_components(components) == 5)
     {
-        printf("texture name %s\n", components[4]);
         sphere->has_checkered = 0;
         sphere->has_texture = 1;
-        get_texture(sphere, components[4], scene);
+        if (!get_texture(sphere, components[4], scene))
+        {
+            ft_free_matrix(sphere->transform, 4);
+            free(sphere->material);
+            free(sphere);
+            return NULL;
+        }
     }
     else
     {
@@ -878,7 +882,7 @@ t_cylinder *ft_new_cylinder(char **components)
     new->material = default_material();
     new->material->color = new->cylinder_color;
     new->next = NULL;
-    return new;
+    return (new);
 }
 
 int ft_add_cylinder(t_scene **scene, char **components)
@@ -918,11 +922,10 @@ t_cone *ft_new_cone(char **components)
     cone->next = NULL;
     cone->material->color = cone->color;
     if (vec_lenght(cone->axis) == 0) {
-        printf("Error: axis of cone is at origin\n");
         free(cone);
-        return NULL;
+        return (NULL);
     }
-    return cone;
+    return (cone);
 }
 
 int ft_add_cone(t_scene **scene, char **components)
@@ -962,7 +965,7 @@ int ft_add_component(t_scene **scene, int identifier, char **components)
     return (1);
 }
  
-int ft_generate_scene(map_line *compoenent, t_scene **scene)
+int ft_generate_scene(t_map_line *compoenent, t_scene **scene)
 {
     int     identifier_id;
 
