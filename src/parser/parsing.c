@@ -452,7 +452,7 @@ int ft_check_cone_component(char **components) {
         return 0;
     if (!ft_check_elements(components[1]))
         return 0;
-    if (!ft_check_elements(components[2]))
+    if (!ft_check_elements(components[2]) || !ft_check_norm(components[2]))
         return 0;
     if (!ft_check_non_negative(components[3]) || !ft_check_non_negative(components[4]))
         return 0;

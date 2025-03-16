@@ -23,11 +23,11 @@
 # include <stdlib.h>
 # include <unistd.h>
 
-// # define SCREEN_WIDTH 1280.f
-// # define SCREEN_HEIGHT 720.f
+# define SCREEN_WIDTH 1280.f
+# define SCREEN_HEIGHT 720.f
 
-# define SCREEN_WIDTH 150.f
-# define SCREEN_HEIGHT 150.f
+// # define SCREEN_WIDTH 150.f
+// # define SCREEN_HEIGHT 150.f
 
 # define EPSILON 1e-4f
 # define PI 3.14159265359

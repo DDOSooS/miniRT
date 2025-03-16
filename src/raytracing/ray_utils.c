@@ -504,25 +504,24 @@ t_vector vector_mult_scalar(t_vector v, float scalar)
 
 t_vector normalize_at_cone_pos(t_cone *cone, t_vector point)
 {
-	float **transform;
-	t_vector local_point;
-	t_vector apex_to_point;
-	float height_component;
-	t_vector normal;
-	float **inverse_transform;
-	t_vector world_normal;
-
-
-	transform = create_cone_transform(cone);
-	local_point = matrix_multiply_vector(transform, point);
-	apex_to_point = vector_sub(local_point, (t_vector){0, 0, 0, 0});
-	height_component = vector_dot(apex_to_point, (t_vector){0, 1, 0, 0});
-	 normal = vector_sub(apex_to_point, vector_mult_scalar((t_vector){0, 1, 0, 0}, height_component));
-	inverse_transform = matrix_inverse(transform);
-	 world_normal = matrix_multiply_vector(inverse_transform, normal);
-	free_matrix(transform);
-	free_matrix(inverse_transform);
-	return (vector_normilze(world_normal));
+    float **transform;
+    t_vector local_point;
+    t_vector apex_to_point;
+    float height_component;
+    t_vector normal;
+    float **inverse_transform;
+    t_vector world_normal;
+    
+    transform = create_cone_transform(cone);
+    local_point = matrix_multiply_vector(transform, point);
+    apex_to_point = vector_sub(local_point, (t_vector){0, 0, 0, 0});
+    height_component = vector_dot(apex_to_point, (t_vector){0, 1, 0, 0});
+    normal = vector_sub(apex_to_point, vector_mult_scalar((t_vector){0, 1, 0, 0}, height_component));
+    inverse_transform = matrix_inverse(transform);
+    world_normal = matrix_multiply_vector(inverse_transform, normal);
+    free_matrix(transform);
+    free_matrix(inverse_transform);
+    return (vector_normilze(world_normal));
 }
 
 t_vector normalize_at_cylinder_pos(t_cylinder *cylinder, t_point world_p)

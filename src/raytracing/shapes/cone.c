@@ -121,27 +121,54 @@ float	**apply_rotation(float **transform, t_vector cross, float angle)
 	return (result);
 }
 
-/* main function */
+float	**create_rotation_matrix_from_vector_cone(t_vector axis)
+{
+    float **rotation;
+    float temp_matrix[4][4];
+    t_transform_vars vars;
+    
+    rotation = create_identity_matrix(4);
+    vars.axis = vector_normilze(axis);
+    vars.up = (t_vector){0, 1, 0, 0};
+    
+    if (fabs(vars.axis.x) < 0.0001 && fabs(vars.axis.y + 1) < 0.0001 && fabs(vars.axis.z) < 0.0001)
+    {
+        init_rotation_matric(temp_matrix);
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                rotation[i][j] = temp_matrix[i][j];
+    }
+    else
+    {
+        vars.dot = vector_dot(vars.axis, vars.up);
+        vars.angle = acos(vars.dot);
+        vars.cross = vector_cross(vars.up, vars.axis);
+        
+        if (fabs(vars.angle) > 0.0001)
+        {
+            create_rotation_matrix(vars.cross, vars.angle, temp_matrix);
+            for (int i = 0; i < 4; i++)
+                for (int j = 0; j < 4; j++)
+                    rotation[i][j] = temp_matrix[i][j];
+        }
+    }
+    
+    return rotation;
+}
+
+
 float	**create_cone_transform(t_cone *cone)
 {
-	float				**transform;
-	t_transform_vars	vars;
+	float **rotation;
+	float **translation;
+	float **combined;
 
-	transform = create_translation_matrix(cone);
-	vars.axis = vector_normilze(cone->axis);
-	vars.up = (t_vector){0, 1, 0, 0};
-	if (fabs(vars.axis.x) < 0.0001 && fabs(vars.axis.y + 1)
-		< 0.0001 && fabs(vars.axis.z) < 0.0001)
-		transform = handle_opposite_up_case(transform);
-	else
-	{
-		vars.dot = vector_dot(vars.axis, vars.up);
-		vars.angle = acos(vars.dot);
-		vars.cross = vector_cross(vars.axis, vars.up);
-		if (fabs(vars.angle) > 0.0001)
-			transform = apply_rotation(transform, vars.cross, vars.angle);
-	}
-	return (transform);
+    rotation = create_rotation_matrix_from_vector_cone(cone->axis);
+    translation = create_translation_matrix(cone);
+    combined = matrix_multiply(rotation, translation);
+    free_matrix(rotation);
+    free_matrix(translation);
+    return (combined);
 }
 
 /* main function */
@@ -151,13 +178,6 @@ t_ray	get_local_ray(t_ray ray, t_cone *cone)
 	t_ray	local_ray;
 
 	transform = create_cone_transform(cone);
-	for (int i = 0; i < 4; i++)
-	{
-		printf("transform[%d][0] = %f\n", i, transform[i][0]);
-		printf("transform[%d][1] = %f\n", i, transform[i][1]);
-		printf("transform[%d][2] = %f\n", i, transform[i][2]);
-		printf("transform[%d][3] = %f\n", i, transform[i][3]);
-	}
 	local_ray = transform_ray(ray, transform);
 	free_matrix(transform);
 	return (local_ray);
