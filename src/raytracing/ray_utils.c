@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ray_utils.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkartit <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/16 12:52:52 by mkartit           #+#    #+#             */
-/*   Updated: 2025/03/16 12:52:56 by mkartit          ###   ########.fr       */
+/*   Updated: 2025/03/16 16:59:57 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -321,31 +321,55 @@ void create_rotation_matrix(t_vector axis, float angle, float rotation_matrix[4]
 
 float **create_matrix(int rows, int cols)
 {
-	float **m = malloc(sizeof(float *) * rows);
-	for (int i = 0; i < rows; i++)
+	float   **m;
+    int     i;
+
+    i = -1;
+    m = malloc(sizeof(float *) * rows);
+	while (++i < rows)
 		m[i] = malloc(sizeof(float) * cols);
 	return m;
 }
+
 float **create_identity_matrix(int size)
 {
-	float **m = create_matrix(size, size);
-	for (int i = 0; i < size; i++)
+	float   **m;
+    int     i;
+    int     j;
+
+    i = -1;
+    m = create_matrix(size, size);
+	while (++i < size)
 	{
-		for (int j = 0; j < size; j++)
-			m[i][j] = (i == j) ? 1 : 0;
+        j = -1;
+		while (++j < size)
+        {
+            if (i == j)
+                m[i][j] = 1;
+            else
+                m[i][j] = 0;
+        }
 	}
 	return m;
 }
 
 float **matrix_multiply(float **a, float **b)
 {
-	float **result = create_matrix(4, 4);
-	for (int i = 0; i < 4; i++)
+	float **result;
+    int     i;
+    int     j;
+    int     k;
+
+    i = -1;
+    result = create_matrix(4, 4);
+	while (++i < 4)
 	{
-		for (int j = 0; j < 4; j++)
+        j = -1;
+		while(++j < 4)
 		{
-			result[i][j] = 0;
-			for (int k = 0; k < 4; k++)
+            result[i][j] = 0;
+            k = -1;
+            while (++k < 4)
 				result[i][j] += a[i][k] * b[k][j];
 		}
 	}
@@ -354,7 +378,10 @@ float **matrix_multiply(float **a, float **b)
 
 void free_matrix(float **m)
 {
-	for (int i = 0; i < 4; i++)
+    int i;
+
+    i = -1;
+	while (++i < 4)
 		free(m[i]);
 	free(m);
 }
@@ -362,6 +389,7 @@ void free_matrix(float **m)
 t_vector matrix_multiply_vector(float **m, t_vector v)
 {
 	t_vector result;
+
 	result.x = m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z + m[0][3] * v.w;
 	result.y = m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z + m[1][3] * v.w;
 	result.z = m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z + m[2][3] * v.w;
@@ -436,60 +464,60 @@ t_intersection ft_intersect_cylinder(t_ray ray, t_cylinder *cylinder)
 	int counter = 0;
 	int is_inside = 0;
 
-	//  rotation matrix && orientation vector
-	float **rotation = create_rotation_matrix_from_vector(cylinder->orientation);
-	// Combine rotation and transformation MX
-	float **combined = ft_multiply_matrix(cylinder->transform, rotation, 4, 4);
-	float **inverse = inverse_matrix(combined, 4);
-	if (!inverse)
-		inverse = cylinder->transform;
-	// Transform ray to object space
-	t_ray tr_ray = create_ray(ft_multiply_matrix_vec(inverse, ray.origin),
-										ft_multiply_matrix_vec(inverse, ray.direction));
-	float a = tr_ray.direction.x * tr_ray.direction.x + tr_ray.direction.z * tr_ray.direction.z;
-	float b = 2.0f * (tr_ray.origin.x * tr_ray.direction.x + tr_ray.origin.z * tr_ray.direction.z);
-	float c = tr_ray.origin.x * tr_ray.origin.x + tr_ray.origin.z * tr_ray.origin.z - cylinder->raduis * cylinder->raduis;
-	float discriminant = b * b - 4.0f * a * c;
-	float disance = INFINITY;
-	if (discriminant >= 0)
-	{
-		float sqrt_disc = sqrtf(discriminant);
-		float t1 = (-b - sqrt_disc) / (2.0f * a);
-		float t2 = (-b + sqrt_disc) / (2.0f * a);
-		float y1 = tr_ray.origin.y + t1 * tr_ray.direction.y;
-		float y2 = tr_ray.origin.y + t2 * tr_ray.direction.y;
-		if (y1 >= -half_height && y1 <= half_height)
-			sol[counter++] = t1;
-		if (y2 >= -half_height && y2 <= half_height) 
-			sol[counter++] = t2;
-	}
-	captop = check_intersection_caps(tr_ray, cylinder, half_height);
-	if (captop.n_sol > 0)
-		sol[counter++] = captop.t1;
-	capbottom = check_intersection_caps(tr_ray, cylinder, -half_height);
-	if (capbottom.n_sol > 0)
-		sol[counter++] = capbottom.t1;
-	if (counter > 0)
-	{
-		float min_t = get_min_sol(sol, counter);
-		t_point p;
-		p.x = ray.origin.x * min_t + ray.direction.x; 
-		p.y = ray.origin.y * min_t + ray.direction.y; 
-		p.z = ray.origin.z * min_t + ray.direction.z;
-		p.w = ray.origin.w * min_t * ray.direction.w; 
-		is_inside = is_point_inside_cylinder(p, cylinder);
-		if (min_t > EPSILON || is_inside)
-		{
-			result.n_sol = 1;
-			result.object = cylinder;
-			result.t1 = min_t;
-		}
-	}
-	ft_free_matrix(rotation, 4);
-	ft_free_matrix(combined, 4);
-	if (inverse != cylinder->transform)
-		ft_free_matrix(inverse, 4);
-	return result;
+    //  rotation matrix && orientation vector
+    float **rotation = create_rotation_matrix_from_vector(cylinder->orientation);
+    // Combine rotation and transformation MX
+    float **combined = ft_multiply_matrix(cylinder->transform, rotation, 4, 4);
+    float **inverse = inverse_matrix(combined, 4);
+    if (!inverse)
+        inverse = cylinder->transform;
+    // Transform ray to object space
+    t_ray tr_ray = create_ray(ft_multiply_matrix_vec(inverse, ray.origin),
+                                        ft_multiply_matrix_vec(inverse, ray.direction));
+    float a = tr_ray.direction.x * tr_ray.direction.x + tr_ray.direction.z * tr_ray.direction.z;
+    float b = 2.0f * (tr_ray.origin.x * tr_ray.direction.x + tr_ray.origin.z * tr_ray.direction.z);
+    float c = tr_ray.origin.x * tr_ray.origin.x + tr_ray.origin.z * tr_ray.origin.z - cylinder->raduis/2.f * cylinder->raduis/2.f;
+    float discriminant = b * b - 4.0f * a * c;
+    float disance = INFINITY;
+    if (discriminant >= 0)
+    {
+        float sqrt_disc = sqrtf(discriminant);
+        float t1 = (-b - sqrt_disc) / (2.0f * a);
+        float t2 = (-b + sqrt_disc) / (2.0f * a);
+        float y1 = tr_ray.origin.y + t1 * tr_ray.direction.y;
+        float y2 = tr_ray.origin.y + t2 * tr_ray.direction.y;
+        if (y1 >= -half_height && y1 <= half_height)
+            sol[counter++] = t1;
+        if (y2 >= -half_height && y2 <= half_height) 
+            sol[counter++] = t2;
+    }
+    captop = check_intersection_caps(tr_ray, cylinder, half_height);
+    if (captop.n_sol > 0)
+        sol[counter++] = captop.t1;
+    capbottom = check_intersection_caps(tr_ray, cylinder, -half_height);
+    if (capbottom.n_sol > 0)
+        sol[counter++] = capbottom.t1;
+    if (counter > 0)
+    {
+        float min_t = get_min_sol(sol, counter);
+        t_point p;
+        p.x = ray.origin.x * min_t + ray.direction.x; 
+        p.y = ray.origin.y * min_t + ray.direction.y; 
+        p.z = ray.origin.z * min_t + ray.direction.z;
+        p.w = ray.origin.w * min_t * ray.direction.w; 
+        is_inside = is_point_inside_cylinder(p, cylinder);
+        if (min_t > EPSILON || is_inside)
+        {
+            result.n_sol = 1;
+            result.object = cylinder;
+            result.t1 = min_t;
+        }
+    }
+    ft_free_matrix(rotation, 4);
+    ft_free_matrix(combined, 4);
+    if (inverse != cylinder->transform)
+        ft_free_matrix(inverse, 4);
+    return result;
 }
 
 t_vector vector_mult_scalar(t_vector v, float scalar)
@@ -524,20 +552,49 @@ t_vector normalize_at_cone_pos(t_cone *cone, t_vector point)
     return (vector_normilze(world_normal));
 }
 
+
+float **copy_matrix(float **m)
+{
+    float   **res;
+    int     i;
+    int     j;
+
+    res = ft_create_matrix(4,4);
+    i = -1;
+    while (++i < 4)
+    {
+        j = -1;
+        while (++j < 4)
+            res[i][j] = m[i][j];
+    }
+    return res;
+}
+
+float **get_combined_inv(t_cylinder *cy)
+{
+    float **rotation;
+    float **combined;
+	float **inv;
+
+    rotation = create_rotation_matrix_from_vector(cy->orientation);
+    combined = ft_multiply_matrix(cy->transform, rotation, 4, 4);
+    inv = inverse_matrix(combined, 4);
+    if (!inv)
+        inv = copy_matrix(combined);
+    ft_free_matrix(rotation, 4);
+    ft_free_matrix(combined, 4);
+    return inv;
+}
+
 t_vector normalize_at_cylinder_pos(t_cylinder *cylinder, t_point world_p)
 {
-	float **rotation;
-	float **combined;
 	float **inv;
 	t_vector world_normal;
-	
-	rotation = create_rotation_matrix_from_vector(cylinder->orientation);
-	combined = ft_multiply_matrix(cylinder->transform, rotation, 4, 4);
-	inv = inverse_matrix(combined, 4);
-	if (!inv)
-		inv = combined;    
-	t_point local_p = ft_multiply_matrix_point(inv, world_p);
+	t_point local_p;
+    
 	//  normal in object space
+    inv = get_combined_inv(cylinder);
+    local_p = ft_multiply_matrix_point(inv, world_p);
 	t_vector local_normal;
 	if (fabs(local_p.y - cylinder->height/2) < EPSILON)
 		local_normal = (t_vector){0, 1, 0};
@@ -545,14 +602,9 @@ t_vector normalize_at_cylinder_pos(t_cylinder *cylinder, t_point world_p)
 		local_normal = (t_vector){0, -1, 0};
 	else
 		local_normal = (t_vector){local_p.x, 0, local_p.z};
-	// Transform normal back to world space !<= 
 	ft_transpose_matrix(&inv, 4, 4);
 	world_normal = ft_multiply_matrix_vec(inv, local_normal);
-	;
-	ft_free_matrix(rotation, 4);
-	ft_free_matrix(combined, 4);
-	if (inv != combined)
-		ft_free_matrix(inv, 4);
+    ft_free_matrix(inv, 4);
 	return vector_normilze(world_normal);
 }
 
@@ -567,21 +619,18 @@ t_intersection intersect_world(t_world *world, t_ray ray)
 		return (t_intersection) {0,0,NULL,0};
 	current = world->shape;
 	inter = malloc(sizeof(t_intersection) * world->n_objects);
-	if (!inter)
-		return (t_intersection) {0,0,NULL,0};
-	i = 0;
+	i = -1;
 	while (current)
 	{
 		if (current->type == SHAPE_SPHERE)
-			inter[i] = ft_intersect_sphere(ray, current->u_objects.sphere);
+			inter[++i] = ft_intersect_sphere(ray, current->u_objects.sphere);
 		else if (current->type == SHAPE_PLANE)
-			inter[i] = ft_intersect_plane(ray, current->u_objects.plane);
+			inter[++i] = ft_intersect_plane(ray, current->u_objects.plane);
 		else if (current->type == SHAPE_CYLINDER)
-			inter[i] = ft_intersect_cylinder(ray, current->u_objects.cylinder);  
+			inter[++i] = ft_intersect_cylinder(ray, current->u_objects.cylinder);  
 		else if (current->type == SHAPE_CONE)
-			inter[i] = ft_intersect_cone(ray, current->u_objects.cone);
+			inter[+i] = ft_intersect_cone(ray, current->u_objects.cone);
 		current = current->next;
-		i++;
 	}
 	res = ray_hit(inter, world->n_objects);
 	return (free(inter), res);
@@ -615,18 +664,16 @@ linear algebraic transformation
 */
 t_vector normalize_at_plane_pos(t_plane *plane, t_point w_p)
 {
-	t_vector world_normal;
-	float **inv_transpose;
-	t_vector normalized;
-	t_vector obj_normal;
+	t_vector    world_normal;
+	float       **inv_transpose;
+	t_vector    normalized;
+	t_vector    obj_normal;
 	
-	// Start with the plane's normal - no need to normalize yet
 	obj_normal = plane->plane_normal;
 		inv_transpose = inverse_matrix(plane->transform, 4);
 	if (!inv_transpose)
 		inv_transpose = plane->transform;
 	ft_transpose_matrix(&inv_transpose, 4, 4);
-	// Transform the normal to world space
 	world_normal = ft_multiply_matrix_vec(inv_transpose, obj_normal);
 	world_normal.w = 0;  
 	normalized = vector_normilze(world_normal);    
@@ -663,17 +710,10 @@ t_compose *prepare_computations(t_intersection inter, t_ray ray)
 		comp->normv = normalize_at_cylinder_pos((t_cylinder *)(inter.object), comp->point);
 	else if (comp->obj_type == SHAPE_CONE)
 		comp->normv = normalize_at_cone_pos((t_cone *)(inter.object), comp->point);
-	else
-		comp->normv = ft_new_vector(0, 0, 0);  
 	comp->normv = vector_normilze(comp->normv);
-	comp->inside = 0;
 	if (vector_dot(comp->normv, comp->camv) < 0.0)
-	{
-		comp->inside = 1;
 		comp->normv = negate_vector(comp->normv);
-	}
-	t_point offset = ft_scale_point(comp->normv, EPSILON);
-	comp->over_point = point_add(comp->point, offset);
+	comp->over_point = point_add(comp->point, ft_scale_point(comp->normv, EPSILON));
 	return comp;
 }
 
@@ -684,6 +724,21 @@ t_compose *prepare_computations(t_intersection inter, t_ray ray)
 */
 
 //camera transform matrix that transform from world coordinates to camera system Co
+
+
+void set_view_matrix(float **m, t_vector left_v, t_vector up_n, t_vector forward_v)
+{
+    m[0][0] = left_v.x;
+	m[0][1] = left_v.y;
+	m[0][2] = left_v.z;
+	m[1][0] = up_n.x;
+	m[1][1] = up_n.y;
+	m[1][2] = up_n.z;
+	m[2][0] = -forward_v.x;
+	m[2][1] = -forward_v.y;
+	m[2][2] = -forward_v.z;
+}
+
 float **get_view_transform(t_point from_v, t_vector to_v, t_vector up_v)
 {
 	t_vector    forward_v;
@@ -698,15 +753,7 @@ float **get_view_transform(t_point from_v, t_vector to_v, t_vector up_v)
 	left_v = vector_cross(forward_v, up_n);
 	up_v = vector_cross(left_v, forward_v);
 	view_transform = identity_matrix(4);
-	view_transform[0][0] = left_v.x;
-	view_transform[0][1] = left_v.y;
-	view_transform[0][2] = left_v.z;
-	view_transform[1][0] = up_n.x;
-	view_transform[1][1] = up_n.y;
-	view_transform[1][2] = up_n.z;
-	view_transform[2][0] = -forward_v.x;
-	view_transform[2][1] = -forward_v.y;
-	view_transform[2][2] = -forward_v.z;
+    set_view_matrix(view_transform, left_v, up_v, forward_v);
 	traslate_mx = ft_translate_matrix(ft_new_point(-from_v.x, -from_v.y, -from_v.z), 1);
 	res = ft_multiply_matrix(view_transform, traslate_mx, 4, 4);
 	ft_free_matrix(view_transform,4);
@@ -717,21 +764,22 @@ float **get_view_transform(t_point from_v, t_vector to_v, t_vector up_v)
 //y rotation than x rotation~~~~~~
 float **create_rotation_matrix_from_vector(t_vector orientation)
 {
-	float **res;
-	float sd_ax;
-	t_vector normalized;
-	float **rot_y;
-	float **rot_x;
-	
-	normalized = vector_normilze(orientation);
-	rot_y = rotate_y(atan2(normalized.x, normalized.z));
-	rot_x = rotate_x(asin(-normalized.y));
-	res = ft_multiply_matrix(rot_y, rot_x, 4, 4);
-	ft_free_matrix(rot_y, 4);
-	ft_free_matrix(rot_x, 4);
-	return res;
+    float **res;
+    float sd_ax;
+    t_vector normalized;
+    float **rot_y;
+    float **rot_x;
+    
+    normalized = vector_normilze(orientation);
+    rot_y = rotate_y(atan2(normalized.x, normalized.z));
+    rot_x = rotate_x(asin(-normalized.y));
+    res = ft_multiply_matrix(rot_x, rot_y, 4, 4);
+    ft_free_matrix(rot_y, 4);
+    ft_free_matrix(rot_x, 4);
+    return res;
 }
-
+/*
+*/
 void ft_add_cylinder_shape(t_world *world, t_cylinder *cylinder)
 {
 	t_cylinder *tmp;
@@ -930,7 +978,8 @@ t_color sample_texture(t_texture *texture, float u, float v)
 	return result;
 }
 
-t_color get_textured_lighting_color(t_color texture_color, t_material *material, t_light *light, t_compose *comp, int shadow)
+//!norminette!!!!!
+t_color get_textured_lighting_color(t_color texture_color, t_material *material, t_light *light, t_compose *comp)
 {
 	t_vector light_dir_normal;
 	t_color eff_color, ambient, diffuse, specular;
@@ -938,7 +987,7 @@ t_color get_textured_lighting_color(t_color texture_color, t_material *material,
 
 	eff_color = ft_multiply_color(texture_color, light->color);
 	ambient = clamp_color(ft_multiply_color_scalar(eff_color, material->ambient));  
-	if (shadow)
+	if (comp->shadow)
 		return ambient;
 	light_dir_normal = vector_normilze(vector_sub(light->coordinate, comp->point));
 	light_dot_normal = vector_dot(light_dir_normal, comp->normv);
@@ -1042,8 +1091,8 @@ t_color handle_checkered_sphere(t_world *world, t_compose *comp, t_light *light,
 	v = 0;
 	get_spherical_coordinates(comp->over_point, (t_sphere *)comp->obj, &u, &v);
 	base_color = get_checkered_color((t_sphere *)comp->obj, u, v);
-	shadowed = is_shadowed(world, light, comp->over_point);
-	return (get_lighting_color(material, light, comp, shadowed, base_color));
+	comp->shadow = is_shadowed(world, light, comp->over_point);
+	return (get_lighting_color(material, light, comp, base_color));
 }
 
 // Handle textured sphere shading
@@ -1055,15 +1104,15 @@ t_color handle_textured_sphere(t_world *world, t_compose *comp, t_light *light, 
 	base_color.r /= 255.0f;
 	base_color.g /= 255.0f;
 	base_color.b /= 255.0f;
-	int shadowed = is_shadowed(world, light, comp->over_point);
-	return get_textured_lighting_color(base_color, material, light, comp, shadowed);
+	comp->shadow = is_shadowed(world, light, comp->over_point);
+	return get_textured_lighting_color(base_color, material, light, comp);
 }
 
 // Handle standard object shading
 t_color handle_standard_object(t_world *world, t_compose *comp, t_light *light, t_material *material)
 {
-	int shadowed = is_shadowed(world, light, comp->over_point);
-	return get_lighting_color(material, light, comp, shadowed, material->color);
+	comp->shadow = is_shadowed(world, light, comp->over_point);
+	return get_lighting_color(material, light, comp, material->color);
 }
 
 // Process a single light source for an object
@@ -1156,13 +1205,17 @@ void    setup_window_hooks(t_scene *scene)
 int render_image(t_scene *scene, t_world *world, t_scamera *cam)
 {
 	float x, y;
-	int total_pixels = cam->w_size * cam->h_size;
-	int current_pixel = 0;
-	
+	int total_pixels;
+	int current_pixel;
+    
+    total_pixels = cam->w_size * cam->h_size;
+    current_pixel = 0;
+    y = -1;
 	mlx_clear_window(scene->data->mlx, scene->data->win);
-	for (y = 0; y < cam->h_size; y++)
+	while(++y < cam->h_size)
 	{
-		for (x = 0; x < cam->w_size; x++)
+        x = -1;
+		while (++x < cam->w_size)
 		{
 			render_pixel(scene, world, cam, x, y);
 			current_pixel++;

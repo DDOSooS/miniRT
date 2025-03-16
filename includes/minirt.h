@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2025/03/13 19:42:16 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/03/16 17:01:18 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,9 +25,6 @@
 
 # define SCREEN_WIDTH 1280.f
 # define SCREEN_HEIGHT 720.f
-
-// # define SCREEN_WIDTH 150.f
-// # define SCREEN_HEIGHT 150.f
 
 # define EPSILON 1e-4f
 # define PI 3.14159265359
@@ -233,6 +230,7 @@ typedef struct s_compose
 	t_vector		normv;
 	t_point			point;
 	int				inside;
+    int             shadow;
 	t_point			over_point;
 }					t_compose;
 
@@ -380,7 +378,7 @@ t_intersection		ray_hit(t_intersection *inters, int count);
 t_ray				transform(t_ray ray, float **m);
 t_point				position(t_ray ray, float distance);
 t_color				get_lighting_color(t_material *material, t_light *light,
-						t_compose *comp, int shadow, t_color base_color);
+						t_compose *comp, t_color base_color);
 t_vector			normilize_at_sphere_pos(t_sphere *sphere, t_point w_p);
 /* end of ray manipulation functions*/
 
