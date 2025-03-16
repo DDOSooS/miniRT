@@ -1,12 +1,12 @@
 #include "./../includes/minirt.h"
 
-void ft_free_camera(s_camera **cam)
+void ft_free_camera(t_scamera **cam)
 {
     ft_free_matrix((*cam)->transform,4);
     free(*cam);
 }
 
-void ft_free_sphere(t_sphere *sphere)
+void ft_free_sphere(t_sphere *sphere, t_var *data)
 {
     t_sphere *tmp;
     
@@ -15,7 +15,10 @@ void ft_free_sphere(t_sphere *sphere)
         tmp = sphere->next;
         ft_free_matrix(sphere->transform,4);
         if (sphere->has_texture)
+        {
+            mlx_destroy_image(data->mlx, sphere->texture->img_ptr);
             free(sphere->texture);
+        }
         free(sphere->material);
         free(sphere);
         sphere = tmp;
@@ -96,7 +99,7 @@ void ft_destroy_scene(t_scene *scen)
     ft_free_light(scen->light); 
     ft_free_camera(&scen->camera);
     ft_free_plane(scen->plane);
-    ft_free_sphere(scen->sphere);
+    ft_free_sphere(scen->sphere, scen->data);
     ft_free_cylinder(scen->cylinder);
     ft_free_cone(scen->cone);
     ft_free_shapes(scen->world->shape);

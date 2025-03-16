@@ -136,16 +136,13 @@ t_shape *ft_new_shape(void *shape_obj, int shape_type)
     new_shape->type = shape_type;
     new_shape->next = NULL;
     if (shape_type == SHAPE_SPHERE) 
-        new_shape->objects.sphere = (t_sphere *)shape_obj;
+        new_shape->u_objects.sphere = (t_sphere *)shape_obj;
     else if (shape_type == SHAPE_PLANE)
-        new_shape->objects.plane = (t_plane *)shape_obj;
+        new_shape->u_objects.plane = (t_plane *)shape_obj;
     else if (shape_type == SHAPE_CYLINDER)
-        new_shape->objects.cylinder = (t_cylinder *)shape_obj;
+        new_shape->u_objects.cylinder = (t_cylinder *)shape_obj;
     else if (shape_type == SHAPE_CONE)
-    {
-        printf("cone is being created\n");
-        new_shape->objects.cone = (t_cone *)shape_obj;
-    }
+        new_shape->u_objects.cone = (t_cone *)shape_obj;
     else
     {
         free(new_shape);
@@ -714,13 +711,13 @@ t_intersection intersect_world(t_world *world, t_ray ray)
     while (current)
     {
         if (current->type == SHAPE_SPHERE)
-            inter[i] = ft_intersect_sphere(ray, current->objects.sphere);
+            inter[i] = ft_intersect_sphere(ray, current->u_objects.sphere);
         else if (current->type == SHAPE_PLANE)
-            inter[i] = ft_intersect_plane(ray, current->objects.plane);
+            inter[i] = ft_intersect_plane(ray, current->u_objects.plane);
         else if (current->type == SHAPE_CYLINDER)
-            inter[i] = ft_intersect_cylinder(ray, current->objects.cylinder);  
+            inter[i] = ft_intersect_cylinder(ray, current->u_objects.cylinder);  
         else if (current->type == SHAPE_CONE)
-            inter[i] = ft_intersect_cone(ray, current->objects.cone);
+            inter[i] = ft_intersect_cone(ray, current->u_objects.cone);
         current = current->next;
         i++;
     }
@@ -975,7 +972,7 @@ t_world *default_world(t_scene *scene)
 
 
 
-void ft_set_camera(s_camera **camera)
+void ft_set_camera(t_scamera **camera)
 {
     float aspect;
     float half_view;
@@ -997,7 +994,7 @@ void ft_set_camera(s_camera **camera)
         vector_normilze((*camera)->direction), ft_new_vector(0, 1, 0));
 }
 
-t_ray get_ray_pixel(s_camera *cam, float x, float y, float edge)
+t_ray get_ray_pixel(t_scamera *cam, float x, float y, float edge)
 {
     t_ray ray;
     t_point pixel_world;
@@ -1259,7 +1256,7 @@ void ft_strcat(char *dest, const char *src)
 }
 
 
-int render_image(t_scene *scene, t_world *world, s_camera *cam)
+int render_image(t_scene *scene, t_world *world, t_scamera *cam)
 {
     float x, y;
     t_color color;

@@ -576,11 +576,11 @@ t_vector reflect_vector(t_vector in, t_vector normal)
     return result;
 }
 
-p_light  *ft_new_plight(t_color color, t_point point)
+t_plight  *ft_new_plight(t_color color, t_point point)
 {
-    p_light *light;
+    t_plight *light;
 
-    light = (p_light *)malloc(sizeof(p_light));
+    light = (t_plight *)malloc(sizeof(t_plight));
     if (!light)
         return NULL;
     light->color = ft_new_color(color.r, color.g, color.b);
@@ -626,7 +626,7 @@ t_color get_lighting_color(t_material *material, t_light *light, t_compose *comp
     t_color eff_color, ambient, diffuse, specular;
     float light_dot_normal, reflect_dot_camera;
 
-    eff_color = ft_multiply_color(base_color, light->color); // Use base_color instead of material->color
+    eff_color = ft_multiply_color(base_color, light->color);
     ambient = clamp_color(ft_multiply_color_scalar(eff_color, material->ambient));
     if (shadow)
         return ambient;

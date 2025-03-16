@@ -340,10 +340,10 @@ void var_dump_shape(t_shape *shape)
                 printf("Sphere\n");
                 // Assuming t_sphere has a radius and center properties for demonstration
                 printf("  Sphere Details: radius = %.2f, center = (%.2f, %.2f, %.2f)\n",
-                       shape->objects.sphere->sphere_diameter,
-                       shape->objects.sphere->sphere_coordinates->x,
-                       shape->objects.sphere->sphere_coordinates->y,
-                       shape->objects.sphere->sphere_coordinates->z);
+                       shape->u_objects.sphere->sphere_diameter,
+                       shape->u_objects.sphere->sphere_coordinates->x,
+                       shape->u_objects.sphere->sphere_coordinates->y,
+                       shape->u_objects.sphere->sphere_coordinates->z);
                 break;
         
             default:
@@ -353,7 +353,7 @@ void var_dump_shape(t_shape *shape)
     }
 }
 
-void var_dump_light(p_light *light)
+void var_dump_light(t_plight *light)
 {
     printf("Light Details:\n");
     printf("  Position: (%.2f, %.2f, %.2f)\n", light->position->x, light->position->y, light->position->z);
@@ -480,7 +480,7 @@ void var_dump_world(t_world *world)
         // t_vector *cam = ft_new_vector(0, 0,-1);
         t_vector *cam = ft_new_vector(0, 0,-1);
         t_vector *norm_v = ft_new_vector(0,0,-1);
-        p_light *l = ft_new_plight(ft_new_color(1, 1, 1), ft_new_point(0, 0, 10));
+        t_plight *l = ft_new_plight(ft_new_color(1, 1, 1), ft_new_point(0, 0, 10));
         t_color *color = get_lighting_color(spher->material, l, ft_new_point(0,0,0), cam, norm_v);
         printf("Color: (%f, %f, %f)\n", color->r, color->g, color->b);
     */
@@ -680,7 +680,7 @@ void var_dump_world(t_world *world)
     // t_vector *cam_vec = ft_new_vector(0,0,-1);
     t_vector *cam_vec = ft_new_vector(0,0,-1);
     t_vector *norm_v = ft_new_vector(0,0,-1);
-    p_light *light = ft_new_plight(ft_new_color(1,1,1), ft_new_point(0,0,10));
+    t_plight *light = ft_new_plight(ft_new_color(1,1,1), ft_new_point(0,0,10));
     t_color *color = get_lighting_color(m,light,point,cam_vec, norm_v);
     printf("res color %f %f %f\n", color->r, color->g, color->b);
 
@@ -760,10 +760,10 @@ t_color *white = ft_new_color(1000000.0, 1.0, 1.0);
     printf( "spher diameter %f\n", sphere_inner->material->diffuse);
     printf("pixel color %f %f %f\n", sphere_inner->material->color->r, sphere_inner->material->color->g, sphere_inner->material->color->b);
     print_matrix(sphere_inner->transform,4,4);
-    p_light *light = ft_new_plight(ft_new_color(1,1,1),ft_new_point(0,0.25,0));
-    t_sphere *sphere_inner = world->shape->next->objects.sphere;
+    t_plight *light = ft_new_plight(ft_new_color(1,1,1),ft_new_point(0,0.25,0));
+    t_sphere *sphere_inner = world->shape->next->u_objects.sphere;
       // Get second sphere
-    t_sphere *sphere_outer = world->shape->objects.sphere;  // Get second sphere
+    t_sphere *sphere_outer = world->shape->u_objects.sphere;  // Get second sphere
     sphere_inner->material->ambient = 1;
     sphere_outer->material->ambient = 1;
     printf("Sphere color: %f %f %f\n", sphere_inner->material->color->r, 
