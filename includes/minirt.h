@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2025/03/13 19:42:16 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/03/16 13:56:11 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,8 @@
 // #define SCREEN_WIDTH 150.f
 // #define SCREEN_HEIGHT 150.f
 
-#define SCREEN_WIDTH 1280.f
-#define SCREEN_HEIGHT 720.f
+#define SCREEN_WIDTH 400.f
+#define SCREEN_HEIGHT 400.f
 
 # define    EPSILON     1e-4f
 # define    PI          3.14159265359

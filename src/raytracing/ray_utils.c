@@ -591,7 +591,7 @@ t_intersection ft_intersect_cylinder(t_ray ray, t_cylinder *cylinder)
                                         ft_multiply_matrix_vec(inverse, ray.direction));
     float a = tr_ray.direction.x * tr_ray.direction.x + tr_ray.direction.z * tr_ray.direction.z;
     float b = 2.0f * (tr_ray.origin.x * tr_ray.direction.x + tr_ray.origin.z * tr_ray.direction.z);
-    float c = tr_ray.origin.x * tr_ray.origin.x + tr_ray.origin.z * tr_ray.origin.z - cylinder->raduis * cylinder->raduis;
+    float c = tr_ray.origin.x * tr_ray.origin.x + tr_ray.origin.z * tr_ray.origin.z - cylinder->raduis/2.f * cylinder->raduis/2.f;
     float discriminant = b * b - 4.0f * a * c;
     float disance = INFINITY;
     if (discriminant >= 0)
@@ -883,12 +883,13 @@ float **create_rotation_matrix_from_vector(t_vector orientation)
     normalized = vector_normilze(orientation);
     rot_y = rotate_y(atan2(normalized.x, normalized.z));
     rot_x = rotate_x(asin(-normalized.y));
-    res = ft_multiply_matrix(rot_y, rot_x, 4, 4);
+    res = ft_multiply_matrix(rot_x, rot_y, 4, 4);
     ft_free_matrix(rot_y, 4);
     ft_free_matrix(rot_x, 4);
     return res;
 }
-
+/*
+*/
 void ft_add_cylinder_shape(t_world *world, t_cylinder *cylinder)
 {
     t_cylinder *tmp;
