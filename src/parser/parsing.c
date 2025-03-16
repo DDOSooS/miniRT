@@ -15,113 +15,113 @@
 
 int ft_is_whitespace(char c)
 {
-    return (c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\v');
+	return (c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\v');
 }
 
 double  get_fractional(char *str, int i)
 {
-    double  fractional_part;
-    double  divisor ;
-    
-    fractional_part = 0.0;
-    divisor = 10.0;
-    while (str[++i] && (str[i] >= '0' && str[i] <= '9'))
-    {
-        fractional_part += (str[i] - '0') / divisor;
-        divisor *= 10.0;
-    }
-    return (fractional_part);
+	double  fractional_part;
+	double  divisor ;
+	
+	fractional_part = 0.0;
+	divisor = 10.0;
+	while (str[++i] && (str[i] >= '0' && str[i] <= '9'))
+	{
+		fractional_part += (str[i] - '0') / divisor;
+		divisor *= 10.0;
+	}
+	return (fractional_part);
 }
 
 double  ft_atod(char *str)
 {
-    double result = 0.0;
-    int i = 0;
-    int sign = 1;
+	double result = 0.0;
+	int i = 0;
+	int sign = 1;
 
-    while (ft_is_whitespace(str[i]))
-        i++;
-    if (str[i] == '-')
-    {
-        sign = -1;
-        i++;
-    }
-    else if (str[i] == '+') 
-        i++;
-    i--;
-    while (str[++i] && (str[i] >= '0' && str[i] <= '9'))
-        result = result * 10 + (str[i] - '0');
-    if (str[i] == '.')
-        result += get_fractional(str, i);
-    return (result * sign);
+	while (ft_is_whitespace(str[i]))
+		i++;
+	if (str[i] == '-')
+	{
+		sign = -1;
+		i++;
+	}
+	else if (str[i] == '+') 
+		i++;
+	i--;
+	while (str[++i] && (str[i] >= '0' && str[i] <= '9'))
+		result = result * 10 + (str[i] - '0');
+	if (str[i] == '.')
+		result += get_fractional(str, i);
+	return (result * sign);
 }
 
 int is_empty_line(char *line)
 {   
-    int i = 0;
-    
-    if (!line || line[0] == '\n')
-        return (1);
-    while (line[i])
-    {
-        if (!ft_is_whitespace(line[i]))
-            return 0;
-        i++;
-    }
-    return 1;
+	int i = 0;
+	
+	if (!line || line[0] == '\n')
+		return (1);
+	while (line[i])
+	{
+		if (!ft_is_whitespace(line[i]))
+			return 0;
+		i++;
+	}
+	return 1;
 }
 
 
 void ft_free_line_components(char **components)
 {
-    int i;
+	int i;
 
-    i = 0;
-    while (components[i])
-    {
-        free(components[i]);
-        i++;
-    }
-    free(components);
+	i = 0;
+	while (components[i])
+	{
+		free(components[i]);
+		i++;
+	}
+	free(components);
 }
 
 void    ft_free_map(t_map_line **map_lines)
 {
-    t_map_line *tmp;
+	t_map_line *tmp;
 
-    while (*map_lines)
-    {
-        tmp = (*map_lines)->next;
-        ft_free_line_components((*map_lines)->line_component);
-        free(*map_lines);
-        (*map_lines) = tmp;
-    }
-    map_lines = NULL;    
+	while (*map_lines)
+	{
+		tmp = (*map_lines)->next;
+		ft_free_line_components((*map_lines)->line_component);
+		free(*map_lines);
+		(*map_lines) = tmp;
+	}
+	map_lines = NULL;    
 }
 
 int ft_check_file_name(char *filename)
 {
-    char *extention;
+	char *extention;
 
-    extention = ft_strrchr(filename, '.');
-    if (extention && ft_strcmp(extention, ".rt") == 0)
-        return 1;
-    return 0;
+	extention = ft_strrchr(filename, '.');
+	if (extention && ft_strcmp(extention, ".rt") == 0)
+		return 1;
+	return 0;
 }
 
 
 int check_delimiter(char c, char *delimiter)
 {
-    int    i;
+	int    i;
 
-    i = 0;
-    while (delimiter[i])
-    {
-        if (c == delimiter[i])
-            return (1);
-        i++;
-    }
-    return (0);
+	i = 0;
+	while (delimiter[i])
+	{
+		if (c == delimiter[i])
+			return (1);
+		i++;
+	}
+	return (0);
 }
 
 static void	ft_free(char ***words, int size)
@@ -210,507 +210,507 @@ char	**split(char const *s, char *delimiter)
 
 int ft_is_degit(char *str)
 {
-    int i;
+	int i;
 
-    i = 0;
-    if (str[i] == '+' || str[i] == '-')
-        i++;
-    while (str[i] && (str[i] >= '0' && str[i] <= '9'))
-         i++;
-    if (str[i] == '.')
-    {
-        i++;
-        while (str[i] && (str[i] >= '0' && str[i] <= '9'))
-            i++;
-        if (str[i])
-            return 0;
-    }
-    else if (str[i])
-        return 0;
-    return 1;
+	i = 0;
+	if (str[i] == '+' || str[i] == '-')
+		i++;
+	while (str[i] && (str[i] >= '0' && str[i] <= '9'))
+		 i++;
+	if (str[i] == '.')
+	{
+		i++;
+		while (str[i] && (str[i] >= '0' && str[i] <= '9'))
+			i++;
+		if (str[i])
+			return 0;
+	}
+	else if (str[i])
+		return 0;
+	return 1;
 }
 
 int ft_count_components(char **components)
 {
-    int i;
+	int i;
 
-    i = 0;
-    while (components[i])
-        i++;
-    return i;
+	i = 0;
+	while (components[i])
+		i++;
+	return i;
 }
 
 int ft_check_range(char *component)
 {
-    double range;
+	double range;
 
-    range = ft_atod(component);
-    // printf("range = %f", range);
-    if (range < 0 || range > 1)
-        return 0;
-    return 1;
+	range = ft_atod(component);
+	// printf("range = %f", range);
+	if (range < 0 || range > 1)
+		return 0;
+	return 1;
 }
 
 int ft_check_colors(char *component)
 {
-    char **colors;
-    int i;
-    double color;
-    
-    colors = split(component,",");
-    if (!colors)
-        return 0;
-    if (ft_count_components(colors) != 3)
-        return (ft_free_line_components(colors), 0);
-    i = -1;
-    while (colors[++i])
-    {
-        if (!ft_is_degit(colors[i]))
-            return (ft_free_line_components(colors), 0);
-        color = ft_atod(colors[i]);
-        if (color < 0 || color > 255)
-            return (ft_free_line_components(colors), 0);         
-    }
-    ft_free_line_components(colors);
-    return (1);
+	char **colors;
+	int i;
+	double color;
+	
+	colors = split(component,",");
+	if (!colors)
+		return 0;
+	if (ft_count_components(colors) != 3)
+		return (ft_free_line_components(colors), 0);
+	i = -1;
+	while (colors[++i])
+	{
+		if (!ft_is_degit(colors[i]))
+			return (ft_free_line_components(colors), 0);
+		color = ft_atod(colors[i]);
+		if (color < 0 || color > 255)
+			return (ft_free_line_components(colors), 0);         
+	}
+	ft_free_line_components(colors);
+	return (1);
 }
 
 int ft_check_elements(char *component)
 {
-    char **coordinates;
-    int i;
+	char **coordinates;
+	int i;
 
-    i = -1;
-    coordinates = split(component,",");
-    if (ft_count_components(coordinates) != 3)
-        return ( ft_free_line_components(coordinates),0);
-    while (coordinates[++i])
-    {
-        if (!ft_is_degit(coordinates[i]))
-            return (ft_free_line_components(coordinates), 0);
-    }
-    return ( ft_free_line_components(coordinates),1);
+	i = -1;
+	coordinates = split(component,",");
+	if (ft_count_components(coordinates) != 3)
+		return ( ft_free_line_components(coordinates),0);
+	while (coordinates[++i])
+	{
+		if (!ft_is_degit(coordinates[i]))
+			return (ft_free_line_components(coordinates), 0);
+	}
+	return ( ft_free_line_components(coordinates),1);
 }
 
 int ft_check_non_negative(char *component)
 {
-    double value;
+	double value;
 
-    value = ft_atod(component);
-    if (value < 0)
-        return 0;
-    return 1;
+	value = ft_atod(component);
+	if (value < 0)
+		return 0;
+	return 1;
 }
 
 int ft_check_fov(char *component)
 {
-    double fov;
+	double fov;
 
-    fov = ft_atod(component);
-    if (fov < 0 || fov > 180)
-        return 0;
-    return 1;
+	fov = ft_atod(component);
+	if (fov < 0 || fov > 180)
+		return 0;
+	return 1;
 }
 
 int ft_check_norm_range(char *comp)
 {
-    double tmp ;
+	double tmp ;
 
-    tmp = ft_atod(comp);
-    if (tmp  < -1 || tmp > 1)
-        return 0;
-    return 1;
+	tmp = ft_atod(comp);
+	if (tmp  < -1 || tmp > 1)
+		return 0;
+	return 1;
 }
 
 int ft_check_norm(char *component)
 {
-    char **norm;
-    int i;
+	char **norm;
+	int i;
 
-    i = -1;
-    norm = split(component, ",");
-    while (++i < 3)
-    {
-        if (!ft_check_norm_range(norm[i]))
-        {
-            ft_free_line_components(norm);
-            return 0;
-        }
-    }
-    ft_free_line_components(norm);
-    return  1;
+	i = -1;
+	norm = split(component, ",");
+	while (++i < 3)
+	{
+		if (!ft_check_norm_range(norm[i]))
+		{
+			ft_free_line_components(norm);
+			return 0;
+		}
+	}
+	ft_free_line_components(norm);
+	return  1;
 }
 
 
 int ft_check_ambient_component(char **components, int *counter)
 {
-    if (ft_count_components(components) != 3)
-        return 0;
-    if (!ft_check_range(components[1]))
-        return (0);
-    if (!ft_check_colors(components[2]))
-        return (0);
-    (counter)[0] += 1;
-    return (1);
+	if (ft_count_components(components) != 3)
+		return 0;
+	if (!ft_check_range(components[1]))
+		return (0);
+	if (!ft_check_colors(components[2]))
+		return (0);
+	(counter)[0] += 1;
+	return (1);
 }
 
 int ft_check_camera_component(char **components, int *counter)
 {
-    if (ft_count_components(components) != 4)
-        return (0);
-    if (!ft_check_elements(components[1]))
-        return (0);
-    if (!ft_check_elements(components[2]))
-        return (0);
-    if (!ft_check_fov(components[3]))
-        return (0);
-    (counter)[1]++;
-    return (1);
+	if (ft_count_components(components) != 4)
+		return (0);
+	if (!ft_check_elements(components[1]))
+		return (0);
+	if (!ft_check_elements(components[2]))
+		return (0);
+	if (!ft_check_fov(components[3]))
+		return (0);
+	(counter)[1]++;
+	return (1);
 }
 
 int ft_check_light_component(char **components, int *counter)
 {
-    if (ft_count_components(components) != 4)
-        return (0);
-    if (!ft_check_elements(components[1]))
-        return (0);
-    if (!ft_check_range(components[2]))
-        return (0);
-    if (!ft_check_colors(components[3]))
-        return (0);
-    (counter)[2]++;
-    // printf("light components are valid\n");
-    return (1);
+	if (ft_count_components(components) != 4)
+		return (0);
+	if (!ft_check_elements(components[1]))
+		return (0);
+	if (!ft_check_range(components[2]))
+		return (0);
+	if (!ft_check_colors(components[3]))
+		return (0);
+	(counter)[2]++;
+	// printf("light components are valid\n");
+	return (1);
 }
 
 int check_xpm_file(char *file)
 {
-    char *extention;
+	char *extention;
 
-    extention = ft_strrchr(file, '.');
-    if (extention && ft_strcmp(extention, ".xpm") == 0)
-        return 1;
-    printf("invalid xpm file\n");
-    return 0;
+	extention = ft_strrchr(file, '.');
+	if (extention && ft_strcmp(extention, ".xpm") == 0)
+		return 1;
+	printf("invalid xpm file\n");
+	return 0;
 }
 
 int ft_check_sphere_component(char **components)
 {
-    int cout = ft_count_components(components);
-    if (cout != 4 && cout != 6 && cout != 5)
-        return 0;
-    if (!ft_check_elements(components[1]))
-        return 0;
-    if (!ft_check_non_negative(components[2])) 
-        return 0;
-    if (!ft_check_colors(components[3]))
-        return 0;
-    if (cout == 5)
-        return check_xpm_file(components[4]);
-    if (cout == 6)
-    {
-        if (ft_strcmp(components[4], "ch") != 0)
-            return 0;
-        if (!ft_check_colors(components[5]))
-            return 0;
-    }
-    return 1;
+	int cout = ft_count_components(components);
+	if (cout != 4 && cout != 6 && cout != 5)
+		return 0;
+	if (!ft_check_elements(components[1]))
+		return 0;
+	if (!ft_check_non_negative(components[2])) 
+		return 0;
+	if (!ft_check_colors(components[3]))
+		return 0;
+	if (cout == 5)
+		return check_xpm_file(components[4]);
+	if (cout == 6)
+	{
+		if (ft_strcmp(components[4], "ch") != 0)
+			return 0;
+		if (!ft_check_colors(components[5]))
+			return 0;
+	}
+	return 1;
 }
 
 int ft_check_plane_component(char **components)
 {
-    if (ft_count_components(components) != 4)
-        return 0;
-    if (!ft_check_elements(components[1]) )
-        return 0;
-    if (!ft_check_elements(components[2]) || !ft_check_norm(components[2]))
-        return 0;
-    if (!ft_check_colors(components[3]))
-        return 0;
-    // printf("plane components are valid\n");
-    return 1;
+	if (ft_count_components(components) != 4)
+		return 0;
+	if (!ft_check_elements(components[1]) )
+		return 0;
+	if (!ft_check_elements(components[2]) || !ft_check_norm(components[2]))
+		return 0;
+	if (!ft_check_colors(components[3]))
+		return 0;
+	// printf("plane components are valid\n");
+	return 1;
 }
 
 int ft_check_cylinder_component(char **components)
 {
-    if (ft_count_components(components) != 6)
-        return 0;
-    if (!ft_check_elements(components[1]))
-        return 0;
-    if (!ft_check_elements(components[2]) || !ft_check_norm(components[2]))
-        return 0;
-    if (!ft_check_non_negative(components[3]) || !ft_check_non_negative(components[4]))
-        return 0;
-    if (!ft_check_colors(components[5]))
-        return 0;
-    // printf("cylinder components are valid\n");        
-    return 1;
+	if (ft_count_components(components) != 6)
+		return 0;
+	if (!ft_check_elements(components[1]))
+		return 0;
+	if (!ft_check_elements(components[2]) || !ft_check_norm(components[2]))
+		return 0;
+	if (!ft_check_non_negative(components[3]) || !ft_check_non_negative(components[4]))
+		return 0;
+	if (!ft_check_colors(components[5]))
+		return 0;
+	// printf("cylinder components are valid\n");        
+	return 1;
 }
 
 int ft_check_cone_component(char **components) {
-    if (ft_count_components(components) != 6)
-        return 0;
-    if (!ft_check_elements(components[1]))
-        return 0;
-    if (!ft_check_elements(components[2]) || !ft_check_norm(components[2]))
-        return 0;
-    if (!ft_check_non_negative(components[3]) || !ft_check_non_negative(components[4]))
-        return 0;
-    if (!ft_check_colors(components[5]))
-        return 0;
-    // printf("cone components are valid\n");
-    return 1;
+	if (ft_count_components(components) != 6)
+		return 0;
+	if (!ft_check_elements(components[1]))
+		return 0;
+	if (!ft_check_elements(components[2]) || !ft_check_norm(components[2]))
+		return 0;
+	if (!ft_check_non_negative(components[3]) || !ft_check_non_negative(components[4]))
+		return 0;
+	if (!ft_check_colors(components[5]))
+		return 0;
+	// printf("cone components are valid\n");
+	return 1;
 }
 
 int ft_check_components(int identifier_id, char **components, int *counter)
 {
-    if (identifier_id == 1)
-        return (ft_check_ambient_component(components, counter));
-    if (identifier_id == 2)
-        return (ft_check_camera_component(components , counter));
-    if (identifier_id == 3)
-        return (ft_check_light_component(components , counter));
-    if (identifier_id == 4)
-        return (ft_check_sphere_component(components));
-    if (identifier_id == 5)
-        return (ft_check_plane_component(components));
-    if (identifier_id == 6)
-        return (ft_check_cylinder_component(components));
-    if (identifier_id == 7)
-        return (ft_check_cone_component(components));
-    return 1;
+	if (identifier_id == 1)
+		return (ft_check_ambient_component(components, counter));
+	if (identifier_id == 2)
+		return (ft_check_camera_component(components , counter));
+	if (identifier_id == 3)
+		return (ft_check_light_component(components , counter));
+	if (identifier_id == 4)
+		return (ft_check_sphere_component(components));
+	if (identifier_id == 5)
+		return (ft_check_plane_component(components));
+	if (identifier_id == 6)
+		return (ft_check_cylinder_component(components));
+	if (identifier_id == 7)
+		return (ft_check_cone_component(components));
+	return 1;
 }
-                                                                              
+																			  
 int is_identifier(char *identifier)
 {   
-    // printf("identifier %s\n", identifier);
-    
-    if (identifier && !ft_strcmp(identifier, "A"))
-        return 1;
-    if (identifier && !ft_strcmp(identifier, "C"))
-       return 2;
-    if (identifier && !ft_strcmp(identifier, "L"))
-        return 3;
-    if (identifier && !ft_strcmp(identifier, "sp"))
-        return 4;
-    if (identifier && !ft_strcmp(identifier, "pl"))
-        return 5;
-    if (identifier && !ft_strcmp(identifier, "cy"))
-        return 6;
-    if (identifier && !ft_strcmp(identifier, "co"))
-        return 7;
-    return 0;
+	// printf("identifier %s\n", identifier);
+	
+	if (identifier && !ft_strcmp(identifier, "A"))
+		return 1;
+	if (identifier && !ft_strcmp(identifier, "C"))
+	   return 2;
+	if (identifier && !ft_strcmp(identifier, "L"))
+		return 3;
+	if (identifier && !ft_strcmp(identifier, "sp"))
+		return 4;
+	if (identifier && !ft_strcmp(identifier, "pl"))
+		return 5;
+	if (identifier && !ft_strcmp(identifier, "cy"))
+		return 6;
+	if (identifier && !ft_strcmp(identifier, "co"))
+		return 7;
+	return 0;
 }
 
 //!norminnete
 int ft_check_map_components(t_map **map)
 {
-    t_map_line    *tmp;
-    int         identifier_id;
-    int i;
+	t_map_line    *tmp;
+	int         identifier_id;
+	int i;
 
-    i = 0;
-    tmp = (*map)->lines;
-    t_map_line *line =(*map)->lines;
-    while (tmp)
-    {        
-        identifier_id = is_identifier(tmp->line_component[0]);
-        if (!identifier_id)
-        {
-            printf("line %d: \n", i);
-            printf("identifier is not a valid identifier (%s)\n", tmp->line_component[0]);
-            return (ft_free_map(&(*map)->lines),0);
-        }
-        if (!ft_check_components(identifier_id, tmp->line_component, ((*map)->scen_elements)))
-        {
-            printf("Error at map checking line component \n");
-            return (ft_free_map(&(*map)->lines),0);
-        }
-        tmp = tmp->next;
-        i++;
-    }
-    if ((*map)->scen_elements[0] > 1 || (*map)->scen_elements[1] > 1)
-    {
-        printf("duplicated of elements that must be declared just Once\n");
-        return (ft_free_map(&(*map)->lines),0);
-    }
-    return (1);
+	i = 0;
+	tmp = (*map)->lines;
+	t_map_line *line =(*map)->lines;
+	while (tmp)
+	{        
+		identifier_id = is_identifier(tmp->line_component[0]);
+		if (!identifier_id)
+		{
+			printf("line %d: \n", i);
+			printf("identifier is not a valid identifier (%s)\n", tmp->line_component[0]);
+			return (ft_free_map(&(*map)->lines),0);
+		}
+		if (!ft_check_components(identifier_id, tmp->line_component, ((*map)->scen_elements)))
+		{
+			printf("Error at map checking line component \n");
+			return (ft_free_map(&(*map)->lines),0);
+		}
+		tmp = tmp->next;
+		i++;
+	}
+	if ((*map)->scen_elements[0] > 1 || (*map)->scen_elements[1] > 1)
+	{
+		printf("duplicated of elements that must be declared just Once\n");
+		return (ft_free_map(&(*map)->lines),0);
+	}
+	return (1);
 }
 
 //================================================================
 
 void    var_dump_lines(t_map_line *map)
 {
-    if (!map)
-    {
-        printf("map is null\n");
-        return ;
-    }
+	if (!map)
+	{
+		printf("map is null\n");
+		return ;
+	}
 
-    printf("============== map  =================\n");
-    while (map)
-    {
-        printf("======================================\n");
-        for (int i = 0; map->line_component[i]; i++)
-            printf("component %d : %s\n", i, map->line_component[i]);
-        // printf("sdfs\n");
-        printf("======================================\n");
-        printf("\n");
-        map = map->next;
-    }
-    printf("======================================\n");
+	printf("============== map  =================\n");
+	while (map)
+	{
+		printf("======================================\n");
+		for (int i = 0; map->line_component[i]; i++)
+			printf("component %d : %s\n", i, map->line_component[i]);
+		// printf("sdfs\n");
+		printf("======================================\n");
+		printf("\n");
+		map = map->next;
+	}
+	printf("======================================\n");
 }
 
 
 t_map_line    *ft_get_last_line(t_map_line **map)
 {
-    t_map_line    *tmp;
+	t_map_line    *tmp;
 
-    tmp = *map;
-    if (!tmp)
-        return (NULL);
-    while (tmp->next)
-        tmp = tmp->next;
-    return (tmp);
+	tmp = *map;
+	if (!tmp)
+		return (NULL);
+	while (tmp->next)
+		tmp = tmp->next;
+	return (tmp);
 }
 
 int    ft_add_line(t_map_line **map, char *line)
 {
-    t_map_line    *new;
-    t_map_line    *last;
+	t_map_line    *new;
+	t_map_line    *last;
 
-    new = (t_map_line *)malloc(sizeof(t_map_line));
-    if (!new)
-        return 0;
-    new->line_component = split(line, " \t\n\r\v");
-    new->next = NULL;
-    last = ft_get_last_line(map);
-    if (last)
-        last->next = new;
-    else
-        *map = new;
-    return (1);
+	new = (t_map_line *)malloc(sizeof(t_map_line));
+	if (!new)
+		return 0;
+	new->line_component = split(line, " \t\n\r\v");
+	new->next = NULL;
+	last = ft_get_last_line(map);
+	if (last)
+		last->next = new;
+	else
+		*map = new;
+	return (1);
 }
 
 
 
 t_map_line *ft_gen_scen_map(char *file_name)
 {
-    t_map_line *map;
-    char *line;
-    int fd;
+	t_map_line *map;
+	char *line;
+	int fd;
 
-    if (!ft_check_file_name(file_name))
-        return (printf("error : invalid file extension\n"),NULL);
-    fd = open(file_name, O_RDONLY);
-    if (fd < 0)
-        return (printf("error : failed to open file\n"),NULL);
-    map = NULL;
-    line = get_next_line(fd);
-    while (line)
-    {
-        if (line && !is_empty_line(line))
-        {
-            if (line && line[0] == '#')
-            {
-                free(line);
-                line = get_next_line(fd);
-                continue;
-            }
-            if (!ft_add_line(&map, line))
-                return (free(line), close(fd),NULL);
-        }
-        free(line);
-        line = get_next_line(fd);
-    }
-    free(line);
-    close(fd);
-    return (map);
+	if (!ft_check_file_name(file_name))
+		return (printf("error : invalid file extension\n"),NULL);
+	fd = open(file_name, O_RDONLY);
+	if (fd < 0)
+		return (printf("error : failed to open file\n"),NULL);
+	map = NULL;
+	line = get_next_line(fd);
+	while (line)
+	{
+		if (line && !is_empty_line(line))
+		{
+			if (line && line[0] == '#')
+			{
+				free(line);
+				line = get_next_line(fd);
+				continue;
+			}
+			if (!ft_add_line(&map, line))
+				return (free(line), close(fd),NULL);
+		}
+		free(line);
+		line = get_next_line(fd);
+	}
+	free(line);
+	close(fd);
+	return (map);
 }
 
 /* =====================   map Components generation   ==========================  */
 
 int ft_gen_colors(t_color *color,char *components)
 {
-    char    **tmp_colors;
+	char    **tmp_colors;
  
-    tmp_colors = split(components, ",");
-    if (!tmp_colors) 
-        return 0;
-    (color)->r = clamp (ft_atod(tmp_colors[0])  / 255.0f,0,1);
-    (color)->g = clamp(ft_atod(tmp_colors[1])  / 255.0f,0,1);
-    (color)->b = clamp(ft_atod(tmp_colors[2])  / 255.0f,0,1);
-    ft_free_line_components(tmp_colors);
-    return (1); 
+	tmp_colors = split(components, ",");
+	if (!tmp_colors) 
+		return 0;
+	(color)->r = clamp (ft_atod(tmp_colors[0])  / 255.0f,0,1);
+	(color)->g = clamp(ft_atod(tmp_colors[1])  / 255.0f,0,1);
+	(color)->b = clamp(ft_atod(tmp_colors[2])  / 255.0f,0,1);
+	ft_free_line_components(tmp_colors);
+	return (1); 
 }
 
 int ft_gen_elements(t_vector *coordinates, char *components)
 {
-    char **tmp_cord;
+	char **tmp_cord;
 
-    tmp_cord = split(components, ",");
-    if (!tmp_cord)
-        return (0);
-    *coordinates = ft_new_vector(ft_atod(tmp_cord[0]),ft_atod(tmp_cord[1]), ft_atod(tmp_cord[2]));
-    ft_free_line_components(tmp_cord);
-    return (1);
+	tmp_cord = split(components, ",");
+	if (!tmp_cord)
+		return (0);
+	*coordinates = ft_new_vector(ft_atod(tmp_cord[0]),ft_atod(tmp_cord[1]), ft_atod(tmp_cord[2]));
+	ft_free_line_components(tmp_cord);
+	return (1);
 }
 
 int ft_add_ambient(t_scene **scene, char **components)
 {
-    t_ambient  *tmp;
+	t_ambient  *tmp;
 
-    tmp = malloc(sizeof(t_ambient));
-    tmp->ambient_ration = ft_atod(components[1]);
-    ft_gen_colors(&tmp->ambient_color, components[2]);
-    (*scene)->ambient = tmp;
-    return (1);
+	tmp = malloc(sizeof(t_ambient));
+	tmp->ambient_ration = ft_atod(components[1]);
+	ft_gen_colors(&tmp->ambient_color, components[2]);
+	(*scene)->ambient = tmp;
+	return (1);
 }
 
 int ft_add_camera(t_scene **scene, char **components)
 {
-    t_scamera *camera;
-    t_point position;
-    t_vector dir;
-    float     fov;
-    
-    ft_gen_elements(&position, components[1]);
-    ft_gen_elements(&dir, components[2]);
-    fov = ft_atod(components[3]);
-    camera = malloc(sizeof(t_scamera));
-    if (!camera)
-        return 0;
-    camera->fov  = fov;
-    camera->h_size = SCREEN_HEIGHT;
-    camera->w_size = SCREEN_WIDTH;
-    camera->direction = dir;
-    camera->origin = position;
-    ft_set_camera(&camera);
-    (*scene)->camera = camera;
-    return 1;
+	t_scamera *camera;
+	t_point position;
+	t_vector dir;
+	float     fov;
+	
+	ft_gen_elements(&position, components[1]);
+	ft_gen_elements(&dir, components[2]);
+	fov = ft_atod(components[3]);
+	camera = malloc(sizeof(t_scamera));
+	if (!camera)
+		return 0;
+	camera->fov  = fov;
+	camera->h_size = SCREEN_HEIGHT;
+	camera->w_size = SCREEN_WIDTH;
+	camera->direction = dir;
+	camera->origin = position;
+	ft_set_camera(&camera);
+	(*scene)->camera = camera;
+	return 1;
 }
 
 int ft_add_light(t_scene **scene, char **components)
 {
-    t_light *light;
-    t_light *tmp;
-    // light = (*scene)->light;
-    light = malloc(sizeof(t_light));
-    ft_gen_elements(&light->coordinate, components[1]);
-    light->ration = ft_atod(components[2]);
-    ft_gen_colors(&light->color, components[3]);
-    light->coordinate.w = 1;
-    light->next = NULL;
-    if (!(*scene)->light)
-        (*scene)->light = light;
-    else
-    {
-        tmp = (*scene)->light;
-        while(tmp->next)
-            tmp = tmp->next;
-        tmp->next = light; 
-    }
-    return 1;
+	t_light *light;
+	t_light *tmp;
+	// light = (*scene)->light;
+	light = malloc(sizeof(t_light));
+	ft_gen_elements(&light->coordinate, components[1]);
+	light->ration = ft_atod(components[2]);
+	ft_gen_colors(&light->color, components[3]);
+	light->coordinate.w = 1;
+	light->next = NULL;
+	if (!(*scene)->light)
+		(*scene)->light = light;
+	else
+	{
+		tmp = (*scene)->light;
+		while(tmp->next)
+			tmp = tmp->next;
+		tmp->next = light; 
+	}
+	return 1;
 }
 
 // t_color int_to_color(int color)
@@ -723,258 +723,262 @@ int ft_add_light(t_scene **scene, char **components)
 // }
 int get_texture(t_sphere *sphere, char *texture_name, t_scene **scene)
 {
-    int fd = open(texture_name, O_RDONLY);
-    if (fd < 0)
-    {
-        perror("Error: Failed to open texture file");
-        return (0);
-    }
-    close(fd);
+	int fd = open(texture_name, O_RDONLY);
+	if (fd < 0)
+	{
+		perror("Error: Failed to open texture file");
+		return (0);
+	}
+	close(fd);
 
-    sphere->texture = malloc(sizeof(t_texture));
-    if (!sphere->texture)
-    {
-        perror("Error: Failed to allocate memory for texture");
-        return (0);
-    }
+	sphere->texture = malloc(sizeof(t_texture));
+	if (!sphere->texture)
+	{
+		perror("Error: Failed to allocate memory for texture");
+		return (0);
+	}
 
-    sphere->texture->img_ptr = mlx_xpm_file_to_image(
-        (*scene)->data->mlx,
-        texture_name,
-        &sphere->texture->width,
-        &sphere->texture->height
-    );
-    if (!sphere->texture->img_ptr)
-    {
-        perror("Error: Failed to load XPM image");
-        free(sphere->texture);
-        sphere->texture = NULL;
-        return (0);
-    }
-    sphere->texture->img_data = mlx_get_data_addr(
-        sphere->texture->img_ptr,
-        &sphere->texture->bpp,
-        &sphere->texture->size_line,
-        &sphere->texture->endian
-    );
-    if (!sphere->texture->img_data)
-    {
-        perror("Error: Failed to get image data");
-        mlx_destroy_image(NULL, sphere->texture->img_ptr);
-        free(sphere->texture);
-        sphere->texture = NULL;
-        return(0);
-    }
-    return (1);
+	sphere->texture->img_ptr = mlx_xpm_file_to_image(
+		(*scene)->data->mlx,
+		texture_name,
+		&sphere->texture->width,
+		&sphere->texture->height
+	);
+	if (!sphere->texture->img_ptr)
+	{
+		perror("Error: Failed to load XPM image");
+		free(sphere->texture);
+		sphere->texture = NULL;
+		return (0);
+	}
+	sphere->texture->img_data = mlx_get_data_addr(
+		sphere->texture->img_ptr,
+		&sphere->texture->bpp,
+		&sphere->texture->size_line,
+		&sphere->texture->endian
+	);
+	if (!sphere->texture->img_data)
+	{
+		perror("Error: Failed to get image data");
+		mlx_destroy_image(NULL, sphere->texture->img_ptr);
+		free(sphere->texture);
+		sphere->texture = NULL;
+		return(0);
+	}
+	return (1);
 }
 
 t_sphere *ft_new_sphere(char **components, t_scene **scene)
 {
-    t_sphere *sphere;
-    
-    sphere = malloc(sizeof(t_sphere));
-    if (!sphere)
-        return NULL;
-    ft_gen_elements(&sphere->sphere_coordinates, components[1]);
-    sphere->sphere_diameter = ft_atod(components[2]);
-    ft_gen_colors(&sphere->sphere_color, components[3]);
-    sphere->transform = identity_matrix(4);
-    sphere->material = default_material();
-    ft_gen_colors(&sphere->material->color, components[3]);
-    sphere->next = NULL;
-    if (ft_count_components(components) == 6)
-    {
-        sphere->has_checkered = 1;
-        sphere->has_texture = 0;
-        ft_gen_colors(&sphere->checkered_color, components[5]);
-    }
-    else if (ft_count_components(components) == 5)
-    {
-        sphere->has_checkered = 0;
-        sphere->has_texture = 1;
-        if (!get_texture(sphere, components[4], scene))
-        {
-            ft_free_matrix(sphere->transform, 4);
-            free(sphere->material);
-            free(sphere);
-            return NULL;
-        }
-    }
-    else
-    {
-        sphere->has_texture = 0;
-        sphere->has_checkered = 0;
-    }
-    return sphere;
+	t_sphere *sphere;
+	
+	sphere = malloc(sizeof(t_sphere));
+	if (!sphere)
+		return NULL;
+	ft_gen_elements(&sphere->sphere_coordinates, components[1]);
+	sphere->sphere_diameter = ft_atod(components[2]);
+	ft_gen_colors(&sphere->sphere_color, components[3]);
+	sphere->transform = identity_matrix(4);
+	sphere->material = default_material();
+	ft_gen_colors(&sphere->material->color, components[3]);
+	sphere->next = NULL;
+	if (ft_count_components(components) == 6)
+	{
+		sphere->has_checkered = 1;
+		sphere->has_texture = 0;
+		ft_gen_colors(&sphere->checkered_color, components[5]);
+	}
+	else if (ft_count_components(components) == 5)
+	{
+		sphere->has_checkered = 0;
+		sphere->has_texture = 1;
+		if (!get_texture(sphere, components[4], scene))
+		{
+			ft_free_matrix(sphere->transform, 4);
+			free(sphere->material);
+			free(sphere);
+			return NULL;
+		}
+	}
+	else
+	{
+		sphere->has_texture = 0;
+		sphere->has_checkered = 0;
+	}
+	return sphere;
 }
 
 int ft_add_sphere(t_scene **scene, char **components)
 {
-    t_sphere *sphere;
-    t_sphere *tmp;
-    
-    sphere = ft_new_sphere(components, scene);
-    if (!sphere)
-            return 0;
-    tmp = (*scene)->sphere;
-    if (!tmp) 
-        (*scene)->sphere = sphere;
-    else
-    {
-        while (tmp->next)
-            tmp =tmp->next;
-        tmp->next = sphere;
-    }
-    return 1;
+	t_sphere *sphere;
+	t_sphere *tmp;
+	
+	sphere = ft_new_sphere(components, scene);
+	if (!sphere)
+			return 0;
+	tmp = (*scene)->sphere;
+	if (!tmp) 
+		(*scene)->sphere = sphere;
+	else
+	{
+		while (tmp->next)
+			tmp =tmp->next;
+		tmp->next = sphere;
+	}
+	return 1;
 }
 
 t_plane *ft_new_plane(char **components)
 {
-    t_plane *plane;
+	t_plane *plane;
 
-    plane = malloc(sizeof(t_plane));
-    if (!plane)
-        return NULL;
-    ft_gen_elements(&plane->plane_cordinates, components[1]);
-    ft_gen_elements(&plane->plane_normal, components[2]);
-    ft_gen_colors(&plane->plane_color, components[3]);
-    plane->transform = identity_matrix(4);
-    plane->material = default_material();
-    plane->material->color = plane->plane_color;
-    plane->next = NULL;
-    return plane;
+	plane = malloc(sizeof(t_plane));
+	if (!plane)
+		return NULL;
+	ft_gen_elements(&plane->plane_cordinates, components[1]);
+	ft_gen_elements(&plane->plane_normal, components[2]);
+	ft_gen_colors(&plane->plane_color, components[3]);
+	plane->transform = identity_matrix(4);
+	plane->material = default_material();
+	plane->material->color = plane->plane_color;
+	plane->next = NULL;
+	return plane;
 }
 
 int ft_add_plane(t_scene **scene, char **components)
 {
-    t_plane *new;
-    t_plane *tmp;
-    
-    new = ft_new_plane(components);
-    tmp = (*scene)->plane;
-    if (!tmp)
-        (*scene)->plane = new;
-    else
-    {
-        while (tmp->next)
-            tmp = tmp->next;
-        tmp->next = new;
-    }
-    return 1;
+	t_plane *new;
+	t_plane *tmp;
+	
+	new = ft_new_plane(components);
+	tmp = (*scene)->plane;
+	if (!tmp)
+		(*scene)->plane = new;
+	else
+	{
+		while (tmp->next)
+			tmp = tmp->next;
+		tmp->next = new;
+	}
+	return 1;
 }
 
 t_cylinder *ft_new_cylinder(char **components)
 {
-    t_cylinder *new;
-    
-    new = malloc(sizeof(t_cylinder));
-    if (!new)
-        return (NULL);
-    ft_gen_elements(&new->coordinates, components[1]);
-    ft_gen_elements(&new->orientation, components[2]);
-    new->raduis = ft_atod(components[3]);
-    new->height = ft_atod(components[4]);
-    ft_gen_colors(&new->cylinder_color, components[5]);
-    new->transform = identity_matrix(4);
-    new->transform[0][3] = new->coordinates.x;
-    new->transform[1][3] = new->coordinates.y;
-    new->transform[2][3] = new->coordinates.z;
-    new->material = default_material();
-    new->material->color = new->cylinder_color;
-    new->next = NULL;
-    return (new);
+	t_cylinder *new;
+	
+	new = malloc(sizeof(t_cylinder));
+	if (!new)
+		return (NULL);
+	ft_gen_elements(&new->coordinates, components[1]);
+	ft_gen_elements(&new->orientation, components[2]);
+	new->raduis = ft_atod(components[3]);
+	new->height = ft_atod(components[4]);
+	ft_gen_colors(&new->cylinder_color, components[5]);
+	new->transform = identity_matrix(4);
+	new->transform[0][3] = new->coordinates.x;
+	new->transform[1][3] = new->coordinates.y;
+	new->transform[2][3] = new->coordinates.z;
+	new->material = default_material();
+	new->material->color = new->cylinder_color;
+	new->next = NULL;
+	return (new);
 }
 
 int ft_add_cylinder(t_scene **scene, char **components)
 {
-    t_cylinder *new;
-    t_cylinder *tmp;
+	t_cylinder *new;
+	t_cylinder *tmp;
 
-    new = ft_new_cylinder(components);
-    tmp = (*scene)->cylinder;
-    if (!tmp)
-        (*scene)->cylinder = new;
-    else
-    {
-        while (tmp->next)
-            tmp = tmp->next;
-        tmp->next = new;
-    }
-    return 1;
+	new = ft_new_cylinder(components);
+	tmp = (*scene)->cylinder;
+	if (!tmp)
+		(*scene)->cylinder = new;
+	else
+	{
+		while (tmp->next)
+			tmp = tmp->next;
+		tmp->next = new;
+	}
+	return 1;
 }
 
-t_cone *ft_new_cone(char **components)
+t_cone  *ft_new_cone(char **components)
 {
-    t_cone *cone = malloc(sizeof(t_cone));
-    if (!cone)
-        return NULL;
-
-    ft_gen_elements(&cone->apex, components[1]);
-    ft_gen_elements(&cone->axis, components[2]);
-    cone->height = ft_atod(components[3]);
-    cone->radius = ft_atod(components[4]);
-    ft_gen_colors(&cone->color, components[5]);
-    cone->material = default_material();
-    cone->transform = identity_matrix(4);
-    cone->transform[0][3] = cone->apex.x;
-    cone->transform[1][3] = cone->apex.y;
-    cone->transform[2][3] = cone->apex.z;
-    cone->next = NULL;
-    cone->material->color = cone->color;
-    if (vec_lenght(cone->axis) == 0) {
-        free(cone);
-        return (NULL);
-    }
-    return (cone);
+	t_cone  *cone;
+	
+	cone = malloc(sizeof(t_cone));
+	if (!cone)
+		return NULL;
+	ft_gen_elements(&cone->apex, components[1]);
+	ft_gen_elements(&cone->axis, components[2]);
+	cone->height = ft_atod(components[3]);
+	cone->radius = ft_atod(components[4]);
+	ft_gen_colors(&cone->color, components[5]);
+	cone->material = default_material();
+	cone->transform = identity_matrix(4);
+	cone->transform[0][3] = cone->apex.x;
+	cone->transform[1][3] = cone->apex.y;
+	cone->transform[2][3] = cone->apex.z;
+	cone->next = NULL;
+	cone->material->color = cone->color;
+	if (vec_lenght(cone->axis) == 0) {
+		free(cone);
+		return (NULL);
+	}
+	return (cone);
 }
 
 int ft_add_cone(t_scene **scene, char **components)
 {
-    t_cone *cone = ft_new_cone(components);
-    if (!cone)
-        return 0;
+	t_cone *cone;
+	t_cone *tmp;
 
-    t_cone *tmp = (*scene)->cone;
-    if (!tmp)
-        (*scene)->cone = cone;
-    else
-    {
-        while (tmp->next)
-            tmp = tmp->next;
-        tmp->next = cone;
-    }
-    return 1;
+	cone = ft_new_cone(components);
+	if (!cone)
+		return 0;
+
+	tmp = (*scene)->cone;
+	if (!tmp)
+		(*scene)->cone = cone;
+	else
+	{
+		while (tmp->next)
+			tmp = tmp->next;
+		tmp->next = cone;
+	}
+	return 1;
 }
 
 int ft_add_component(t_scene **scene, int identifier, char **components)
 {
-    if (identifier == 1)
-        return (ft_add_ambient(scene, components));
-    if (identifier == 2)
-        return (ft_add_camera(scene, components));
-    if (identifier == 3)
-        return (ft_add_light(scene, components));
-    if (identifier == 4)
-        return (ft_add_sphere(scene, components));
-    if (identifier == 5)
-        return (ft_add_plane(scene, components));
-    if (identifier == 6)
-        return (ft_add_cylinder(scene, components));
-    if (identifier == 7)
-        return (ft_add_cone(scene, components));
-    return (1);
+	if (identifier == 1)
+		return (ft_add_ambient(scene, components));
+	if (identifier == 2)
+		return (ft_add_camera(scene, components));
+	if (identifier == 3)
+		return (ft_add_light(scene, components));
+	if (identifier == 4)
+		return (ft_add_sphere(scene, components));
+	if (identifier == 5)
+		return (ft_add_plane(scene, components));
+	if (identifier == 6)
+		return (ft_add_cylinder(scene, components));
+	if (identifier == 7)
+		return (ft_add_cone(scene, components));
+	return (1);
 }
  
 int ft_generate_scene(t_map_line *compoenent, t_scene **scene)
 {
-    int     identifier_id;
+	int     identifier_id;
 
-    while (compoenent)
-    {
-        identifier_id = is_identifier(compoenent->line_component[0]);
-        if (identifier_id)
-            ft_add_component(scene, identifier_id, compoenent->line_component);
-        compoenent = compoenent->next;
-    }
-    return 1;
+	while (compoenent)
+	{
+		identifier_id = is_identifier(compoenent->line_component[0]);
+		if (identifier_id)
+			ft_add_component(scene, identifier_id, compoenent->line_component);
+		compoenent = compoenent->next;
+	}
+	return 1;
 }
