@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 20:24:10 by aghergho          #+#    #+#             */
-/*   Updated: 2025/03/16 13:17:33 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/03/16 16:28:50 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -245,7 +245,6 @@ int ft_check_range(char *component)
     double range;
 
     range = ft_atod(component);
-    // printf("range = %f", range);
     if (range < 0 || range > 1)
         return 0;
     return 1;
@@ -427,7 +426,6 @@ int ft_check_plane_component(char **components)
         return 0;
     if (!ft_check_colors(components[3]))
         return 0;
-    // printf("plane components are valid\n");
     return 1;
 }
 
@@ -443,11 +441,11 @@ int ft_check_cylinder_component(char **components)
         return 0;
     if (!ft_check_colors(components[5]))
         return 0;
-    // printf("cylinder components are valid\n");        
     return 1;
 }
 
-int ft_check_cone_component(char **components) {
+int ft_check_cone_component(char **components)
+{
     if (ft_count_components(components) != 6)
         return 0;
     if (!ft_check_elements(components[1]))
@@ -458,7 +456,6 @@ int ft_check_cone_component(char **components) {
         return 0;
     if (!ft_check_colors(components[5]))
         return 0;
-    // printf("cone components are valid\n");
     return 1;
 }
 
@@ -482,9 +479,7 @@ int ft_check_components(int identifier_id, char **components, int *counter)
 }
                                                                               
 int is_identifier(char *identifier)
-{   
-    // printf("identifier %s\n", identifier);
-    
+{       
     if (identifier && !ft_strcmp(identifier, "A"))
         return 1;
     if (identifier && !ft_strcmp(identifier, "C"))
@@ -502,38 +497,38 @@ int is_identifier(char *identifier)
     return 0;
 }
 
-//!norminnete
+void error_handler(int i, int line, char *identifier)
+{
+    if (i == 0)
+    {
+        printf("line %d: \n", line);
+        printf("identifier is not a valid identifier (%s)\n", identifier);
+    }
+    else if (i == 1)
+        printf("Error at map checking line component at line %d \n", line);
+    else if (i == 2)
+        printf("duplicated of elements that must be declared just Once\n");
+}
+
 int ft_check_map_components(t_map **map)
 {
-    t_map_line    *tmp;
-    int         identifier_id;
-    int i;
+    t_map_line      *tmp;
+    int             identifier_id;
+    int             i;
 
-    i = 0;
+    i = -1;
     tmp = (*map)->lines;
-    t_map_line *line =(*map)->lines;
     while (tmp)
     {        
         identifier_id = is_identifier(tmp->line_component[0]);
         if (!identifier_id)
-        {
-            printf("line %d: \n", i);
-            printf("identifier is not a valid identifier (%s)\n", tmp->line_component[0]);
-            return (ft_free_map(&(*map)->lines),0);
-        }
+            return (error_handler(0, ++i, tmp->line_component[0]), ft_free_map(&(*map)->lines),0);
         if (!ft_check_components(identifier_id, tmp->line_component, ((*map)->scen_elements)))
-        {
-            printf("Error at map checking line component \n");
-            return (ft_free_map(&(*map)->lines),0);
-        }
+            return (error_handler(1, ++i, "") ,ft_free_map(&(*map)->lines),0);
         tmp = tmp->next;
-        i++;
     }
-    if ((*map)->scen_elements[0] > 1 || (*map)->scen_elements[1] > 1)
-    {
-        printf("duplicated of elements that must be declared just Once\n");
-        return (ft_free_map(&(*map)->lines),0);
-    }
+    if ((*map)->scen_elements[0] > 1 || (*map)->scen_elements[1] > 1 || (*map)->scen_elements[2] < 1)
+        return (error_handler(2,0,"") ,ft_free_map(&(*map)->lines),0);
     return (1);
 }
 
@@ -591,8 +586,6 @@ int    ft_add_line(t_map_line **map, char *line)
         *map = new;
     return (1);
 }
-
-
 
 t_map_line *ft_gen_scen_map(char *file_name)
 {
@@ -694,7 +687,7 @@ int ft_add_light(t_scene **scene, char **components)
 {
     t_light *light;
     t_light *tmp;
-    // light = (*scene)->light;
+
     light = malloc(sizeof(t_light));
     ft_gen_elements(&light->coordinate, components[1]);
     light->ration = ft_atod(components[2]);

@@ -116,30 +116,59 @@ int compare_vector(float a, float b)
 float **ft_create_matrix(int n_rows, int n_cols)
 {
     float  **matrix;
-    
+    int i;
+    int j;
+
     matrix = (float **)malloc(n_rows * sizeof(float *));
     if (!matrix)
         return (NULL);
-    for (int i = 0; i < n_rows; i++)
+    i = -1;
+    while (++i < n_rows)
     {
+        j = -1;
         matrix[i] = (float *)malloc(n_cols * sizeof(float));
         if (!matrix[i])
         {
-            for (int j = 0; j < i; j++)
+            while (++j < i)
                 free(matrix[j]);
             free(matrix);
             return (NULL);
         }
-        for (int j = 0; j < n_cols; j++)
+        while(++j < n_cols)
             matrix[i][j] = 0;
     }
     return (matrix);
 }
 
+
+// float **ft_create_matrix(int n_rows, int n_cols)
+// {
+//     float  **matrix;
+    
+//     matrix = (float **)malloc(n_rows * sizeof(float *));
+//     if (!matrix)
+//         return (NULL);
+//     for (int i = 0; i < n_rows; i++)
+//     {
+//         matrix[i] = (float *)malloc(n_cols * sizeof(float));
+//         if (!matrix[i])
+//         {
+//             for (int j = 0; j < i; j++)
+//                 free(matrix[j]);
+//             free(matrix);
+//             return (NULL);
+//         }
+//         for (int j = 0; j < n_cols; j++)
+//             matrix[i][j] = 0;
+//     }
+//     return (matrix);
+// }
+
 int ft_compare_matrix(float **m1, float **m2, int n_col, int n_row)
 {
     int i;
     int j;
+
     i = -1;
     while(++i < n_row)
     {
@@ -156,16 +185,22 @@ int ft_compare_matrix(float **m1, float **m2, int n_col, int n_row)
 float ** ft_multiply_matrix(float **m1, float **m2, int n_cols, int n_row)
 {
     float **result;
+    int     i;
+    int     j;
+    int     k;
 
+    i = -1;
     result = ft_create_matrix(n_row, n_cols);
     if (!result)
         return (NULL);
-    for (int i = 0; i < n_row; i++)
+    while (++i < n_row)
     {
-        for (int j = 0; j < n_cols; j++)
+        j = -1;
+        while(++j < n_cols)
         {
             result[i][j] = 0;
-            for (int k = 0; k < n_cols; k++)
+            k = -1;
+            while(++k < n_cols)
                 result[i][j] += m1[i][k] * m2[k][j];
         }
     }
@@ -180,9 +215,6 @@ t_vector ft_multiply_matrix_vec(float **m, t_vector v)
     result.y = m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z + m[1][3] * v.w;
     result.z = m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z + m[2][3] * v.w;
     result.w = m[3][0] * v.x + m[3][1] * v.y + m[3][2] * v.z + m[3][3] * v.w;
-    // printf("=====================================\n");
-    // printf("Translation %f %f %f\n", result->x, result->y, result->z);
-    // printf("=====================================\n");
     return (result);
 }
 t_point ft_multiply_matrix_point(float **m, t_point v)
@@ -193,19 +225,19 @@ t_point ft_multiply_matrix_point(float **m, t_point v)
     result.y = m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z + m[1][3] * v.w;
     result.z = m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z + m[2][3] * v.w;
     result.w = m[3][0] * v.x + m[3][1] * v.y + m[3][2] * v.z + m[3][3] * v.w;
-    // printf("=====================================\n");
-    // printf("Translation %f %f %f\n", result->x, result->y, result->z);
-    // printf("=====================================\n");
     return (result);
 }
 
 void ft_scale_matrix(float ***m, float scale,int n)
 {
-    int i, j;
+    int     i;
+    int     j;
 
-    for (int i = 0; i < n ; i++)
+    i = -1;
+    while(++i < n)
     {
-        for (int j = 0; j < n; j++)
+        j = -1;
+        while(++j < n)
             (*m)[i][j] *= scale;
     }
 }
@@ -213,10 +245,14 @@ void ft_scale_matrix(float ***m, float scale,int n)
 void ft_transpose_matrix(float ***m, int n_rows, int n_col)
 {
     float temp;
- 
-    for (int i = 0; i < n_rows; i++)
+    int     i;
+    int     j;
+
+    i = -1;
+    while(++i < n_rows)
     {
-        for (int j = 0; j < n_col; j++)
+        j = -1;
+        while(++j < n_col)
         {
             temp = (*m)[i][j];
             (*m)[i][j] = (*m)[j][i];
@@ -225,16 +261,19 @@ void ft_transpose_matrix(float ***m, int n_rows, int n_col)
     }
 }
 
+
 float **ft_translate_matrix(t_point point, int inverse)
 {
     float **translation_matrix;
+    int     i;
+    int     j;
 
+    i = -1;
     translation_matrix = ft_create_matrix(4, 4);
-    if (!translation_matrix)
-        return (NULL);
-    for (int i = 0; i < 4; i++)
+    while(++i < 4)
     {
-        for (int j = 0; j < 4; j++)
+        j = -1;
+        while(++j < 4)
         {
             if (i == j && i < 3)
                 translation_matrix[i][j] = 1;
@@ -251,7 +290,10 @@ float **ft_translate_matrix(t_point point, int inverse)
 
 void ft_free_matrix(float **m, int n)
 {
-    for (int i = 0; i < n; i++)
+    int     i;
+
+    i = -1;
+    while (++i < n)
         free(m[i]);
     free(m);
     m = NULL;
@@ -268,7 +310,7 @@ t_point ft_transform(t_point p1 , t_point p2, int inverse)
     return (transformed_point);
 }
 
-
+//unused!!!
 float **ft_scaling_matrix(float x, float y, float z, int inverse)
 {
     float **scale_matrix;
@@ -329,6 +371,7 @@ t_vector vector_copy(t_vector v)
     return (vec_copy);   
 }
 
+//!norminete!!!!!!1
 float **get_minor(float **m, int row, int col, int n)
 {
     int i, j;
@@ -336,8 +379,6 @@ float **get_minor(float **m, int row, int col, int n)
     float **minor;
 
     minor = ft_create_matrix(n - 1, n - 1);
-    if (!minor)
-        return (NULL);
     mi = 0;
     for (i = 0; i < n; i++)
     {
@@ -360,6 +401,8 @@ inline float radian( float degree)
 {
     return (degree * PI / 180);
 }
+
+//!norminete!!!!!!1
 
 float **rotate_x(float rad)
 {
@@ -385,6 +428,7 @@ float **rotate_x(float rad)
     return (m);
 }
 
+//!norminete!!!!!!1
 float **rotate_y(float rad)
 {
     float **m;
@@ -409,6 +453,7 @@ float **rotate_y(float rad)
     return (m);
 }
 
+//!norminete!!!!!!
 float **rotate_z(float rad)
 {
     float **m;
@@ -435,19 +480,22 @@ float **rotate_z(float rad)
 
 float **shearing_matrix(int *coord)
 {
-    float **shearing_matrix;
+    float   **shearing_matrix;
+    int     i;
+    int     j;
 
+    i = -1;
     shearing_matrix = ft_create_matrix(4, 4);
-    if (!shearing_matrix)
-        return (NULL);
-    for (int i = 0; i < 4; i++)
-        for (int j = 0; j < 4; j++)
+    while (++i < 4)
+    {
+        j = -1;
+        while (++j < 4)
         {
+            shearing_matrix[i][j] = 0;    
             if (i == j)
                 shearing_matrix[i][j] = 1;
-            else 
-                shearing_matrix[i][j] = 0;    
         }
+    }
     shearing_matrix[0][1] = coord[0];
     shearing_matrix[0][2] = coord[1];
     shearing_matrix[1][0] = coord[2];
@@ -459,15 +507,17 @@ float **shearing_matrix(int *coord)
 
 float determinant(float **m, int n)
 {
-    float det;
-    int sign;
-    float **minor;
+    float   det;
+    int     sign;
+    float   **minor;
+    int     i;
 
     if (n == 2)
         return (m[0][0] * m[1][1] - m[0][1] * m[1][0]);
     det = 0;
     sign = 1;
-    for (int i = 0; i < n; i++)
+    i = -1;
+    while(++i < n)
     {
         minor = get_minor(m, 0, i, n);
         if (!minor)
@@ -479,6 +529,7 @@ float determinant(float **m, int n)
     return (det);
 }
 
+//!norminette!!!!
 float **inverse_matrix(float **m, int n)
 {
     float **inverse;
@@ -508,19 +559,25 @@ float **inverse_matrix(float **m, int n)
 
 float **identity_matrix(int n)
 {
-    float **identity;
+    float   **identity;
+    int     i;
+    int     j;
 
     identity = ft_create_matrix(n, n);
     if (!identity)
         return (NULL);
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < n; j++)
+    i = -1;
+    while(++i < n)
+    {
+        j = -1;
+        while(++j < n)
         {
             if (i == j)
                 identity[i][j] = 1;
             else 
                 identity[i][j] = 0;    
         }
+    }
     return (identity);
 }
 
@@ -570,9 +627,13 @@ t_vector vector_multiply_scalar(t_vector v, float scalar)
 //Phong reflection model
 t_vector reflect_vector(t_vector in, t_vector normal)
 {
-    float dot = vector_dot(in, normal);
-    t_vector scaled_normal = vector_multiply_scalar(normal, 2.0f * dot);
-    t_vector result = vector_sub( in, scaled_normal); 
+    float dot;
+    t_vector scaled_normal;
+    t_vector result;
+    
+    dot = vector_dot(in, normal);
+    scaled_normal = vector_multiply_scalar(normal, 2.0f * dot);
+    result = vector_sub( in, scaled_normal); 
     return result;
 }
 
@@ -619,8 +680,8 @@ t_color clamp_color(t_color color)
 /*
     Specular=Lightcolor×MaterialSpecular×(cos(θ)) 
 */
-
-t_color get_lighting_color(t_material *material, t_light *light, t_compose *comp, int shadow, t_color base_color)
+//!!NORMINETTE
+t_color get_lighting_color(t_material *material, t_light *light, t_compose *comp, t_color base_color)
 {
     t_vector light_dir_normal;
     t_color eff_color, ambient, diffuse, specular;
@@ -628,7 +689,7 @@ t_color get_lighting_color(t_material *material, t_light *light, t_compose *comp
 
     eff_color = ft_multiply_color(base_color, light->color);
     ambient = clamp_color(ft_multiply_color_scalar(eff_color, material->ambient));
-    if (shadow)
+    if (comp->shadow)
         return ambient;
 
     light_dir_normal = vector_normilze(vector_sub(light->coordinate, comp->point));
@@ -652,7 +713,9 @@ t_color get_lighting_color(t_material *material, t_light *light, t_compose *comp
 
 t_material *default_material(void)
 {
-    t_material *m = malloc(sizeof(t_material));
+    t_material *m;
+    
+    m = malloc(sizeof(t_material));
     if (!m)
         return NULL;
     m->color = ft_new_color(1.0, 1.0, 1.0);  
@@ -666,10 +729,9 @@ t_material *default_material(void)
 t_vector vector_normilze(t_vector vec)
 {
     t_vector new ;  
- 
-    // if (!vec) 
-    //     return (t_vector ){0,0,0};
-    float magnitude = vec_lenght(vec);
+    float magnitude;
+    
+    magnitude = vec_lenght(vec);
     if (magnitude == 0) 
         return ft_new_vector(0, 0, 0);
     new.x = vec.x / magnitude;

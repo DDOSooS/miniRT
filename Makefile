@@ -11,7 +11,9 @@ src = main.c ./src/parser/parsing.c \
 	./includes/get_next_line/get_next_line.c \
 	./includes/get_next_line/get_next_line_utils.c \
 	./src/operations/vec_utils.c ./src/raytracing/ray_utils.c \
-	./src/freieer.c
+	./src/freieer.c\
+	./src/loading.c\
+	./src/raytracing/shapes/cone.c\
 
 obj = $(src:.c=.o)
 

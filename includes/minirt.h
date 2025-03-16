@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2025/03/16 14:01:18 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/03/16 17:01:18 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,8 @@
 // # define SCREEN_WIDTH 1280.f
 // # define SCREEN_HEIGHT 720.f
 
-#define SCREEN_WIDTH 80.f
-#define SCREEN_HEIGHT 720.f
+#define SCREEN_WIDTH 50.f
+#define SCREEN_HEIGHT 50.f
 
 # define EPSILON 1e-4f
 # define PI 3.14159265359
@@ -233,6 +233,7 @@ typedef struct s_compose
 	t_vector		normv;
 	t_point			point;
 	int				inside;
+    int             shadow;
 	t_point			over_point;
 }					t_compose;
 
@@ -270,11 +271,35 @@ typedef struct s_scene
 	t_world			*world;
 }					t_scene;
 
+typedef struct s_transform_vars
+{
+	float		dot;
+	float		angle;
+	t_vector	axis;
+	t_vector	up;
+	t_vector	cross;
+}					t_transform_vars;
+
+typedef struct s_quadratic
+{
+	float	a;
+	float	b;
+	float	c;
+}					t_quadratic;
+
+typedef struct s_intdata
+{
+	float	t1;
+	float	t2;
+}					t_intdata;
+
 int					ft_close_window(t_scene *scen);
 void				my_pixel_put(t_img *img, int x, int y, int color);
 t_map_line			*ft_gen_scen_map(char *file_name);
 int					render_image(t_scene *scene, t_world *t_world,
 						t_scamera *cam);
+void				display_progress(t_scene *scene, t_scamera *cam,
+						int current_pixel, int total_pixels);
 int					ft_generate_scene(t_map_line *compoenent, t_scene **scene);
 void				var_dump_lines(t_map_line *map);
 int					ft_check_map_components(t_map **map);
@@ -341,19 +366,26 @@ t_plight			*ft_new_plight(t_color color, t_point point);
 /* end of  matrix operation*/
 
 /* ray manipulation*/
+float				**create_matrix(int rows, int cols);
+float				**create_identity_matrix(int size);
+void				free_matrix(float **m);
+float				**matrix_multiply(float **a, float **b);
+t_vector			matrix_multiply_vector(float **m, t_vector v);
+void				create_rotation_matrix(t_vector axis, float angle,
+						float rotation_matrix[4][4]);
 t_point				position(t_ray ray, float distance);
 t_ray				create_ray(t_point origin, t_vector dir);
 t_intersection		ft_intersect_sphere(t_ray ray, t_sphere *sphere);
 t_intersection		ft_new_intersection(float t, void *object, int type);
 t_intersection		ray_hit(t_intersection *inters, int count);
 t_ray				transform(t_ray ray, float **m);
-t_ray				transform(t_ray ray, float **m);
 t_point				position(t_ray ray, float distance);
 t_color				get_lighting_color(t_material *material, t_light *light,
-						t_compose *comp, int shadow, t_color base_color);
+						t_compose *comp, t_color base_color);
 t_vector			normilize_at_sphere_pos(t_sphere *sphere, t_point w_p);
 /* end of ray manipulation functions*/
 
+/* scene manipulation functions*/
 t_world				*default_world(t_scene *scene);
 t_intersection		intersect_world(t_world *world, t_ray ray);
 t_sphere			*default_sphere(void);
@@ -364,13 +396,17 @@ float				**get_view_transform(t_point from_v, t_point to_v,
 						t_vector up_v);
 t_ray				get_ray_pixel(t_scamera *cam, float x, float y, float edge);
 t_color				clamp_color(t_color color);
-
 int					is_shadowed(t_world *world, t_light *light, t_point point);
 float				clamp(float value, float min, float max);
 t_vector			ft_scale_vector(t_vector vector, float scale);
 t_point				ft_multiply_matrix_point(float **m, t_point v);
 float				**create_rotation_matrix_from_vector(t_vector orientation);
 t_point				ft_scale_point(t_point vector, float scale);
+
+t_intersection		ft_intersect_cone(t_ray ray, t_cone *cone);
+float				**create_cone_transform(t_cone *cone);
+
+/* end of scene manipulation functions*/
 
 /* destroy scen functions */
 void				ft_destroy_scene(t_scene *scen);
