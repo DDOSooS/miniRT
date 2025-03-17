@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2025/03/17 01:21:09 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/03/17 02:43:27 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,8 @@
 // # define SCREEN_WIDTH 1280.f
 // # define SCREEN_HEIGHT 720.f
 
-# define SCREEN_WIDTH 150.f
-# define SCREEN_HEIGHT 150.f
+# define SCREEN_WIDTH 50.f
+# define SCREEN_HEIGHT 50.f
 
 # define EPSILON 1e-4f
 # define PI 3.14159265359
@@ -386,6 +386,94 @@ t_material			*default_material(void);
 t_plight			*ft_new_plight(t_color color, t_point point);
 /* end of  matrix operation*/
 
+/*generate components*/
+int		ft_add_ambient(t_scene **scene, char **components);
+
+int		ft_add_camera(t_scene **scene, char **components);
+void	ft_set_camera(t_scamera **camera);
+void	set_view_matrix(float **m, t_vector left_v, t_vector up_n, t_vector forward_v);
+float	**get_view_transform(t_point from_v, t_vector to_v, t_vector up_v);
+
+t_cone 	*ft_new_cone(char **components);
+int		ft_add_cone(t_scene **scene, char **components);
+
+int		ft_add_light(t_scene **scene, char **components);
+
+t_plane	*ft_new_plane(char **components);
+int		ft_add_plane(t_scene **scene, char **components);
+
+t_sphere		*ft_new_sphere(char **components, t_scene **scene);
+int				ft_add_sphere(t_scene **scene, char **components);
+
+int				ft_is_whitespace(char c);
+double			ft_atod(char *str);
+double			get_fractional(char *str, int i);
+int				is_empty_line(char *line);
+int				ft_check_file_name(char *filename);
+char			**split(char const *s, char *delimiter);
+int				check_delimiter(char c, char *delimiter);
+int 			ft_is_degit(char *str);
+
+int ft_count_components(char **components);
+int ft_gen_colors(t_color *color,char *components);
+t_map_line    *ft_get_last_line(t_map_line **map);
+int file_cheker(char *file_name, int *fd);
+int    ft_add_line(t_map_line **map, char *line);
+t_map_line *ft_gen_scen_map(char *file_name);
+int ft_gen_elements(t_vector *coordinates, char *components);
+int get_texture(t_sphere *sphere, char *texture_name, t_scene **scene);
+int ft_add_component(t_scene **scene, int identifier, char **components);
+int ft_generate_scene(t_map_line *compoenent, t_scene **scene);
+
+int ft_check_non_negative(char *component);
+int ft_check_fov(char *component);
+int ft_check_elements(char *component);
+int ft_check_colors(char *component);
+int ft_check_range(char *component);
+int ft_check_norm(char *component);
+int ft_check_norm_range(char *comp);
+int is_identifier(char *identifier);
+int check_xpm_file(char *file);
+
+int ft_check_cone_component(char **components);
+int ft_check_light_component(char **components, int *counter);
+int ft_check_camera_component(char **components, int *counter);
+int ft_check_ambient_component(char **components, int *counter);
+int ft_check_cylinder_component(char **components);
+int ft_check_plane_component(char **components);
+int ft_check_sphere_component(char **components);
+int ft_check_components(int identifier_id, char **components, int *counter);
+int ft_check_map_components(t_map **map);
+
+/*add components*/
+int ft_add_ambient(t_scene **scene, char **components);
+
+int ft_add_camera(t_scene **scene, char **components);
+void ft_set_camera(t_scamera **camera);
+void set_view_matrix(float **m, t_vector left_v, t_vector up_n, t_vector forward_v);
+float **get_view_transform(t_point from_v, t_vector to_v, t_vector up_v);
+
+t_cone  *ft_new_cone(char **components);
+int ft_add_cone(t_scene **scene, char **components);
+
+t_cylinder *ft_new_cylinder(char **components);
+int ft_add_cylinder(t_scene **scene, char **components);
+
+int ft_add_light(t_scene **scene, char **components);
+
+t_plane *ft_new_plane(char **components);
+int ft_add_plane(t_scene **scene, char **components);
+
+int ft_add_sphere(t_scene **scene, char **components);
+t_sphere *ft_new_sphere(char **components, t_scene **scene);
+
+
+
+
+
+/*errors handler*/
+void error_handler(int i, int line, char *identifier);
+
 /* ray manipulation*/
 float				**create_matrix(int rows, int cols);
 float				**create_identity_matrix(int size);
@@ -400,11 +488,12 @@ t_intersection		ft_intersect_sphere(t_ray ray, t_sphere *sphere);
 t_intersection		ft_new_intersection(float t, void *object, int type);
 t_intersection		ray_hit(t_intersection *inters, int count);
 t_ray				transform(t_ray ray, float **m);
-t_point				position(t_ray ray, float distance);
 t_color				get_lighting_color(t_material *material, t_light *light,
 						t_compose *comp, t_color base_color);
 t_vector			normilize_at_sphere_pos(t_sphere *sphere, t_point w_p);
 float				**get_combined_inv(t_cylinder *cy);
+static float		**matrix_inverse(float **m);
+
 
 /* end of ray manipulation functions*/
 
@@ -439,4 +528,7 @@ t_vector			normalize_at_cone_pos(t_cone *cone, t_vector point);
 void				ft_destroy_scene(t_scene *scen);
 void				ft_free_map(t_map_line **map_lines);
 void				ft_free_map_line(t_map *map);
+void 				ft_free_line_components(char **components);
+void			ft_free(char ***words, int size);
+
 #endif /* MINIRT_H */

@@ -194,6 +194,7 @@ void     ft_free_map_line(t_map *map)
         map->lines = tmp;
     }
 }
+
 /*main function*/
 int main(int argc, char **argv)
 {

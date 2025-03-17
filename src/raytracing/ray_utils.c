@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/16 12:52:52 by mkartit           #+#    #+#             */
-/*   Updated: 2025/03/17 01:28:28 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/03/17 02:42:24 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -509,28 +509,6 @@ t_vector vector_mult_scalar(t_vector v, float scalar)
 }
 
 
-t_vector normalize_at_cone_pos(t_cone *cone, t_vector point)
-{
-	float **transform;
-	t_vector local_point;
-	t_vector apex_to_point;
-	float height_component;
-	t_vector normal;
-	float **inverse_transform;
-	t_vector world_normal;
-
-	transform = create_cone_transform(cone);
-	local_point = matrix_multiply_vector(transform, point);
-	apex_to_point = vector_sub(local_point, (t_vector){0, 0, 0, 0});
-	height_component = vector_dot(apex_to_point, (t_vector){0, 1, 0, 0});
-	 normal = vector_sub(apex_to_point, vector_mult_scalar((t_vector){0, 1, 0, 0}, height_component));
-	inverse_transform = matrix_inverse(transform);
-	 world_normal = matrix_multiply_vector(inverse_transform, normal);
-	free_matrix(transform);
-	free_matrix(inverse_transform);
-	return (vector_normilze(world_normal));
-}
-
 
 float **copy_matrix(float **m)
 {
@@ -708,40 +686,7 @@ t_compose *prepare_computations(t_intersection inter, t_ray ray)
 //camera transform matrix that transform from world coordinates to camera system Co
 
 
-void set_view_matrix(float **m, t_vector left_v, t_vector up_n, t_vector forward_v)
-{
-    m[0][0] = left_v.x;
-	m[0][1] = left_v.y;
-	m[0][2] = left_v.z;
-	m[1][0] = up_n.x;
-	m[1][1] = up_n.y;
-	m[1][2] = up_n.z;
-	m[2][0] = -forward_v.x;
-	m[2][1] = -forward_v.y;
-	m[2][2] = -forward_v.z;
-}
 
-float **get_view_transform(t_point from_v, t_vector to_v, t_vector up_v)
-{
-	t_vector    forward_v;
-	t_vector    left_v;
-	t_vector    up_n;
-	float       **view_transform;
-	float       **res;
-	float       **traslate_mx;
-
-	forward_v = vector_normilze(to_v);
-	up_n = vector_normilze(up_v);
-	left_v = vector_cross(forward_v, up_n);
-	up_v = vector_cross(left_v, forward_v);
-	view_transform = identity_matrix(4);
-    set_view_matrix(view_transform, left_v, up_v, forward_v);
-	traslate_mx = ft_translate_matrix(ft_new_point(-from_v.x, -from_v.y, -from_v.z), 1);
-	res = ft_multiply_matrix(view_transform, traslate_mx, 4, 4);
-	ft_free_matrix(view_transform,4);
-	ft_free_matrix(traslate_mx, 4);
-	return res;
-}
 
 //y rotation than x rotation~~~~~~
 float **create_rotation_matrix_from_vector(t_vector orientation)
@@ -854,28 +799,6 @@ t_world	*default_world(t_scene *scene)
 }
 
 
-
-void ft_set_camera(t_scamera **camera)
-{
-	float aspect;
-	float half_view;
-   
-	aspect = (*camera)->w_size / (*camera)->h_size;
-	half_view = tan((*camera)->fov / 2.0f);
-	if (aspect >= 1.0f)
-	{
-		(*camera)->half_w_size = half_view;
-		(*camera)->half_h_size = half_view / aspect;
-	}
-	else
-	{
-		(*camera)->half_w_size = half_view * aspect;
-		(*camera)->half_h_size = half_view;
-	}
-	(*camera)->pixel_size = (*camera)->half_w_size * 2.0f / (*camera)->w_size;
-	(*camera)->transform = get_view_transform((*camera)->origin,
-		vector_normilze((*camera)->direction), ft_new_vector(0, 1, 0));
-}
 
 t_ray get_ray_pixel(t_scamera *cam, float x, float y, float edge)
 {
