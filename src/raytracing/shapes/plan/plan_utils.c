@@ -1,21 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_lstdelone_bonus.c                               :+:      :+:    :+:   */
+/*   plan_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/11/03 01:52:32 by aghergho          #+#    #+#             */
-/*   Updated: 2023/11/08 13:22:19 by aghergho         ###   ########.fr       */
+/*   Created: 2025/03/17 08:49:44 by aghergho          #+#    #+#             */
+/*   Updated: 2025/03/17 10:06:45 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "../../../../includes/minirt.h"
 
-void	ft_lstdelone(t_list *lst, void (*del)(void *))
+void	ft_add_plane_shape(t_world *world, t_plane *plane)
 {
-	if (!*del || !del)
-		return ;
-	del(lst->content);
-	free(lst);
+	t_plane	*tmp;
+
+	tmp = plane;
+	while (tmp)
+	{
+		ft_add_shape(&world, tmp, SHAPE_PLANE);
+		tmp = tmp->next;
+	}
 }

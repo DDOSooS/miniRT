@@ -6,11 +6,11 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/16 09:25:34 by mkartit           #+#    #+#             */
-/*   Updated: 2025/03/17 01:46:17 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/03/17 09:17:32 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../../includes/minirt.h"
+#include "../../../../includes/minirt.h"
 
 static void	calculate_cone_coefficients(t_ray local_ray, t_cone *cone,
 		t_quadratic *coeff)

@@ -28,13 +28,13 @@ t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *))
 		{
 			ft_lstclear(&new, del);
 			return (NULL);
-		}	
+		}
 		new_node = ft_lstnew(temp);
 		if (!new_node)
 		{
 			ft_lstclear(&new, del);
 			return (NULL);
-		}	
+		}
 		ft_lstadd_back(&new, new_node);
 		lst = lst->next;
 	}
@@ -43,6 +43,7 @@ t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *))
 
 /*=========================TESTING PART=======================
 #include <stdio.h>
+
 void	del(void *content)
 {
 	free(content);

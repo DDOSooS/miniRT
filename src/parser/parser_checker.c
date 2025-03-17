@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 01:58:09 by aghergho          #+#    #+#             */
-/*   Updated: 2025/03/17 01:58:22 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/03/17 10:21:09 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ int	ft_check_colors(char *component)
 	int		i;
 	double	color;
 
-	colors = split(component, ",");
+	colors = ftt_split(component, ",");
 	if (!colors)
 		return (0);
 	if (ft_count_components(colors) != 3)
@@ -52,7 +52,7 @@ int	ft_check_elements(char *component)
 	int		i;
 
 	i = -1;
-	coordinates = split(component, ",");
+	coordinates = ftt_split(component, ",");
 	if (ft_count_components(coordinates) != 3)
 		return (ft_free_line_components(coordinates), 0);
 	while (coordinates[++i])

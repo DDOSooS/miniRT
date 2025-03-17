@@ -20,7 +20,7 @@ char	*ft_strdup(const char *s)
 
 	len = ft_strlen(s);
 	i = -1;
-	new = (char *) ft_calloc(sizeof(char), len + 1);
+	new = (char *)ft_calloc(sizeof(char), len + 1);
 	if (!new)
 		return (NULL);
 	while (++i < len)
@@ -31,12 +31,14 @@ char	*ft_strdup(const char *s)
 /*=====================Testsing part===================
 int main ()
 {
-    char *s = "";
-    char *new;
-    new = ft_strdup(s);
-    if (!new)
-        return (0);
-    printf("%s\n", new);
-    return (0);
+	char	*s;
+	char	*new;
+
+	s = "";
+	new = ft_strdup(s);
+	if (!new)
+		return (0);
+	printf("%s\n", new);
+	return (0);
 }
 //=======================================================*/

@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 01:49:09 by aghergho          #+#    #+#             */
-/*   Updated: 2025/03/17 01:49:21 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/03/17 10:20:43 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ static void	ft_gen_words(char **words, char const *s, char *delimiter)
 	words[k] = NULL;
 }
 
-char	**split(char const *s, char *delimiter)
+char	**ftt_split(char const *s, char *delimiter)
 {
 	char	**words;
 

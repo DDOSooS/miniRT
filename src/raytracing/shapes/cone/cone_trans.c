@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   cone_trans.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkartit <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/16 21:14:47 by mkartit           #+#    #+#             */
-/*   Updated: 2025/03/16 21:14:49 by mkartit          ###   ########.fr       */
+/*   Updated: 2025/03/17 09:17:48 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../../includes/minirt.h"
+#include "../../../../includes/minirt.h"
 
 static void	init_rotation_matric(float rotation_matrix[4][4])
 {

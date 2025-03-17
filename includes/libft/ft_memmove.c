@@ -17,8 +17,8 @@ void	*ft_memmove(void *dest, const void *src, size_t n)
 	unsigned char	*d;
 	unsigned char	*s;
 
-	d = (unsigned char *) dest;
-	s = (unsigned char *) src;
+	d = (unsigned char *)dest;
+	s = (unsigned char *)src;
 	if (dest == src || n == 0)
 		return (dest);
 	if (d < s)
@@ -34,15 +34,15 @@ void	*ft_memmove(void *dest, const void *src, size_t n)
 	return (dest);
 }
 /*------------------- TESTING PART -----------------
-int main()
+int	main(void)
 {
-    char str1[50] = "Geeks"; 
-    char str2[5] = "Quiz";  
+	char	str1[50] = "Geeks";
+	char	str2[5] = "Quiz";
 
-    puts("str1 before mmmove ");
-    puts(str1);
-    ft_memmove(str1, str2, sizeof(str2));
-    puts(str1);
-    return 0;
+	puts("str1 before mmmove ");
+	puts(str1);
+	ft_memmove(str1, str2, sizeof(str2));
+	puts(str1);
+	return (0);
 }
 ---------------------------------------------------*/

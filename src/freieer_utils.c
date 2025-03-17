@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 02:21:43 by aghergho          #+#    #+#             */
-/*   Updated: 2025/03/17 02:36:16 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/03/17 09:57:16 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,4 +48,14 @@ void	ft_free_map(t_map_line **map_lines)
 		(*map_lines) = tmp;
 	}
 	map_lines = NULL;
+}
+
+void	free_matrix(float **m)
+{
+	int	i;
+
+	i = -1;
+	while (++i < 4)
+		free(m[i]);
+	free(m);
 }
