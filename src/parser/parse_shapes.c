@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   parse_shapes.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkartit <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 02:18:29 by mkartit           #+#    #+#             */
-/*   Updated: 2025/03/17 02:18:31 by mkartit          ###   ########.fr       */
+/*   Updated: 2025/03/17 06:09:56 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/minirt.h"
 
-static t_cone	*ft_new_cone(char **components)
+t_cone	*ft_new_cone(char **components)
 {
 	t_cone	*cone;
 

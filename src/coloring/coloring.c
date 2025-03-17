@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   coloring.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkartit <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 03:06:50 by mkartit           #+#    #+#             */
-/*   Updated: 2025/03/17 03:06:51 by mkartit          ###   ########.fr       */
+/*   Updated: 2025/03/17 06:10:59 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,8 @@
 t_color	handle_standard_object(t_world *world, t_compose *comp, t_light *light,
 		t_material *material)
 {
-	int	shadowed;
-
-	shadowed = is_shadowed(world, light, comp->over_point);
-	return (get_lighting_color(material, light, comp, shadowed,
+	comp->shadow = is_shadowed(world, light, comp->over_point);
+	return (get_lighting_color(material, light, comp,
 			material->color));
 }
 
