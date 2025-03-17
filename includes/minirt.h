@@ -26,8 +26,8 @@
 // # define SCREEN_WIDTH 1280.f
 // # define SCREEN_HEIGHT 720.f
 
-#define SCREEN_WIDTH 50.f
-#define SCREEN_HEIGHT 50.f
+# define SCREEN_WIDTH 150.f
+# define SCREEN_HEIGHT 150.f
 
 # define EPSILON 1e-4f
 # define PI 3.14159265359
@@ -339,6 +339,7 @@ int					gen_ray(t_scene *scene, float x, float y, t_ray cam_r);
 void				ft_set_camera(t_scamera **camera);
 t_vector			vector_copy(t_vector src);
 t_sphere			*ft_new_sphere(char **components, t_scene **scene);
+t_vector			vector_mult_scalar(t_vector v, float scalar);
 
 /* colors operations*/
 t_color				ft_new_color(float r, float g, float b);
@@ -427,6 +428,10 @@ t_point				ft_scale_point(t_point vector, float scale);
 
 t_intersection		ft_intersect_cone(t_ray ray, t_cone *cone);
 float				**create_cone_transform(t_cone *cone);
+t_ray				get_local_ray(t_ray ray, t_cone *cone);
+void				copy_matrix_cone(float **dst, float temp_matrix[4][4]);
+float				**create_translation_matrix(t_cone *cone);
+t_vector			normalize_at_cone_pos(t_cone *cone, t_vector point);
 
 /* end of scene manipulation functions*/
 

@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/16 12:52:52 by mkartit           #+#    #+#             */
-/*   Updated: 2025/03/17 00:23:10 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/03/17 01:28:28 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -439,21 +439,6 @@ float **translation_matrix(float x, float y, float z)
 	return m;
 }
 
-float **matrix_inverse(float **m)
-{
-	return create_identity_matrix(4);
-}
-
-// void print_matrix_v2(float **m)
-// {
-// 	for (int i = 0; i < 4; i++)
-// 	{
-// 		for (int j = 0; j < 4; j++)
-// 			printf("%f ", m[i][j]);
-// 		printf("\n");
-// 	}
-// }
-
 // NORMINETTE URGENT TO DO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 t_intersection ft_intersect_cylinder(t_ray ray, t_cylinder *cylinder)
 {
@@ -522,6 +507,7 @@ t_vector vector_mult_scalar(t_vector v, float scalar)
 	result.w = v.w * scalar;
 	return result;
 }
+
 
 t_vector normalize_at_cone_pos(t_cone *cone, t_vector point)
 {
@@ -821,9 +807,9 @@ void ft_add_sphere_shape(t_world *world, t_sphere *sphere)
 	}
 }
 
-void ft_add_cone_shape(t_world *world, t_cone *cone)
+void	ft_add_cone_shape(t_world *world, t_cone *cone)
 {
-	t_cone *tmp;
+	t_cone	*tmp;
 
 	tmp = cone;
 	while (tmp)
@@ -846,9 +832,11 @@ void ft_add_plight(t_world *world, t_light *light)
 	}
 }
 
-t_world *default_world(t_scene *scene)
+t_world	*default_world(t_scene *scene)
 {
-	t_world *world = malloc(sizeof(t_world));
+	t_world *world;
+
+	world = malloc(sizeof(t_world));
 	if (!world)
 		return NULL;
 	world->n_objects = 0;
@@ -862,7 +850,7 @@ t_world *default_world(t_scene *scene)
 	if (scene->cone)
 		ft_add_cone_shape(world, scene->cone);
 	ft_add_plight(world, scene->light);
-	return world;
+	return (world);
 }
 
 
@@ -1206,7 +1194,7 @@ void    setup_window_hooks(t_scene *scene)
 	mlx_loop(scene->data->mlx);
 }
 
-int render_image(t_scene *scene, t_world *world, t_scamera *cam)
+int	render_image(t_scene *scene, t_world *world, t_scamera *cam)
 {
 	float x, y;
 	int total_pixels;

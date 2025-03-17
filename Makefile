@@ -18,6 +18,9 @@ src = main.c ./src/parser/parsing.c \
 	./src/freieer.c\
 	./src/loading.c\
 	./src/raytracing/shapes/cone.c\
+	./src/raytracing/shapes/cone_utils.c\
+	./src/raytracing/shapes/cone_trans.c\
+	./src/raytracing/shapes/cone_norm.c\
 
 obj = $(src:.c=.o)
 

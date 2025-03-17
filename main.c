@@ -147,7 +147,7 @@ void my_pixel_put(t_img *img, int x, int y, int color)
     *((unsigned int *)(img->addr + offset)) = color;
 }
 
-void init_scene(t_scene *scene)
+void    init_scene(t_scene *scene)
 {
     scene->data->mlx = mlx_init();
     scene->data->win = mlx_new_window(scene->data->mlx, SCREEN_WIDTH, SCREEN_HEIGHT,"MiniRT");
