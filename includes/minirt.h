@@ -23,8 +23,8 @@
 # include <stdlib.h>
 # include <unistd.h>
 
-# define SCREEN_WIDTH 1240.f
-# define SCREEN_HEIGHT 740.f
+# define SCREEN_WIDTH 140.f
+# define SCREEN_HEIGHT 40.f
 
 # define EPSILON 1e-4f
 # define PI 3.14159265359
@@ -355,6 +355,7 @@ typedef struct s_cylinder_equation
 	float				min_t;
 }						t_cylinder_eq;
 /*parsing utils*/
+int						ft_check_empty_element(char *comp);
 int						ft_gen_elements(t_vector *coordinates,
 							char *components);
 double					ft_atod(char *str);

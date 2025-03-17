@@ -12,6 +12,20 @@
 
 #include "../../includes/minirt.h"
 
+int	ft_check_empty_element(char *comp)
+{
+	int	i;
+
+	i = 0;
+	while (comp[i])
+	{
+		if (comp[i + 1] && comp[i + 1] == ',' && comp[i] == ',')
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
 int	ft_check_components(int identifier_id, char **components, int *counter)
 {
 	if (identifier_id == 1)

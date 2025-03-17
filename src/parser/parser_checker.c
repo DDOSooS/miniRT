@@ -53,7 +53,8 @@ int	ft_check_elements(char *component)
 
 	i = -1;
 	coordinates = ftt_split(component, ",");
-	if (ft_count_components(coordinates) != 3)
+	if (ft_count_components(coordinates) != 3
+		|| !ft_check_empty_element(component))
 		return (ft_free_line_components(coordinates), 0);
 	while (coordinates[++i])
 	{
