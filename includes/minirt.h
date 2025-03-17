@@ -23,11 +23,8 @@
 # include <stdlib.h>
 # include <unistd.h>
 
-// # define SCREEN_WIDTH 1240.f
-// # define SCREEN_HEIGHT 740.f
-
-# define SCREEN_WIDTH 150.f
-# define SCREEN_HEIGHT 150.f
+# define SCREEN_WIDTH 1240.f
+# define SCREEN_HEIGHT 740.f
 
 # define EPSILON 1e-4f
 # define PI 3.14159265359
@@ -472,7 +469,7 @@ int						ft_add_sphere(t_scene **scene, char **components);
 
 int						ft_is_whitespace(char c);
 char					**ftt_split(char const *s, char *delimiter);
-double 					ft_atod(char *str);
+double					ft_atod(char *str);
 double					get_fractional(char *str, int i);
 int						is_empty_line(char *line);
 int						ft_check_file_name(char *filename);
@@ -628,7 +625,8 @@ t_intersection			ft_init_intersection(int type);
 t_intersection			ft_intersect_cylinder(t_ray ray, t_cylinder *cylinder);
 t_vector				normalize_at_cylinder_pos(t_cylinder *cylinder,
 							t_point world_p);
-float					**create_rotation_matrix_from_vector(t_vector orientation);
+float					**create_rotation_matrix_from_vector(
+							t_vector orientation);
 float					**get_combined_inv(t_cylinder *cy);
 void					ft_add_cylinder_shape(t_world *world,
 							t_cylinder *cylinder);
