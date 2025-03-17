@@ -510,37 +510,6 @@ void var_dump_world(t_world *world)
     float **matrix1 = ft_create_matrix(4,4);
     matrix1[0][0]=8.0f;
     matrix1[0][1]=2.0f;
-    matrix1[0][2]=2.0f;
-    matrix1[0][3]=2.0f;
-    matrix1[1][0]=3.0f;
-    matrix1[1][1]=-1.0f;
-    matrix1[1][2]=7.0f;
-    matrix1[1][3]=-0.0f;
-    matrix1[2][0]=7.0f;
-    matrix1[2][1]=0.0f;
-    matrix1[2][2]=5.0f;
-    matrix1[2][3]=4.0f;
-    matrix1[3][0]=6.0f;
-    matrix1[3][1]=-2.0f;
-    matrix1[3][2]=0.0f;
-    matrix1[3][3]=5.0f;
-
-    float **res = ft_multiply_matrix(matrix, matrix1, 4,4);
-     printf("===========================\n");
-    float **inv = inverse_matrix(matrix1, 4);
-    printf("===========================\n");
-    float **a = ft_multiply_matrix(matrix1 , inv, 4,4);
-
-    printf("===========================\n");
-    for (int i=0; i<4; i++)
-    {
-        for (int j = 0; j < 4; j++)
-            printf("matrix[%d][%d]==[%f] || ", i, j, (a[i][j]));
-        printf("\n");            
-    }
-
-    if (ft_compare_matrix(a, matrix, 4,4))
-        printf("the are equal\n");
     else
         printf("the are not equal\n");
 
@@ -577,7 +546,38 @@ void var_dump_world(t_world *world)
     }
     t_point *p = ft_new_point(2,3,4);
     t_point *p2 = ft_new_point(-3,4,5);
-    t_vector *v = ft_new_vector(-4, 6,8);
+    t_vector *v = ft_n    matrix1[0][2]=2.0f;
+    matrix1[0][3]=2.0f;
+    matrix1[1][0]=3.0f;
+    matrix1[1][1]=-1.0f;
+    matrix1[1][2]=7.0f;
+    matrix1[1][3]=-0.0f;
+    matrix1[2][0]=7.0f;
+    matrix1[2][1]=0.0f;
+    matrix1[2][2]=5.0f;
+    matrix1[2][3]=4.0f;
+    matrix1[3][0]=6.0f;
+    matrix1[3][1]=-2.0f;
+    matrix1[3][2]=0.0f;
+    matrix1[3][3]=5.0f;
+
+    float **res = ft_multiply_matrix(matrix, matrix1, 4,4);
+     printf("===========================\n");
+    float **inv = inverse_matrix(matrix1, 4);
+    printf("===========================\n");
+    float **a = ft_multiply_matrix(matrix1 , inv, 4,4);
+
+    printf("===========================\n");
+    for (int i=0; i<4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+            printf("matrix[%d][%d]==[%f] || ", i, j, (a[i][j]));
+        printf("\n");            
+    }
+
+    if (ft_compare_matrix(a, matrix, 4,4))
+        printf("the are equal\n");
+ew_vector(-4, 6,8);
     // t_point *res = ft_transform(p, p2, -1);
     t_point *res = ft_scale(p, v, -1);
 

@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/16 12:52:52 by mkartit           #+#    #+#             */
-/*   Updated: 2025/03/16 16:59:57 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/03/17 00:23:10 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -463,14 +463,10 @@ t_intersection ft_intersect_cylinder(t_ray ray, t_cylinder *cylinder)
 	float sol[4];
 	int counter = 0;
 	int is_inside = 0;
+	float	**inverse;
 
     //  rotation matrix && orientation vector
-    float **rotation = create_rotation_matrix_from_vector(cylinder->orientation);
-    // Combine rotation and transformation MX
-    float **combined = ft_multiply_matrix(cylinder->transform, rotation, 4, 4);
-    float **inverse = inverse_matrix(combined, 4);
-    if (!inverse)
-        inverse = cylinder->transform;
+	inverse = get_combined_inv(cylinder);
     // Transform ray to object space
     t_ray tr_ray = create_ray(ft_multiply_matrix_vec(inverse, ray.origin),
                                         ft_multiply_matrix_vec(inverse, ray.direction));
@@ -513,10 +509,7 @@ t_intersection ft_intersect_cylinder(t_ray ray, t_cylinder *cylinder)
             result.t1 = min_t;
         }
     }
-    ft_free_matrix(rotation, 4);
-    ft_free_matrix(combined, 4);
-    if (inverse != cylinder->transform)
-        ft_free_matrix(inverse, 4);
+	ft_free_matrix(inverse, 4);
     return result;
 }
 
@@ -539,7 +532,6 @@ t_vector normalize_at_cone_pos(t_cone *cone, t_vector point)
 	t_vector normal;
 	float **inverse_transform;
 	t_vector world_normal;
-
 
 	transform = create_cone_transform(cone);
 	local_point = matrix_multiply_vector(transform, point);
@@ -581,7 +573,7 @@ float **get_combined_inv(t_cylinder *cy)
     combined = ft_multiply_matrix(cy->transform, rotation, 4, 4);
     inv = inverse_matrix(combined, 4);
     if (!inv)
-        inv = copy_matrix(combined);
+        inv = copy_matrix(cy->transform);
     ft_free_matrix(rotation, 4);
     ft_free_matrix(combined, 4);
     return inv;
@@ -608,6 +600,9 @@ t_vector normalize_at_cylinder_pos(t_cylinder *cylinder, t_point world_p)
     ft_free_matrix(inv, 4);
 	return vector_normilze(world_normal);
 }
+
+
+
 
 t_intersection intersect_world(t_world *world, t_ray ray)
 {
@@ -765,19 +760,27 @@ float **get_view_transform(t_point from_v, t_vector to_v, t_vector up_v)
 //y rotation than x rotation~~~~~~
 float **create_rotation_matrix_from_vector(t_vector orientation)
 {
-    float **res;
-    float sd_ax;
-    t_vector normalized;
-    float **rot_y;
-    float **rot_x;
+    t_vector new_y = vector_normilze(orientation);
+    t_vector tmp_axis;
+    t_vector new_x, new_z;
     
-    normalized = vector_normilze(orientation);
-    rot_y = rotate_y(atan2(normalized.x, normalized.z));
-    rot_x = rotate_x(asin(-normalized.y));
-    res = ft_multiply_matrix(rot_x, rot_y, 4, 4);
-    ft_free_matrix(rot_y, 4);
-    ft_free_matrix(rot_x, 4);
-    return res;
+    // Choose a temporary axis that's not parallel to new_y
+    if (fabs(new_y.y) < 0.9999f)
+        tmp_axis = (t_vector){0, 1, 0}; // Use default up (Y-axis)
+    else
+        tmp_axis = (t_vector){0, 0, 1}; // If new_y is close to Y, use Z-axis
+    
+    new_x = vector_normilze(vector_cross(tmp_axis, new_y));
+    new_z = vector_normilze(vector_cross(new_y, new_x));
+    // Create the 4x4 rotation matrix
+    float **matrix = create_matrix(4, 4);
+    for (int i = 0; i < 4; i++)
+        for (int j = 0; j < 4; j++)
+            matrix[i][j] = (i == j) ? 1.0f : 0.0f;
+    matrix[0][0] = new_x.x; matrix[0][1] = new_y.x; matrix[0][2] = new_z.x;
+    matrix[1][0] = new_x.y; matrix[1][1] = new_y.y; matrix[1][2] = new_z.y;
+    matrix[2][0] = new_x.z; matrix[2][1] = new_y.z; matrix[2][2] = new_z.z;
+    return matrix;
 }
 /*
 */

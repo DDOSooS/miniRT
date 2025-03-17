@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2025/03/16 17:01:18 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/03/17 01:21:09 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,26 @@ typedef struct s_ray
 	t_vector		origin;
 	t_vector		direction;
 }					t_ray;
+
+typedef struct minor
+{
+	int col;
+	int i;
+	int	mi;
+	int n;
+}	t_minor;
+
+typedef struct light_utils
+{
+	t_vector light_dir_normal;
+	t_color eff_color;
+	t_color ambient;
+	t_color diffuse;
+	t_color specular;
+	float	light_dot_normal;
+	float	reflect_dot_camera;
+	t_color	res;
+}	t_lihgt_color;
 
 typedef struct s_intersection
 {
@@ -346,7 +366,7 @@ float				**get_minor(float **m, int row, int col, int n);
 float				determinant(float **m, int n);
 float				**inverse_matrix(float **m, int n);
 void				ft_scale_matrix(float ***m, float scale, int n);
-float				**ft_scaling_matrix(float x, float y, float z, int inverse);
+// float				**ft_scaling_matrix(float x, float y, float z, int inverse);
 float				**ft_translate_matrix(t_point point, int inverse);
 t_point				ft_transform(t_point p1, t_point p2, int inverse);
 float				**shearing_matrix(int *coord);
@@ -359,7 +379,7 @@ float				**rotate_y(float rad);
 float				**rotate_z(float rad);
 void				print_matrix(float **matrix, int rows, int cols);
 float				**shearing_matrix(int *coord);
-
+// inline float 		radian( float degree);
 void				ft_free_matrix(float **m, int n);
 t_material			*default_material(void);
 t_plight			*ft_new_plight(t_color color, t_point point);
@@ -383,6 +403,8 @@ t_point				position(t_ray ray, float distance);
 t_color				get_lighting_color(t_material *material, t_light *light,
 						t_compose *comp, t_color base_color);
 t_vector			normilize_at_sphere_pos(t_sphere *sphere, t_point w_p);
+float				**get_combined_inv(t_cylinder *cy);
+
 /* end of ray manipulation functions*/
 
 /* scene manipulation functions*/

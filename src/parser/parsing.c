@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 20:24:10 by aghergho          #+#    #+#             */
-/*   Updated: 2025/03/16 16:28:50 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/03/16 17:25:21 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -378,7 +378,6 @@ int ft_check_light_component(char **components, int *counter)
     if (!ft_check_colors(components[3]))
         return (0);
     (counter)[2]++;
-    // printf("light components are valid\n");
     return (1);
 }
 
