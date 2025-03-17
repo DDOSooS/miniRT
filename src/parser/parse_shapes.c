@@ -33,6 +33,8 @@ t_cone	*ft_new_cone(char **components)
 	cone->material->color = cone->color;
 	if (vec_lenght(cone->axis) == 0)
 	{
+		ft_free_matrix(cone->transform, 4);
+		free(cone->material);
 		free(cone);
 		return (NULL);
 	}
