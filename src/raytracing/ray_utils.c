@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/16 12:52:52 by mkartit           #+#    #+#             */
-/*   Updated: 2025/03/17 06:17:19 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/03/17 06:24:03 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -592,6 +592,7 @@ t_intersection intersect_world(t_world *world, t_ray ray)
 			inter[++i] = ft_intersect_cone(ray, current->u_objects.cone);
 		current = current->next;
 	}
+	
 	res = ray_hit(inter, world->n_objects);
 	return (free(inter), res);
 }
