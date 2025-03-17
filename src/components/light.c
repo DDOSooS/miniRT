@@ -10,12 +10,12 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "../../includes/minirt.h"
+#include "../../includes/minirt.h"
 
-int ft_add_light(t_scene **scene, char **components)
+int	ft_add_light(t_scene **scene, char **components)
 {
-	t_light *light;
-	t_light *tmp;
+	t_light	*light;
+	t_light	*tmp;
 
 	light = malloc(sizeof(t_light));
 	ft_gen_elements(&light->coordinate, components[1]);
@@ -28,9 +28,9 @@ int ft_add_light(t_scene **scene, char **components)
 	else
 	{
 		tmp = (*scene)->light;
-		while(tmp->next)
+		while (tmp->next)
 			tmp = tmp->next;
-		tmp->next = light; 
+		tmp->next = light;
 	}
-	return 1;
+	return (1);
 }

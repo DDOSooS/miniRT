@@ -10,11 +10,11 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "../../includes/minirt.h"
+#include "../../includes/minirt.h"
 
-int ft_add_ambient(t_scene **scene, char **components)
+int	ft_add_ambient(t_scene **scene, char **components)
 {
-	t_ambient  *tmp;
+	t_ambient	*tmp;
 
 	tmp = malloc(sizeof(t_ambient));
 	tmp->ambient_ration = ft_atod(components[1]);

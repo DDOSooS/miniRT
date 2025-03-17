@@ -10,51 +10,50 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "../../includes/minirt.h"
+#include "../../includes/minirt.h"
 
-int ft_is_degit(char *str)
+int	ft_is_degit(char *str)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	if (str[i] == '+' || str[i] == '-')
 		i++;
 	while (str[i] && (str[i] >= '0' && str[i] <= '9'))
-		 i++;
+		i++;
 	if (str[i] == '.')
 	{
 		i++;
 		while (str[i] && (str[i] >= '0' && str[i] <= '9'))
 			i++;
 		if (str[i])
-			return 0;
+			return (0);
 	}
 	else if (str[i])
-		return 0;
-	return 1;
+		return (0);
+	return (1);
 }
 
-int ft_count_components(char **components)
+int	ft_count_components(char **components)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (components[i])
 		i++;
-	return i;
+	return (i);
 }
 
-
-int ft_gen_colors(t_color *color,char *components)
+int	ft_gen_colors(t_color *color, char *components)
 {
-	char    **tmp_colors;
- 
+	char	**tmp_colors;
+
 	tmp_colors = split(components, ",");
-	if (!tmp_colors) 
-		return 0;
-	(color)->r = clamp (ft_atod(tmp_colors[0])  / 255.0f,0,1);
-	(color)->g = clamp(ft_atod(tmp_colors[1])  / 255.0f,0,1);
-	(color)->b = clamp(ft_atod(tmp_colors[2])  / 255.0f,0,1);
+	if (!tmp_colors)
+		return (0);
+	(color)->r = clamp(ft_atod(tmp_colors[0]) / 255.0f, 0, 1);
+	(color)->g = clamp(ft_atod(tmp_colors[1]) / 255.0f, 0, 1);
+	(color)->b = clamp(ft_atod(tmp_colors[2]) / 255.0f, 0, 1);
 	ft_free_line_components(tmp_colors);
-	return (1); 
+	return (1);
 }

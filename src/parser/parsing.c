@@ -47,7 +47,7 @@ int	ft_add_component(t_scene **scene, int identifier, char **components)
 
 int	ft_generate_scene(t_map_line *compoenent, t_scene **scene)
 {
-	int identifier_id;
+	int	identifier_id;
 
 	while (compoenent)
 	{

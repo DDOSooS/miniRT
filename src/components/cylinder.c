@@ -10,13 +10,12 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "../../includes/minirt.h"
+#include "../../includes/minirt.h"
 
-
-t_cylinder *ft_new_cylinder(char **components)
+t_cylinder	*ft_new_cylinder(char **components)
 {
-	t_cylinder *new;
-	
+	t_cylinder	*new;
+
 	new = malloc(sizeof(t_cylinder));
 	if (!new)
 		return (NULL);
@@ -35,10 +34,10 @@ t_cylinder *ft_new_cylinder(char **components)
 	return (new);
 }
 
-int ft_add_cylinder(t_scene **scene, char **components)
+int	ft_add_cylinder(t_scene **scene, char **components)
 {
-	t_cylinder *new;
-	t_cylinder *tmp;
+	t_cylinder	*new;
+	t_cylinder	*tmp;
 
 	new = ft_new_cylinder(components);
 	tmp = (*scene)->cylinder;
@@ -50,5 +49,5 @@ int ft_add_cylinder(t_scene **scene, char **components)
 			tmp = tmp->next;
 		tmp->next = new;
 	}
-	return 1;
+	return (1);
 }

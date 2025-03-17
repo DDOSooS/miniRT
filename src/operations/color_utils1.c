@@ -10,32 +10,32 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "../../includes/minirt.h"
+#include "../../includes/minirt.h"
 
-float clamp(float value, float min, float max)
+float	clamp(float value, float min, float max)
 {
-    if (value < min)
-        return min;
-    else if (value > max)
-        return max;
-    else
-        return value;
+	if (value < min)
+		return (min);
+	else if (value > max)
+		return (max);
+	else
+		return (value);
 }
 
-t_color clamp_color(t_color color)
+t_color	clamp_color(t_color color)
 {
-    color.r = clamp(color.r, 0.0f, 1.0f);
-    color.g = clamp(color.g, 0.0f, 1.0f);
-    color.b = clamp(color.b, 0.0f, 1.0f);
-    return color;
+	color.r = clamp(color.r, 0.0f, 1.0f);
+	color.g = clamp(color.g, 0.0f, 1.0f);
+	color.b = clamp(color.b, 0.0f, 1.0f);
+	return (color);
 }
 
-t_color ft_multiply_color_scalar(t_color color, float scalar)
+t_color	ft_multiply_color_scalar(t_color color, float scalar)
 {
-    t_color new_color;
+	t_color	new_color;
 
-    new_color.r = color.r * scalar;
-    new_color.g = color.g * scalar;
-    new_color.b = color.b * scalar;
-    return (new_color);
+	new_color.r = color.r * scalar;
+	new_color.g = color.g * scalar;
+	new_color.b = color.b * scalar;
+	return (new_color);
 }

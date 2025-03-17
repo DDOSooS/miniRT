@@ -10,11 +10,11 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "../../includes/minirt.h"
+#include "../../includes/minirt.h"
 
-int check_delimiter(char c, char *delimiter)
+int	check_delimiter(char c, char *delimiter)
 {
-	int    i;
+	int	i;
 
 	i = 0;
 	while (delimiter[i])
@@ -92,7 +92,8 @@ char	**split(char const *s, char *delimiter)
 
 	if (!s)
 		return (NULL);
-	words = (char **)malloc(sizeof(char *) * (ft_count_words(s, delimiter) + 1));
+	words = (char **)malloc(sizeof(char *) * (ft_count_words(s, delimiter)
+				+ 1));
 	if (!words)
 		return (NULL);
 	ft_gen_words(words, s, delimiter);

@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-
 #include "./../includes/minirt.h"
 
 void	ft_free(char ***words, int size)
@@ -24,9 +23,9 @@ void	ft_free(char ***words, int size)
 	*words = NULL;
 }
 
-void ft_free_line_components(char **components)
+void	ft_free_line_components(char **components)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (components[i])
@@ -37,9 +36,9 @@ void ft_free_line_components(char **components)
 	free(components);
 }
 
-void    ft_free_map(t_map_line **map_lines)
+void	ft_free_map(t_map_line **map_lines)
 {
-	t_map_line *tmp;
+	t_map_line	*tmp;
 
 	while (*map_lines)
 	{
@@ -48,5 +47,5 @@ void    ft_free_map(t_map_line **map_lines)
 		free(*map_lines);
 		(*map_lines) = tmp;
 	}
-	map_lines = NULL;    
+	map_lines = NULL;
 }

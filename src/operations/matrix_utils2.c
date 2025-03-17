@@ -10,16 +10,15 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "../../includes/minirt.h"
+#include "../../includes/minirt.h"
 
-t_point ft_transform(t_point p1 , t_point p2, int inverse)
+t_point	ft_transform(t_point p1, t_point p2, int inverse)
 {
-    t_point transformed_point;
-    float **matrix;
+	t_point	transformed_point;
+	float	**matrix;
 
-    matrix = ft_translate_matrix(p1, inverse);
-    transformed_point = ft_multiply_matrix_vec(matrix, p2);
-    ft_free_matrix(matrix, 4);
-    return (transformed_point);
+	matrix = ft_translate_matrix(p1, inverse);
+	transformed_point = ft_multiply_matrix_vec(matrix, p2);
+	ft_free_matrix(matrix, 4);
+	return (transformed_point);
 }
-

@@ -10,27 +10,27 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "../../includes/minirt.h"
+#include "../../includes/minirt.h"
 
-int ft_check_range(char *component)
+int	ft_check_range(char *component)
 {
-	double range;
+	double	range;
 
 	range = ft_atod(component);
 	if (range < 0 || range > 1)
-		return 0;
-	return 1;
+		return (0);
+	return (1);
 }
 
-int ft_check_colors(char *component)
+int	ft_check_colors(char *component)
 {
-	char **colors;
-	int i;
-	double color;
-	
-	colors = split(component,",");
+	char	**colors;
+	int		i;
+	double	color;
+
+	colors = split(component, ",");
 	if (!colors)
-		return 0;
+		return (0);
 	if (ft_count_components(colors) != 3)
 		return (ft_free_line_components(colors), 0);
 	i = -1;
@@ -40,45 +40,45 @@ int ft_check_colors(char *component)
 			return (ft_free_line_components(colors), 0);
 		color = ft_atod(colors[i]);
 		if (color < 0 || color > 255)
-			return (ft_free_line_components(colors), 0);         
+			return (ft_free_line_components(colors), 0);
 	}
 	ft_free_line_components(colors);
 	return (1);
 }
 
-int ft_check_elements(char *component)
+int	ft_check_elements(char *component)
 {
-	char **coordinates;
-	int i;
+	char	**coordinates;
+	int		i;
 
 	i = -1;
-	coordinates = split(component,",");
+	coordinates = split(component, ",");
 	if (ft_count_components(coordinates) != 3)
-		return ( ft_free_line_components(coordinates),0);
+		return (ft_free_line_components(coordinates), 0);
 	while (coordinates[++i])
 	{
 		if (!ft_is_degit(coordinates[i]))
 			return (ft_free_line_components(coordinates), 0);
 	}
-	return ( ft_free_line_components(coordinates),1);
+	return (ft_free_line_components(coordinates), 1);
 }
 
-int ft_check_non_negative(char *component)
+int	ft_check_non_negative(char *component)
 {
-	double value;
+	double	value;
 
 	value = ft_atod(component);
 	if (value < 0)
-		return 0;
-	return 1;
+		return (0);
+	return (1);
 }
 
-int ft_check_fov(char *component)
+int	ft_check_fov(char *component)
 {
-	double fov;
+	double	fov;
 
 	fov = ft_atod(component);
 	if (fov < 0 || fov > 180)
-		return 0;
-	return 1;
+		return (0);
+	return (1);
 }

@@ -10,18 +10,18 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "../../includes/minirt.h"
+#include "../../includes/minirt.h"
 
-int ft_is_whitespace(char c)
+int	ft_is_whitespace(char c)
 {
 	return (c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\v');
 }
 
-double  get_fractional(char *str, int i)
+double	get_fractional(char *str, int i)
 {
-	double  fractional_part;
-	double  divisor ;
-	
+	double	fractional_part;
+	double	divisor;
+
 	fractional_part = 0.0;
 	divisor = 10.0;
 	while (str[++i] && (str[i] >= '0' && str[i] <= '9'))
@@ -32,12 +32,15 @@ double  get_fractional(char *str, int i)
 	return (fractional_part);
 }
 
-double  ft_atod(char *str)
+double	ft_atod(char *str)
 {
-	double result = 0.0;
-	int i = 0;
-	int sign = 1;
+	double	result;
+	int		i;
+	int		sign;
 
+	result = 0.0;
+	i = 0;
+	sign = 1;
 	while (ft_is_whitespace(str[i]))
 		i++;
 	if (str[i] == '-')
@@ -45,7 +48,7 @@ double  ft_atod(char *str)
 		sign = -1;
 		i++;
 	}
-	else if (str[i] == '+') 
+	else if (str[i] == '+')
 		i++;
 	i--;
 	while (str[++i] && (str[i] >= '0' && str[i] <= '9'))
@@ -55,27 +58,28 @@ double  ft_atod(char *str)
 	return (result * sign);
 }
 
-int is_empty_line(char *line)
-{   
-	int i = 0;
-	
+int	is_empty_line(char *line)
+{
+	int	i;
+
+	i = 0;
 	if (!line || line[0] == '\n')
 		return (1);
 	while (line[i])
 	{
 		if (!ft_is_whitespace(line[i]))
-			return 0;
+			return (0);
 		i++;
 	}
-	return 1;
+	return (1);
 }
 
-int ft_check_file_name(char *filename)
+int	ft_check_file_name(char *filename)
 {
-	char *extention;
+	char	*extention;
 
 	extention = ft_strrchr(filename, '.');
 	if (extention && ft_strcmp(extention, ".rt") == 0)
-		return 1;
-	return 0;
+		return (1);
+	return (0);
 }

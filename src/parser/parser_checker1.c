@@ -10,22 +10,22 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "../../includes/minirt.h"
+#include "../../includes/minirt.h"
 
-int ft_check_norm_range(char *comp)
+int	ft_check_norm_range(char *comp)
 {
-	double tmp ;
+	double	tmp;
 
 	tmp = ft_atod(comp);
-	if (tmp  < -1 || tmp > 1)
-		return 0;
-	return 1;
+	if (tmp < -1 || tmp > 1)
+		return (0);
+	return (1);
 }
 
-int ft_check_norm(char *component)
+int	ft_check_norm(char *component)
 {
-	char **norm;
-	int i;
+	char	**norm;
+	int		i;
 
 	i = -1;
 	norm = split(component, ",");
@@ -34,18 +34,17 @@ int ft_check_norm(char *component)
 		if (!ft_check_norm_range(norm[i]))
 		{
 			ft_free_line_components(norm);
-			return 0;
+			return (0);
 		}
 	}
 	ft_free_line_components(norm);
-	return  1;
+	return (1);
 }
 
-
-int ft_check_ambient_component(char **components, int *counter)
+int	ft_check_ambient_component(char **components, int *counter)
 {
 	if (ft_count_components(components) != 3)
-		return 0;
+		return (0);
 	if (!ft_check_range(components[1]))
 		return (0);
 	if (!ft_check_colors(components[2]))
@@ -54,7 +53,7 @@ int ft_check_ambient_component(char **components, int *counter)
 	return (1);
 }
 
-int ft_check_camera_component(char **components, int *counter)
+int	ft_check_camera_component(char **components, int *counter)
 {
 	if (ft_count_components(components) != 4)
 		return (0);
@@ -68,7 +67,7 @@ int ft_check_camera_component(char **components, int *counter)
 	return (1);
 }
 
-int ft_check_light_component(char **components, int *counter)
+int	ft_check_light_component(char **components, int *counter)
 {
 	if (ft_count_components(components) != 4)
 		return (0);
@@ -79,6 +78,5 @@ int ft_check_light_component(char **components, int *counter)
 	if (!ft_check_colors(components[3]))
 		return (0);
 	(counter)[2]++;
-	// printf("light components are valid\n");
 	return (1);
 }

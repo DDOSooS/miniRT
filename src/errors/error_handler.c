@@ -10,17 +10,17 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "../../includes/minirt.h"
+#include "../../includes/minirt.h"
 
-void error_handler(int i, int line, char *identifier)
+void	error_handler(int i, int line, char *identifier)
 {
-    if (i == 0)
-    {
-        printf("line %d: \n", line);
-        printf("identifier is not a valid identifier (%s)\n", identifier);
-    }
-    else if (i == 1)
-        printf("Error at map checking line component at line %d \n", line);
-    else if (i == 2)
-        printf("duplicated of elements that must be declared just Once\n");
+	if (i == 0)
+	{
+		printf("line %d: \n", line);
+		printf("identifier is not a valid identifier (%s)\n", identifier);
+	}
+	else if (i == 1)
+		printf("Error at map checking line component at line %d \n", line);
+	else if (i == 2)
+		printf("duplicated of elements that must be declared just Once\n");
 }

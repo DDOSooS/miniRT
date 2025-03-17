@@ -10,16 +10,15 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "../../includes/minirt.h"
+#include "../../includes/minirt.h"
 
-
-t_plane *ft_new_plane(char **components)
+t_plane	*ft_new_plane(char **components)
 {
-	t_plane *plane;
+	t_plane	*plane;
 
 	plane = malloc(sizeof(t_plane));
 	if (!plane)
-		return NULL;
+		return (NULL);
 	ft_gen_elements(&plane->plane_cordinates, components[1]);
 	ft_gen_elements(&plane->plane_normal, components[2]);
 	ft_gen_colors(&plane->plane_color, components[3]);
@@ -27,14 +26,14 @@ t_plane *ft_new_plane(char **components)
 	plane->material = default_material();
 	plane->material->color = plane->plane_color;
 	plane->next = NULL;
-	return plane;
+	return (plane);
 }
 
-int ft_add_plane(t_scene **scene, char **components)
+int	ft_add_plane(t_scene **scene, char **components)
 {
-	t_plane *new;
-	t_plane *tmp;
-	
+	t_plane	*new;
+	t_plane	*tmp;
+
 	new = ft_new_plane(components);
 	tmp = (*scene)->plane;
 	if (!tmp)
@@ -45,5 +44,5 @@ int ft_add_plane(t_scene **scene, char **components)
 			tmp = tmp->next;
 		tmp->next = new;
 	}
-	return 1;
+	return (1);
 }
