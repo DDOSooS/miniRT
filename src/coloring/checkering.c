@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 03:28:23 by mkartit           #+#    #+#             */
-/*   Updated: 2025/03/17 06:10:33 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/03/17 09:36:07 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,6 @@ t_color	handle_checkered_sphere(t_world *world, t_compose *comp, t_light *light,
 {
 	float	u;
 	float	v;
-	int		shadowed;
 	t_color	base_color;
 
 	u = 0;

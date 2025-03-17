@@ -6,50 +6,11 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 02:21:45 by aghergho          #+#    #+#             */
-/*   Updated: 2025/03/17 02:21:55 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/03/17 09:15:29 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./../includes/minirt.h"
-
-void	ft_free_camera(t_scamera **cam)
-{
-	ft_free_matrix((*cam)->transform, 4);
-	free(*cam);
-}
-
-void	ft_free_sphere(t_sphere *sphere, t_var *data)
-{
-	t_sphere	*tmp;
-
-	while (sphere)
-	{
-		tmp = sphere->next;
-		ft_free_matrix(sphere->transform, 4);
-		if (sphere->has_texture)
-		{
-			mlx_destroy_image(data->mlx, sphere->texture->img_ptr);
-			free(sphere->texture);
-		}
-		free(sphere->material);
-		free(sphere);
-		sphere = tmp;
-	}
-}
-
-void	ft_free_cylinder(t_cylinder *cy)
-{
-	t_cylinder	*tmp;
-
-	while (cy)
-	{
-		tmp = cy->next;
-		ft_free_matrix(cy->transform, 4);
-		free(cy->material);
-		free(cy);
-		cy = tmp;
-	}
-}
+#include "../includes/minirt.h"
 
 void	ft_free_plane(t_plane *pl)
 {

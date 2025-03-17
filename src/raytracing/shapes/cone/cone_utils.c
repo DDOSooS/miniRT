@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   cone_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkartit <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/16 21:03:01 by mkartit           #+#    #+#             */
-/*   Updated: 2025/03/16 21:03:03 by mkartit          ###   ########.fr       */
+/*   Updated: 2025/03/17 09:17:43 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../../includes/minirt.h"
+#include "../../../../includes/minirt.h"
 
 void	copy_matrix_cone(float **dst, float temp_matrix[4][4])
 {

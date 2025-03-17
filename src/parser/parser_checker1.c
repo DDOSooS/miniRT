@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 01:58:23 by aghergho          #+#    #+#             */
-/*   Updated: 2025/03/17 02:22:04 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/03/17 10:21:03 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ int	ft_check_norm(char *component)
 	int		i;
 
 	i = -1;
-	norm = split(component, ",");
+	norm = ftt_split(component, ",");
 	while (++i < 3)
 	{
 		if (!ft_check_norm_range(norm[i]))

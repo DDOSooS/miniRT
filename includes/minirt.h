@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 18:25:24 by aghergho          #+#    #+#             */
-/*   Updated: 2025/03/17 06:19:32 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/03/17 10:22:58 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,6 +109,13 @@ typedef struct s_material
 	float				specular;
 	float				shininess;
 }						t_material;
+
+typedef struct s_rmatrix
+{
+	float				cos_theta;
+	float				sin_theta;
+	float				one_minus_cos;
+}						t_matrix;
 
 typedef struct light_s
 {
@@ -305,7 +312,22 @@ typedef struct s_quadratic
 	float				a;
 	float				b;
 	float				c;
+	float				t1;
+	float				t2;
 }						t_quadratic;
+
+typedef struct set_view_matrix
+{
+	t_vector			up_n;
+	t_vector			left_v;
+	t_vector			forward_v;
+}						t_view_matrix;
+
+typedef struct s_world_system
+{
+	float				world_x;
+	float				world_y;
+}						t_world_sys;
 
 typedef struct s_intdata
 {
@@ -322,6 +344,19 @@ typedef struct s_lighting
 	int					shadow;
 }						t_lighting;
 
+typedef struct s_cylinder_equation
+{
+	float				a;
+	float				b;
+	float				c;
+	float				discriminant;
+	t_ray				tr_ray;
+	float				sol[4];
+	float				half_height;
+	int					counter;
+	int					is_inside;
+	float				min_t;
+}						t_cylinder_eq;
 /*parsing utils*/
 int						ft_gen_elements(t_vector *coordinates,
 							char *components);
@@ -343,8 +378,7 @@ t_color					int_to_color(int color);
 int						ft_close_window(t_scene *scen);
 void					my_pixel_put(t_img *img, int x, int y, int color);
 t_map_line				*ft_gen_scen_map(char *file_name);
-int						render_image(t_scene *scene, t_world *t_world,
-							t_scamera *cam);
+int						render_image(t_scene *scene, t_scamera *cam);
 void					display_progress(t_scene *scene, t_scamera *cam,
 							int current_pixel, int total_pixels);
 int						ft_generate_scene(t_map_line *compoenent,
@@ -377,7 +411,6 @@ t_color					ft_scale_color(t_color c, float scalar);
 t_color					ft_multiply_color(t_color c1, t_color c2);
 t_vector				negate_vector(t_vector vector);
 int						compare_vector(float a, float b);
-t_vector				normalize_at_plane_pos(t_plane *plane, t_point w_p);
 t_vector				reflect_vector(t_vector, t_vector);
 t_color					ft_multiply_color_scalar(t_color color, float scalar);
 /* end of color manipulation*/
@@ -395,8 +428,9 @@ float					**get_minor(float **m, int row, int col, int n);
 float					determinant(float **m, int n);
 float					**inverse_matrix(float **m, int n);
 void					ft_scale_matrix(float ***m, float scale, int n);
+t_intersection			ft_init_intersection(int type);
 // float				**ft_scaling_matrix(float x, float y, float z,
-					// int inverse);
+// int inverse);
 float					**ft_translate_matrix(t_point point, int inverse);
 t_point					ft_transform(t_point p1, t_point p2, int inverse);
 float					**shearing_matrix(int *coord);
@@ -437,7 +471,8 @@ t_sphere				*ft_new_sphere(char **components, t_scene **scene);
 int						ft_add_sphere(t_scene **scene, char **components);
 
 int						ft_is_whitespace(char c);
-double					ft_atod(char *str);
+char					**ftt_split(char const *s, char *delimiter);
+double 					ft_atod(char *str);
 double					get_fractional(char *str, int i);
 int						is_empty_line(char *line);
 int						ft_check_file_name(char *filename);
@@ -529,13 +564,23 @@ t_color					get_lighting_color(t_material *material, t_light *light,
 t_vector				normilize_at_sphere_pos(t_sphere *sphere, t_point w_p);
 t_color					process_light(t_world *world, t_compose *comp,
 							t_light *light, t_material *material);
+t_material				*get_object_material(void *obj, int obj_type);
 void					get_spherical_coordinates(t_vector hit_point,
 							t_sphere *sphere, float *u, float *v);
+t_color					shading_hit(t_world *world, t_compose *comp);
+
 t_color					handle_checkered_sphere(t_world *world, t_compose *comp,
 							t_light *light, t_material *material);
-float	**get_combined_inv(t_cylinder *cy);
-t_color handle_textured_sphere(t_world *world, t_compose *comp,
-		t_light *light, t_material *material);
+float					**get_combined_inv(t_cylinder *cy);
+t_color					handle_textured_sphere(t_world *world, t_compose *comp,
+							t_light *light, t_material *material);
+t_color					get_color_at(t_world *world, t_ray ray);
+t_vector				vector_mult_scalar(t_vector v, float scalar);
+float					**copy_matrix(float **m);
+t_vector				matrix_multiply_vector(float **m, t_vector v);
+float					**rotation_matrix(t_vector axis, float angle);
+float					**translation_matrix(float x, float y, float z);
+
 /* end of ray manipulation functions*/
 
 /* scene manipulation functions*/
@@ -555,7 +600,6 @@ int						is_shadowed(t_world *world, t_light *light,
 float					clamp(float value, float min, float max);
 t_vector				ft_scale_vector(t_vector vector, float scale);
 t_point					ft_multiply_matrix_point(float **m, t_point v);
-float					**create_rotation_matrix_from_vector(t_vector orientation);
 t_point					ft_scale_point(t_point vector, float scale);
 
 t_intersection			ft_intersect_cone(t_ray ray, t_cone *cone);
@@ -567,11 +611,74 @@ t_vector				normalize_at_cone_pos(t_cone *cone, t_vector point);
 
 /* end of scene manipulation functions*/
 
+/*shapes intersection*/
+int						check_cylinder_caps(t_ray *ray, float t, float radius);
+t_intersection			check_intersection_caps(t_ray ray, t_cylinder *cylinder,
+							float cap);
+float					get_min_sol(float *arr, int len);
+int						is_point_inside_cylinder(t_point point,
+							t_cylinder *cylinder);
+void					calculate_cylinder_discriment(t_cylinder_eq *tmp,
+							t_cylinder *cylinder, t_ray ray, float **inverse);
+void					descriminant_intersction(t_cylinder_eq *tmp);
+void					set_result_equation(t_intersection *result,
+							t_cylinder_eq *tmp, t_ray ray,
+							t_cylinder *cylinder);
+t_intersection			ft_init_intersection(int type);
+t_intersection			ft_intersect_cylinder(t_ray ray, t_cylinder *cylinder);
+t_vector				normalize_at_cylinder_pos(t_cylinder *cylinder,
+							t_point world_p);
+float					**create_rotation_matrix_from_vector(t_vector orientation);
+float					**get_combined_inv(t_cylinder *cy);
+void					ft_add_cylinder_shape(t_world *world,
+							t_cylinder *cylinder);
+
+t_intersection			ft_intersect_plane(t_ray ray, t_plane *plane);
+t_vector				normalize_at_plane_pos(t_plane *plane);
+void					ft_add_plane_shape(t_world *world, t_plane *plane);
+
+float					calculate_discriment(t_quadratic *tmp, t_ray ray,
+							t_sphere *sphere);
+void					ft_set_equation_sol(t_intersection *result,
+							t_sphere *sphere, float closest_t);
+t_intersection			intersect_world(t_world *world, t_ray ray);
+t_compose				*init_composition(t_intersection inter, t_ray ray);
+t_point					position(t_ray ray, float distance);
+t_ray					transform(t_ray ray, float **m);
+t_point					point_add(t_point point, t_vector p2);
+int						calculate_pixel_color(t_world *world, t_ray ray);
+t_ray					create_ray(t_point origin, t_vector dir);
+void					rotation_matrix_helper(t_matrix tr, t_vector axis,
+							float rotation_matrix[4][4]);
+void					create_rotation_matrix(t_vector axis, float angle,
+							float rotation_matrix[4][4]);
+t_ray					get_ray_pixel(t_scamera *cam, float x, float y,
+							float edge);
+void					render_pixel(t_scene *scene, t_scamera *cam, int x,
+							int y);
+
+/*shapes functions*/
+t_shape					*ft_new_shape(void *shape_obj, int shape_type);
+void					ft_add_shape(t_world **root, void *new, int shape);
+void					ft_add_sphere_shape(t_world *world, t_sphere *sphere);
+void					ft_add_cone_shape(t_world *world, t_cone *cone);
+void					ft_add_plight(t_world *world, t_light *light);
+
+/*hooks event*/
+void					setup_window_hooks(t_scene *scene);
+int						key_hook(int keycode, t_scene *data);
+
 /* destroy scen functions */
+
+int						ft_close(t_var *vars);
 void					ft_destroy_scene(t_scene *scen);
 void					ft_free_map(t_map_line **map_lines);
 void					ft_free_map_line(t_map *map);
 void					ft_free_line_components(char **components);
 void					ft_free(char ***words, int size);
+void					free_matrix(float **m);
+void					ft_free_camera(t_scamera **cam);
+void					ft_free_sphere(t_sphere *sphere, t_var *data);
+void					ft_free_cylinder(t_cylinder *cy);
 
 #endif /* MINIRT_H */

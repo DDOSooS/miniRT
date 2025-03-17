@@ -106,7 +106,7 @@ int	main(void)
 	for (int i = 0; words[i]; i++)
 	{
 			printf("%s\n", words[i]);
-	        printf("Length: %zu\n", strlen(words[i]));
+			printf("Length: %zu\n", strlen(words[i]));
 	}
 	return (0);
 }

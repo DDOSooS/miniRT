@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   cone_norm.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkartit <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/16 21:30:27 by mkartit           #+#    #+#             */
-/*   Updated: 2025/03/16 21:30:28 by mkartit          ###   ########.fr       */
+/*   Updated: 2025/03/17 09:37:02 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../../includes/minirt.h"
+#include "../../../../includes/minirt.h"
 
-static float	**matrix_inverse(float **m)
+static float	**matrix_inverse(void)
 {
 	return (create_identity_matrix(4));
 }
@@ -41,7 +41,7 @@ t_vector	normalize_at_cone_pos(t_cone *cone, t_vector point)
 	transform = create_cone_transform(cone);
 	local_point = matrix_multiply_vector(transform, point);
 	normal = compute_local_normal(local_point);
-	inverse_transform = matrix_inverse(transform);
+	inverse_transform = matrix_inverse();
 	world_normal = matrix_multiply_vector(inverse_transform, normal);
 	free_matrix(transform);
 	free_matrix(inverse_transform);

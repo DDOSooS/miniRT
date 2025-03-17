@@ -33,19 +33,19 @@ size_t	ft_strlcpy(char *dst, const char *src, size_t size)
 /*=====================testing part===============
 int test (char *str)
 {
-    int len ;
-
-    len = ft_strlen(str);
-    return (len);
+	int len ;
+	len = ft_strlen(str);
+	return (len);
 }
-#include<stdio.h>
+#include <stdio.h>
 #include <string.h>
-int main(void)
-{
-    char str[100];
 
-    strcpy(str," abdeeeeeeeee");
-    printf("%d\n",test("hello"));
-    return (0);
+int	main(void)
+{
+	char	str[100];
+
+	strcpy(str," abdeeeeeeeee");
+	printf("%d\n",test("hello"));
+	return (0);
 }
 =================================================*/

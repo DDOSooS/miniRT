@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 02:10:05 by aghergho          #+#    #+#             */
-/*   Updated: 2025/03/17 02:11:48 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/03/17 08:15:08 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,19 +83,17 @@ void	set_view_matrix(float **m, t_vector left_v, t_vector up_n,
 
 float	**get_view_transform(t_point from_v, t_vector to_v, t_vector up_v)
 {
-	t_vector	forward_v;
-	t_vector	left_v;
-	t_vector	up_n;
-	float		**view_transform;
-	float		**res;
-	float		**traslate_mx;
+	t_view_matrix	view_mx;
+	float			**view_transform;
+	float			**res;
+	float			**traslate_mx;
 
-	forward_v = vector_normilze(to_v);
-	up_n = vector_normilze(up_v);
-	left_v = vector_cross(forward_v, up_n);
-	up_v = vector_cross(left_v, forward_v);
+	view_mx.forward_v = vector_normilze(to_v);
+	view_mx.up_n = vector_normilze(up_v);
+	view_mx.left_v = vector_cross(view_mx.forward_v, view_mx.up_n);
+	up_v = vector_cross(view_mx.left_v, view_mx.forward_v);
 	view_transform = identity_matrix(4);
-	set_view_matrix(view_transform, left_v, up_v, forward_v);
+	set_view_matrix(view_transform, view_mx.left_v, up_v, view_mx.forward_v);
 	traslate_mx = ft_translate_matrix(ft_new_point(-from_v.x, -from_v.y,
 				-from_v.z), 1);
 	res = ft_multiply_matrix(view_transform, traslate_mx, 4, 4);

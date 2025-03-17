@@ -29,16 +29,17 @@ int	ft_strncmp(const char *s1, const char *s2, size_t n)
 }
 
 /*================TESTING PART==============
-#include<stdio.h>
+#include <stdio.h>
 
 int main ()
 {
-    char s1[100];
-    char s2[100];
-    strcpy(s1,"adbde");
-    strcpy(s2,"abdee");
-    printf("%d\n",strncmp("test\200", "test\0", 6));
-  	printf("%d", ft_strncmp("test\200", "test\0", 6));
-   	return (0);
+	char	s1[100];
+	char	s2[100];
+
+	strcpy(s1,"adbde");
+	strcpy(s2,"abdee");
+	printf("%d\n",strncmp("test\200", "test\0", 6));
+	printf("%d", ft_strncmp("test\200", "test\0", 6));
+	return (0);
 }
 ===========================================*/

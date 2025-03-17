@@ -37,14 +37,13 @@ size_t	ft_strlcat(char *dest, const char *src, size_t size)
 /*===========TESTING PART==================
 int	main(void)
 {
-    char dst[100];
-    char src[100];
+	char	dst[100];
+	char	src[100];
 
-    
-    strcpy(src, "abde");
-    strcpy(dst, "gher");
-    ft_strlcat(dst, src, 100);
-    printf("%s\n", dst);
-    return (0);
+	strcpy(src, "abde");
+	strcpy(dst, "gher");
+	ft_strlcat(dst, src, 100);
+	printf("%s\n", dst);
+	return (0);
 }
 ========================================*/

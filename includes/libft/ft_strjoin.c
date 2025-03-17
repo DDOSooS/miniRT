@@ -38,15 +38,17 @@ char	*ft_strjoin(char const *s1, char const *s2)
 /*=====================TESTING PART==================
 #include <stdio.h>
 
-int    main(void)
+int	main(void)
 {
-    char    *str1 = "Hello";
-    char    *str2 = " World";
-    char    *str3 = ft_strjoin(str1, str2);
+	char	*str1;
+	char	*str2;
+	char	*str3;
 
-    printf("%s\n", str3);
-
-    free(str3);
-    return (0);
-} 
+	str1 = "Hello";
+	str2 = " World";
+	str3 = ft_strjoin(str1, str2);
+	printf("%s\n", str3);
+	free(str3);
+	return (0);
+}
 =====================================================*/

@@ -29,13 +29,12 @@ char	*ft_strchr(const char *s, int c)
 }
 
 /*------------------TESTING PART------------
-int main(void)
+int	main(void)
 {
-     char *str;
+		char *str;
 
-     str = "Hello World";
-     printf("%s\n", strchr(str, '\0'));
-     printf("%s\n", ft_strchr(str, '\0'));
-
+		str = "Hello World";
+		printf("%s\n", strchr(str, '\0'));
+		printf("%s\n", ft_strchr(str, '\0'));
 }
 --------------------------------------------*/

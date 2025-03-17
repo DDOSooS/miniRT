@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 01:59:17 by aghergho          #+#    #+#             */
-/*   Updated: 2025/03/17 02:38:47 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/03/17 09:47:14 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,11 +55,9 @@ int	ft_check_map_components(t_map **map)
 	t_map_line	*tmp;
 	int			identifier_id;
 	int			i;
-	t_map_line	*line;
 
 	i = 0;
 	tmp = (*map)->lines;
-	line = (*map)->lines;
 	while (tmp)
 	{
 		identifier_id = is_identifier(tmp->line_component[0]);

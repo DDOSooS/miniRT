@@ -6,7 +6,7 @@
 /*   By: aghergho <aghergho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/16 20:24:10 by aghergho          #+#    #+#             */
-/*   Updated: 2025/03/17 06:15:39 by aghergho         ###   ########.fr       */
+/*   Updated: 2025/03/17 10:21:06 by aghergho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ int	ft_gen_elements(t_vector *coordinates, char *components)
 {
 	char	**tmp_cord;
 
-	tmp_cord = split(components, ",");
+	tmp_cord = ftt_split(components, ",");
 	if (!tmp_cord)
 		return (0);
 	*coordinates = ft_new_vector(ft_atod(tmp_cord[0]), ft_atod(tmp_cord[1]),

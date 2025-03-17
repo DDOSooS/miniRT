@@ -27,12 +27,12 @@ int	ft_memcmp(const void *s1, const void *s2, size_t n)
 /*=======================Testing Part=============
 int main ()
 {
-    void    *str;
-    void    *str1;
-    
-    str1 = "Aabdess";
-    str = "Aabde";
-    printf("%d\n",ft_memcmp(str,str1,5));
-    return (0);
+	void	*str;
+	void	*str1;
+
+	str1 = "Aabdess";
+	str = "Aabde";
+	printf("%d\n",ft_memcmp(str,str1,5));
+	return (0);
 }
 ====================================================*/
