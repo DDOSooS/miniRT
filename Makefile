@@ -7,7 +7,14 @@ LIBFT = ./includes/libft/libft.a
 MLX = ./minilibx-linux/libmlx.a
 
 name = miniRT
-src = main.c ./src/parser/parsing.c \
+src = main.c\
+	./src/parser/parsing.c \
+	./src/parser/parse_shapes.c\
+	./src/coloring/parser_texture.c\
+	./src/coloring/coloring.c\
+	./src/coloring/texturing.c\
+	./src/coloring/checkering.c\
+	./src/coloring/utils.c\
 	./includes/get_next_line/get_next_line.c \
 	./includes/get_next_line/get_next_line_utils.c \
 	./src/operations/vec_utils.c ./src/raytracing/ray_utils.c \

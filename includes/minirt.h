@@ -23,11 +23,11 @@
 # include <stdlib.h>
 # include <unistd.h>
 
-// # define SCREEN_WIDTH 1280.f
-// # define SCREEN_HEIGHT 720.f
+# define SCREEN_WIDTH 1280.f
+# define SCREEN_HEIGHT 720.f
 
-# define SCREEN_WIDTH 150.f
-# define SCREEN_HEIGHT 150.f
+// # define SCREEN_WIDTH 150.f
+// # define SCREEN_HEIGHT 150.f
 
 # define EPSILON 1e-4f
 # define PI 3.14159265359
@@ -292,6 +292,32 @@ typedef struct s_intdata
 	float	t2;
 }					t_intdata;
 
+typedef struct s_lighting
+{
+	t_color		texture_color;
+	t_material	*material;
+	t_light		*light;
+	t_compose	*comp;
+	int			shadow;
+}					t_lighting;
+
+
+/*parsing utils*/
+int					ft_gen_elements(t_vector *coordinates, char *components);
+double  ft_atod(char *str);
+int ft_gen_colors(t_color *color,char *components);
+int	ft_add_cone(t_scene **scene, char **components);
+int ft_add_sphere(t_scene **scene, char **components);
+int ft_count_components(char **components);
+int get_texture(t_sphere *sphere, char *texture_name, t_scene **scene);
+int	handle_sphere_texture(t_sphere *sphere, char **components, int comp_count,
+		t_scene **scene);
+t_color	handle_textured_sphere(t_world *world, t_compose *comp, t_light *light,
+		t_material *material);
+t_color	sample_texture(t_texture *texture, float u, float v);
+t_color	int_to_color(int color);
+/*end of parsing utils*/
+
 int					ft_close_window(t_scene *scen);
 void				my_pixel_put(t_img *img, int x, int y, int color);
 t_map_line			*ft_gen_scen_map(char *file_name);
@@ -383,6 +409,12 @@ t_point				position(t_ray ray, float distance);
 t_color				get_lighting_color(t_material *material, t_light *light,
 						t_compose *comp, int shadow, t_color base_color);
 t_vector			normilize_at_sphere_pos(t_sphere *sphere, t_point w_p);
+t_color	process_light(t_world *world, t_compose *comp, t_light *light, t_material *material);
+void get_spherical_coordinates(t_vector hit_point, t_sphere *sphere, float *u, float *v);
+t_color handle_checkered_sphere(t_world *world, t_compose *comp, t_light *light, t_material *material);
+
+t_color	handle_textured_sphere(t_world *world, t_compose *comp, t_light *light,
+		t_material *material);
 /* end of ray manipulation functions*/
 
 /* scene manipulation functions*/
